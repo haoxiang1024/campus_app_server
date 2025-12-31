@@ -1,0 +1,27 @@
+server:
+  servlet:
+    context-path: /school
+  port: 8081
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/school_app?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 100MB
+      location: ./temp/tomcat/
+  web:
+    resources:
+      static-locations:
+        - classpath:/static/
+        - file:./src/main/resources/static/  # 映射项目内的src/static
+
+# 关键：file和spring同级（缩进和spring一致），解决配置无法识别问题
+file:
+  upload:
+    # 路径改为相对路径（./开头），指向项目根目录下的src
+    path: ./school/upload/
