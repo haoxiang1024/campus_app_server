@@ -18,7 +18,7 @@ public class SpringMvcSupport extends WebMvcConfigurationSupport {
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
         // 1. 原有static目录映射（保留）
-        registry.addResourceHandler("/static/**")
+        registry.addResourceHandler("/**")
                 .addResourceLocations("classpath:/static/");
 
         // 2. 核心修正：映射upload目录

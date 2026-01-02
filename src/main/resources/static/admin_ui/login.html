@@ -1,0 +1,101 @@
+<!--
+	Author: W3layouts
+	Author URL: http://w3layouts.com
+	License: Creative Commons Attribution 3.0 Unported
+	License URL: http://creativecommons.org/licenses/by/3.0/
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>校园失物招领系统 - 管理员登录</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link href="./css/style-login.css" rel="stylesheet" type="text/css" media="all"/><!--stylesheet-css-->
+    <script src="./js/vue.js"></script>
+    <script src="./js/jquery.js"></script>
+    <style>
+        /* 移除标签页样式（已删除标签页模块，无需保留） */
+    </style>
+</head>
+<body>
+<h1>校园失物招领网站系统 - 管理员登录</h1>
+
+<div class="w3l-form" id="app">
+    <div class="w3l-grids-from2">
+        <div class="w3l-user2">
+            <div class="agile">
+                <div class="w3l-signup5" style="">
+                    <form action="#" method="post">
+                        <!-- 移除身份认证标签页、学校选择下拉框 -->
+
+                        <!-- 管理员账号输入框 -->
+                        <input v-model="user.username" type="text" placeholder="管理员账号" required=""/>
+                        <!-- 管理员密码输入框 -->
+                        <input v-model="user.password" type="password" placeholder="管理员密码" required=""/>
+                        <!-- 移除验证码相关模块 -->
+
+                        <!-- 登录按钮 -->
+                        <input @click="submit" type="button" class="btn" value="登录"/>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <footer>
+        &copy; 2019 校园失物招领网站系统 | <a href="http://www.ecit.edu.cn/" target="_blank">ECUT</a>
+    </footer>
+</div>
+
+<script src="./js/layer.js"></script>
+<script src="js/mine/common.js"></script>
+<script>
+    var app = new Vue({
+        el: "#app",
+        data: {
+            user: {
+                username: "admin", // 管理员默认账号
+                password: "admin123" // 管理员默认密码
+            }
+        },
+        methods: {
+            // 移除changeTab、changeSelect、newCode方法
+            submit: function () {
+                // 移除学校选择校验
+                let me = this;
+                // 管理员登录接口（可根据后端实际接口调整）
+                $.ajax({
+                    url: baseUrl + "/admin/login",
+                    method: "POST",
+                    data: JSON.stringify(this.user),
+                    success: function (res, status) {
+                        if (status == "success") {
+                            if (res.success) {
+                                showOK("管理员登录成功！");
+                                saveSession("user", res.data.user);
+                                // 管理员登录后跳转到后台管理首页
+                                location.replace("admin_index.html");
+
+                                // 清空密码
+                                me.user.password = "";
+                            } else {
+                                showAlertError(res.msg);
+                            }
+                        } else {
+                            console.log(res);
+                            alert(res)
+                        }
+                    },
+                });
+            }
+        }
+    });
+
+    $(function () {
+        // 移除验证码高度设置、学校列表加载逻辑
+    });
+
+    // 移除get方法（无需加载学校列表）
+</script>
+</body>
+</html>
