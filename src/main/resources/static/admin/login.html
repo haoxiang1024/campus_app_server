@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>校园失物招领系统 - 管理员登录</title>
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; display: flex; align-items: center; height: 100vh; }
+        .login-card { width: 100%; max-width: 400px; margin: auto; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); background: #fff; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <h3 class="text-center mb-4">校园失物招领系统后台</h3>
+    <form id="loginForm">
+        <div class="mb-3">
+            <label class="form-label">用户名</label>
+            <input type="text" name="username" class="form-control" required placeholder="请输入管理员账号">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">密码</label>
+            <input type="password" name="password" class="form-control" required placeholder="请输入密码">
+        </div>
+        <button type="submit" class="btn btn-primary w-100">登录</button>
+    </form>
+</div>
+
+<script src="./js/jquery.min.js"></script>
+<script>
+    $('#loginForm').on('submit', function(e) {
+        e.preventDefault();
+
+        // 获取表单数据
+        const loginData = {
+            username: $('input[name="username"]').val(),
+            password: $('input[name="password"]').val()
+        };
+
+        $.ajax({
+            url: '/school/admin/login',
+            type: 'POST',
+            data: loginData,
+            success: function(res) {
+                console.log("服务器返回：", res);
+                if (res.status === 0) {
+                   // alert('登录成功！');
+                    // 将后端返回的完整的 Admin 对象存入 Session
+                    sessionStorage.setItem("admin", JSON.stringify(res.data));
+                    window.location.href = 'index.html';
+                } else {
+                    // 显示后端返回的具体错误信息
+                    alert('错误：' + (res.msg || '用户名或密码不正确'));
+                }
+            },
+            error: function() {
+                alert('服务器连接失败，请检查后端服务是否启动');
+            }
+        });
+    });
+</script>
+</body>
+</html>

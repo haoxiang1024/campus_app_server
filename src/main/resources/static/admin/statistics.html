@@ -1,0 +1,76 @@
+<div class="animation-fadeIn">
+    <h4 class="mb-4 text-dark fw-bold"><i class="fa fa-chart-line me-2"></i>概览</h4>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="flex-shrink-0 bg-primary bg-opacity-10 p-3 rounded-3 me-3">
+                        <i class="fa fa-users fa-2x text-primary"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase">总用户数</div>
+                        <h2 class="mb-0 fw-bold" id="s_totalUsers">0</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="flex-shrink-0 bg-warning bg-opacity-10 p-3 rounded-3 me-3">
+                        <i class="fa fa-box-open fa-2x text-warning"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase">累计丢失物品</div>
+                        <h2 class="mb-0 fw-bold text-warning" id="s_totalLost">0</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="flex-shrink-0 bg-success bg-opacity-10 p-3 rounded-3 me-3">
+                        <i class="fa fa-check-circle fa-2x text-success"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase">成功找回件数</div>
+                        <h2 class="mb-0 fw-bold text-success" id="s_totalFound">0</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // 1. 获取总用户数
+        $.get('/school/admin/getAllUser', function(res) {
+            if(res.status === 0) {
+                // 如果 res.data 是数组，则用 .length；如果是直接返回的数字，则直接填入
+                const count = Array.isArray(res.data) ? res.data.length : res.data;
+                $('#s_totalUsers').text(count);
+            }
+        });
+
+        // 2. 获取丢失物品总数
+        $.get('/school/admin/getAllLost', function(res) {
+            if(res.status === 0) {
+                const count = Array.isArray(res.data) ? res.data.length : res.data;
+                $('#s_totalLost').text(count);
+            }
+        });
+
+        // 3. 获取找回物品总数
+        $.get('/school/admin/getAllFound', function(res) {
+            if(res.status === 0) {
+                const count = Array.isArray(res.data) ? res.data.length : res.data;
+                $('#s_totalFound').text(count);
+            }
+        });
+    })();
+</script>

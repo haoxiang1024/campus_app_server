@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>校园失物招领后台</title>
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
+    <link href="./css/all.min.css" rel="stylesheet">    <style>
+        :root { --sky-blue: #00aaff; --bg-color: #f0f8ff; --sidebar-dark: #2c3e50; }
+        body { font-size: .875rem; background-color: var(--bg-color); overflow-x: hidden; }
+        .navbar { background: #fff !important; border-bottom: 2px solid var(--sky-blue); height: 56px; z-index: 1001; }
+        .navbar-brand { color: var(--sky-blue) !important; font-weight: bold; }
+        .sidebar { position: fixed; top: 0; bottom: 0; left: 0; width: 240px; padding-top: 56px; background: var(--sidebar-dark); z-index: 1000; }
+        .sidebar .nav-link { color: #bdc3c7; margin: 5px 15px; border-radius: 8px; padding: 10px 15px; cursor: pointer; }
+        .sidebar .nav-link.active { background: var(--sky-blue); color: #fff !important; }
+        .main-content { margin-left: 240px; padding: 25px; width: calc(100% - 240px); box-sizing: border-box; min-height: 100vh; }
+    </style>
+</head>
+<body>
+
+<script>
+    // 权限与用户名检查
+    (function() {
+        const data = sessionStorage.getItem("admin");
+        if (!data) { window.location.href = 'login.html'; return; }
+        const admin = JSON.parse(data);
+        const check = setInterval(function() {
+            const el = document.getElementById('adminName');
+            if (el) { el.textContent = admin.username; clearInterval(check); }
+        }, 5);
+    })();
+</script>
+
+<header class="navbar navbar-expand-md sticky-top shadow-sm">
+    <a class="navbar-brand px-4" href="#"><i class="fa fa-paper-plane me-2"></i>校园失物招领管理后台</a>
+    <div class="navbar-nav ms-auto align-items-center">
+        <span class="nav-link text-dark fw-bold me-4" >用户名:</span>
+        <span class="nav-link text-dark fw-bold me-4" id="adminName"></span>
+        <a class="btn btn-outline-danger btn-sm me-3" href="#" onclick="logout()"><i class="fa fa-sign-out-alt"></i> 退出</a>
+    </div>
+</header>
+
+<div class="container-fluid">
+    <div class="row">
+        <nav class="sidebar">
+            <ul class="nav flex-column mt-3">
+                <li class="nav-item"><a class="nav-link active" data-page="statistics.html"><i class="fa fa-chart-pie me-2"></i> 数据统计</a></li>
+                <li class="nav-item"><a class="nav-link" data-page="user_manage.html"><i class="fa fa-user-friends me-2"></i> 用户管理</a></li>
+                <li class="nav-item"><a class="nav-link" data-page="lost_manage.html"><i class="fa fa-search-minus me-2"></i> 失物管理</a></li>
+                <li class="nav-item"><a class="nav-link" data-page="found_manage.html"><i class="fa fa-hand-holding-heart me-2"></i> 招领管理</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content" id="displayArea">
+        </main>
+    </div>
+</div>
+
+<script src="./js/jquery.min.js"></script>
+<script src="./js/bootstrap.bundle.min.js"></script>
+
+<script>
+    $(function() {
+        // 初始加载默认页
+        loadContent('statistics.html');
+
+        // 点击侧边栏切换
+        $('.sidebar .nav-link').click(function() {
+            const page = $(this).attr('data-page');
+            $('.sidebar .nav-link').removeClass('active');
+            $(this).addClass('active');
+            loadContent(page);
+        });
+    });
+
+    // 核心加载函数
+    function loadContent(pageName) {
+        // 使用 jQuery 的 load 方法动态加载 HTML 片段
+        $('#displayArea').load(pageName, function(response, status, xhr) {
+            if (status === "error") {
+                $('#displayArea').html('<div class="alert alert-danger">页面加载失败: ' + xhr.status + " " + xhr.statusText + '</div>');
+            }
+        });
+    }
+
+    function logout() {
+        if(confirm('确定退出吗？')) { sessionStorage.clear(); window.location.href = 'login.html'; }
+    }
+</script>
+</body>
+</html>

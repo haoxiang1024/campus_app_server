@@ -1,0 +1,139 @@
+<div class="animation-fadeIn">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="m-0 text-white">用户账号管理</h4>
+        <div class="input-group" style="max-width: 450px;">
+            <input type="text" id="userKeyword" class="form-control border-end-0 bg-dark text-white border-secondary" placeholder="搜索用户信息(昵称/手机号/email),为空则显示全部">
+            <button class="btn btn-outline-info border-start-0" type="button" id="btnSearchUser">
+                <i class="fa fa-search"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="table-card" style="background: #1a1d20; border-radius: 12px; padding: 20px; border: 1px solid #2d3238;">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle">
+                <thead>
+                <tr>
+                    <th>ID</th><th>头像</th><th>昵称</th>
+                    <th class="text-center">性别</th>
+                    <th>注册时间</th><th>手机号码</th><th>Email</th><th>操作</th>
+                </tr>
+                </thead>
+                <tbody id="userTableBody">
+                <tr><td colspan="8" class="text-center">加载中...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-between mt-3" id="paginationBar">
+            <div class="btn-group">
+                <button class="btn btn-sm btn-outline-info" id="btnFirstPage">首页</button>
+                <button class="btn btn-sm btn-outline-info" id="btnPrevPage">上一页</button>
+            </div>
+
+            <span id="pageInfo" class="align-self-center text-info fw-bold">第 1 页 / 共 1 页</span>
+
+            <div class="btn-group">
+                <button class="btn btn-sm btn-outline-info" id="btnNextPage">下一页</button>
+                <button class="btn btn-sm btn-outline-info" id="btnLastPage">末页</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        let currentPage = 1;
+        let totalPages = 1;
+        const pageSize = 10;
+
+        // 路径处理
+        function getPhotoUrl(photo) {
+            if (!photo) return './svgs/solid/circle-user.svg';
+            if (photo.startsWith('http')) return photo;
+            return '/school/upload/' + photo;
+        }
+
+        // 时间转换
+        function formatDate(ts) {
+            if (!ts) return '未设置';
+            const d = new Date(ts);
+            return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+        }
+
+        // 渲染表格
+        function renderUserTable(list) {
+            const $tbody = $('#userTableBody');
+            if (!list || list.length === 0) {
+                $tbody.html('<tr><td colspan="8" class="text-center text-muted">暂无匹配的数据</td></tr>');
+                return;
+            }
+            let html = '';
+            list.forEach(u => {
+                let sexIcon = u.sex === '男' ? '<i class="fa fa-mars text-primary"></i>' : (u.sex === '女' ? '<i class="fa fa-venus text-danger"></i>' : '-');
+                html += `<tr>
+                <td>${u.id}</td>
+                <td><img src="${getPhotoUrl(u.photo)}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;" onerror="this.src='./svgs/solid/circle-user.svg'"></td>
+                <td>${u.nickname || '未设置'}</td>
+                <td class="text-center">${sexIcon}</td>
+                <td><small class="text-muted">${formatDate(u.reg_date)}</small></td>
+                <td>${u.phone || '-'}</td>
+                <td>${u.email || '-'}</td>
+                <td>
+                    <button class="btn btn-sm btn-link text-info p-0 me-2"><i class="fa fa-edit"></i></button>
+                    <button class="btn btn-sm btn-link text-danger p-0"><i class="fa fa-trash"></i></button>
+                </td>
+            </tr>`;
+            });
+            $tbody.html(html);
+        }
+
+        // 分页加载
+        function loadUsers(page) {
+            $.get(`/school/admin/getAllUserInfo`, { page: page, size: pageSize }, function(res) {
+                if (res.status === 0) {
+                    // 核心修复：从 res.data.list 取数据，从 res.data.total 取总数
+                    const list = res.data.list || [];
+                    const total = res.data.total || 0;
+
+                    totalPages = Math.ceil(total / pageSize) || 1;
+                    currentPage = page;
+
+                    renderUserTable(list);
+                    $('#pageInfo').text(`第 ${currentPage} 页 / 共 ${totalPages} 页`);
+                    $('#paginationBar').show();
+
+                    // 按钮状态控制
+                    $('#btnFirstPage, #btnPrevPage').prop('disabled', currentPage === 1);
+                    $('#btnNextPage, #btnLastPage').prop('disabled', currentPage === totalPages);
+                }
+            });
+        }
+
+        // 搜索逻辑
+        function doSearch() {
+            const kw = $('#userKeyword').val().trim();
+            console.log(kw)
+            if (!kw) { loadUsers(1); return; }
+
+            $.get('/school/admin/searchUsers', { keyword: kw }, function(res) {
+                if (res.status === 0) {
+                    renderUserTable(res.data); // 搜索接口通常直接返回数组
+                    $('#pageInfo').text(`搜索结果: ${res.data.length} 条`);
+                    $('#paginationBar').hide(); // 搜索模式通常隐藏分页
+                }
+            });
+        }
+
+        // 事件绑定
+        $('#btnSearchUser').off('click').on('click', doSearch);
+        $('#userKeyword').on('keypress', e => { if(e.which===13) doSearch(); });
+
+        $('#btnFirstPage').on('click', () => loadUsers(1));
+        $('#btnLastPage').on('click', () => loadUsers(totalPages));
+        $('#btnPrevPage').on('click', () => { if(currentPage > 1) loadUsers(currentPage - 1); });
+        $('#btnNextPage').on('click', () => { if(currentPage < totalPages) loadUsers(currentPage + 1); });
+
+        loadUsers(1);
+    })();
+</script>
