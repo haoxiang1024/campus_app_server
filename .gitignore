@@ -31,3 +31,5 @@ build/
 
 ### VS Code ###
 .vscode/
+# 忽略包含敏感信息的配置文件
+application-secret.properties

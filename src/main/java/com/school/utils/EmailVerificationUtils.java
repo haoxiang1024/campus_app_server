@@ -1,4 +1,5 @@
 package com.school.utils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.mail.*;
@@ -13,8 +14,12 @@ public class EmailVerificationUtils {
     private static final String SMTP_HOST = "smtp.qq.com";
     private static final int SMTP_PORT = 587;
     private static final String SMTP_USERNAME = "3502777299@qq.com";
-    private static final String SMTP_PASSWORD = "wcfcwypirtsjcjge"; // QQ邮箱授权码
-
+    private static String SMTP_PASSWORD ; // QQ邮箱授权码
+    @Value("${mail.smtp.password}")
+    public void setSmtpPassword(String password) {
+        // 将注入的值赋给本类的静态变量
+        EmailVerificationUtils.SMTP_PASSWORD = password;
+    }
     // 验证码存储（线程安全）：key=邮箱，value=验证码+过期时间
     private static final Map<String, VerificationCode> CODE_STORE = new ConcurrentHashMap<>();
     // 验证码有效期（默认5分钟）

@@ -2,7 +2,7 @@ server:
   servlet:
     context-path: /school
   port: 8081
-
+# 引入其他的配置文件
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -19,6 +19,8 @@ spring:
       static-locations:
         - classpath:/static/
         - file:./src/main/resources/static/  # 映射项目内的src/static
+  config:
+    import: classpath:application-secret.properties
 
 # 关键：file和spring同级（缩进和spring一致），解决配置无法识别问题
 file:
