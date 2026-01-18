@@ -61,7 +61,7 @@ public class LostController {
                     id = lostfoundtype.getId();
                 }
             }
-        }
+       }
         ServerResponse lostDetailList = lostDetail.getLostDetailList(id);
         //更新图片地址
         List<Lost> data = (List<Lost>) lostDetailList.getData();

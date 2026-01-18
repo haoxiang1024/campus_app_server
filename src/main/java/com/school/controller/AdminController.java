@@ -13,6 +13,7 @@ public class AdminController {
     @ResponseBody
     @RequestMapping("/login")
     public ResponseDTO login(User  user) {
+
         return ResponseDTO.successObj();
     }
 
