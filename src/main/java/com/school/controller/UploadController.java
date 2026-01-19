@@ -45,7 +45,7 @@ public class UploadController {
                 //失物
                 //添加物品信息,调用json-update设置图片名称
                 String newLostJson = Json.updateByKey(lostJson, "img", filename);
-                System.out.println(newLostJson);
+                //System.out.println(newLostJson);
                 lostDetail.addLost(newLostJson);
             } else {
                 //招领

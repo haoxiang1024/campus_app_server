@@ -1,17 +1,46 @@
+<style>
+    .text-custom-blue { color: #00aaff !important; }
+    .btn-outline-custom {
+        color: #00aaff !important;
+        border-color: #00aaff !important;
+    }
+    .btn-outline-custom:hover {
+        background-color: #00aaff !important;
+        color: white !important;
+    }
+    .btn-link.text-custom-blue {
+        color: #00aaff !important;
+        text-decoration: none;
+    }
+    .btn-link.text-custom-blue:hover {
+        color: #0088cc !important;
+    }
+    .modal-content { border-radius: 12px; border: none; }
+    /* 头像预览样式 */
+    #avatarPreview {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #00aaff;
+        margin-bottom: 10px;
+    }
+</style>
+
 <div class="animation-fadeIn">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="m-0 text-white">用户账号管理</h4>
+        <h4 class="m-0 text-custom-blue">用户账号管理</h4>
         <div class="input-group" style="max-width: 450px;">
-            <input type="text" id="userKeyword" class="form-control border-end-0 bg-dark text-white border-secondary" placeholder="搜索用户信息(昵称/手机号/email),为空则显示全部">
-            <button class="btn btn-outline-info border-start-0" type="button" id="btnSearchUser">
+            <input type="text" id="userKeyword" class="form-control border-end-0 border-secondary" placeholder="搜索用户信息(昵称/手机号/email),为空则显示全部">
+            <button class="btn btn-outline-custom border-start-0" type="button" id="btnSearchUser">
                 <i class="fa fa-search"></i>
             </button>
         </div>
     </div>
 
-    <div class="table-card" style="background: #1a1d20; border-radius: 12px; padding: 20px; border: 1px solid #2d3238;">
+    <div class="table-card" style="border-radius: 12px; padding: 20px;">
         <div class="table-responsive">
-            <table class="table table-dark table-hover align-middle">
+            <table class="table table-hover align-middle">
                 <thead>
                 <tr>
                     <th>ID</th><th>头像</th><th>昵称</th>
@@ -27,15 +56,59 @@
 
         <div class="d-flex justify-content-between mt-3" id="paginationBar">
             <div class="btn-group">
-                <button class="btn btn-sm btn-outline-info" id="btnFirstPage">首页</button>
-                <button class="btn btn-sm btn-outline-info" id="btnPrevPage">上一页</button>
+                <button class="btn btn-sm btn-outline-custom" id="btnFirstPage">首页</button>
+                <button class="btn btn-sm btn-outline-custom" id="btnPrevPage">上一页</button>
             </div>
-
-            <span id="pageInfo" class="align-self-center text-info fw-bold">第 1 页 / 共 1 页</span>
-
+            <span id="pageInfo" class="align-self-center text-custom-blue fw-bold">第 1 页 / 共 1 页</span>
             <div class="btn-group">
-                <button class="btn btn-sm btn-outline-info" id="btnNextPage">下一页</button>
-                <button class="btn btn-sm btn-outline-info" id="btnLastPage">末页</button>
+                <button class="btn btn-sm btn-outline-custom" id="btnNextPage">下一页</button>
+                <button class="btn btn-sm btn-outline-custom" id="btnLastPage">末页</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-custom-blue">编辑用户信息</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editUserForm" enctype="multipart/form-data">
+                    <input type="hidden" name="id" id="editUserId">
+
+                    <div class="mb-3 text-center">
+                        <div><img src="" id="avatarPreview" onerror="this.src='./svgs/solid/circle-user.svg'"></div>
+                        <label for="editPhoto" class="btn btn-sm btn-outline-secondary">更换头像</label>
+                        <input type="file" id="editPhoto" name="photoFile" accept="image/*" style="display: none;">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">昵称</label>
+                        <input type="text" class="form-control" name="nickname" id="editNickname" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">性别</label>
+                        <select class="form-select" name="sex" id="editSex">
+                            <option value="男">男</option>
+                            <option value="女">女</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">手机号码</label>
+                        <input type="text" class="form-control" name="phone" id="editPhone">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" id="editEmail">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="btnSubmitEdit" style="background-color: #00aaff; border: none;">保存修改</button>
             </div>
         </div>
     </div>
@@ -46,23 +119,22 @@
         let currentPage = 1;
         let totalPages = 1;
         const pageSize = 10;
+        let allUsersData = [];
 
-        // 路径处理
         function getPhotoUrl(photo) {
             if (!photo) return './svgs/solid/circle-user.svg';
             if (photo.startsWith('http')) return photo;
             return '/school/upload/' + photo;
         }
 
-        // 时间转换
         function formatDate(ts) {
             if (!ts) return '未设置';
             const d = new Date(ts);
             return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
         }
 
-        // 渲染表格
         function renderUserTable(list) {
+            allUsersData = list;
             const $tbody = $('#userTableBody');
             if (!list || list.length === 0) {
                 $tbody.html('<tr><td colspan="8" class="text-center text-muted">暂无匹配的数据</td></tr>');
@@ -80,55 +152,91 @@
                 <td>${u.phone || '-'}</td>
                 <td>${u.email || '-'}</td>
                 <td>
-                    <button class="btn btn-sm btn-link text-info p-0 me-2"><i class="fa fa-edit"></i></button>
+                    <button class="btn btn-sm btn-link text-custom-blue p-0 me-2 btn-edit-user" data-id="${u.id}"><i class="fa fa-edit"></i></button>
                     <button class="btn btn-sm btn-link text-danger p-0"><i class="fa fa-trash"></i></button>
                 </td>
             </tr>`;
             });
             $tbody.html(html);
+
+            $('.btn-edit-user').off('click').on('click', function() {
+                const id = $(this).data('id');
+                const user = allUsersData.find(item => item.id == id);
+                if (user) {
+                    $('#editUserId').val(user.id);
+                    $('#editNickname').val(user.nickname);
+                    $('#editSex').val(user.sex || '男');
+                    $('#editPhone').val(user.phone);
+                    $('#editEmail').val(user.email);
+                    $('#avatarPreview').attr('src', getPhotoUrl(user.photo));
+                    $('#editPhoto').val(''); // 清空上次选择的文件
+                    $('#editUserModal').modal('show');
+                }
+            });
         }
 
-        // 分页加载
+        // 头像预览逻辑
+        $('#editPhoto').on('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => $('#avatarPreview').attr('src', e.target.result);
+                reader.readAsDataURL(file);
+            }
+        });
+
         function loadUsers(page) {
             $.get(`/school/admin/getAllUserInfo`, { page: page, size: pageSize }, function(res) {
                 if (res.status === 0) {
-                    // 核心修复：从 res.data.list 取数据，从 res.data.total 取总数
                     const list = res.data.list || [];
                     const total = res.data.total || 0;
-
                     totalPages = Math.ceil(total / pageSize) || 1;
                     currentPage = page;
-
                     renderUserTable(list);
                     $('#pageInfo').text(`第 ${currentPage} 页 / 共 ${totalPages} 页`);
                     $('#paginationBar').show();
-
-                    // 按钮状态控制
                     $('#btnFirstPage, #btnPrevPage').prop('disabled', currentPage === 1);
                     $('#btnNextPage, #btnLastPage').prop('disabled', currentPage === totalPages);
                 }
             });
         }
 
-        // 搜索逻辑
+        // 提交修改逻辑 (FormData 方式处理文件上传)
+        $('#btnSubmitEdit').off('click').on('click', function() {
+            const formElement = document.getElementById('editUserForm');
+            const formData = new FormData(formElement);
+
+            $.ajax({
+                url: '/school/admin/updateUserInfo',
+                type: 'POST',
+                data: formData,
+                processData: false, // 必须设置
+                contentType: false, // 必须设置
+                success: function(res) {
+                    if (res.status === 0) {
+                        $('#editUserModal').modal('hide');
+                        loadUsers(currentPage);
+                    } else {
+                        alert('修改失败：' + res.msg);
+                    }
+                }
+            });
+        });
+
         function doSearch() {
             const kw = $('#userKeyword').val().trim();
-            console.log(kw)
             if (!kw) { loadUsers(1); return; }
-
             $.get('/school/admin/searchUsers', { keyword: kw }, function(res) {
                 if (res.status === 0) {
-                    renderUserTable(res.data); // 搜索接口通常直接返回数组
+                    renderUserTable(res.data);
                     $('#pageInfo').text(`搜索结果: ${res.data.length} 条`);
-                    $('#paginationBar').hide(); // 搜索模式通常隐藏分页
+                    $('#paginationBar').hide();
                 }
             });
         }
 
-        // 事件绑定
         $('#btnSearchUser').off('click').on('click', doSearch);
         $('#userKeyword').on('keypress', e => { if(e.which===13) doSearch(); });
-
         $('#btnFirstPage').on('click', () => loadUsers(1));
         $('#btnLastPage').on('click', () => loadUsers(totalPages));
         $('#btnPrevPage').on('click', () => { if(currentPage > 1) loadUsers(currentPage - 1); });
