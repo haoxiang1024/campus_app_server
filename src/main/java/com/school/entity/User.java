@@ -16,14 +16,14 @@ public class User {
     private Integer prestige;
     private Date reg_date;
     private String email;
-    private int status;
+    private int state;
 
-    public int getStatus() {
-        return status;
+    public int getstate() {
+        return state;
     }
 
-    public void setStatus(int status) {
-        this.status = status;
+    public void setstate(int state) {
+        this.state = state;
     }
 
     public User(String phone, String password, String email) {
@@ -187,7 +187,7 @@ public class User {
                 ", prestige=" + prestige +
                 ", reg_date=" + reg_date +
                 ", email='" + email + '\'' +
-                ", status=" + status +
+                ", state=" + state +
                 '}';
     }
 }

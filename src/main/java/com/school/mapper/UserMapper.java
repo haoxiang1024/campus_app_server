@@ -46,6 +46,6 @@ public interface UserMapper {
      * @param status 目标状态 (1:正常, 0:禁用)
      * @return 影响行数
      */
-    int updateUserStatus(@Param("ids") List<Integer> ids, @Param("status") Integer status);
+    int updateUserStatus(@Param("ids") List<Integer> ids, @Param("state") Integer state);
 
 }

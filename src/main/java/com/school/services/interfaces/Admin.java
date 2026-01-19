@@ -14,5 +14,7 @@ public interface Admin {
     ServerResponse getAllUserInfo(int page,int size);
     //模糊查询用户信息
     ServerResponse searchUsers(String keyword);
+    //批量重置密码
+    ServerResponse resetPassword(String ids);
 
 }

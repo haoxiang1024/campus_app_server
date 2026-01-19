@@ -6,13 +6,17 @@ import com.school.entity.User;
 import com.school.mapper.AdminMapper;
 import com.school.services.interfaces.Admin;
 import com.school.utils.ServerResponse;
+import com.school.utils.Util;
 import org.apache.commons.lang3.StringUtils;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class AdminService implements Admin {
@@ -76,5 +80,25 @@ public class AdminService implements Admin {
 
         // 返回成功响应
         return ServerResponse.createServerResponseBySuccess(list);
+    }
+
+    @Override
+    public ServerResponse resetPassword(String ids) {
+        if (ids == null || ids.isEmpty()) {
+            return ServerResponse.createServerResponseByFail(500,"ID不能为空");
+        }
+
+        // 将字符串 "1,2,3" 转为 List<Integer>
+        List<Integer> idList = Stream.of(ids.split(","))
+                .map(Integer::parseInt)
+                .collect(Collectors.toList());
+        String pwd="a12345678";
+         String hashedPassword = Util.encryptPwd(pwd);
+         int result = adminMapper.batchResetPassword(idList, hashedPassword);
+
+        if (result > 0) {
+            return ServerResponse.createServerResponseBySuccess("成功重置 " + result + " 个账号的密码");
+        }
+        return ServerResponse.createServerResponseByFail(500,"重置密码失败");
     }
 }

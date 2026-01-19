@@ -1,8 +1,7 @@
 <link href="./css/sweetalert2.min.css" rel="stylesheet">
 
 <style>
-
-    .text-custom-blue { color: #00aaff !important; }
+    .text-custom-blue { color: #ffffff !important; }
     .btn-outline-custom {
         color: #00aaff !important;
         border-color: #00aaff !important;
@@ -32,19 +31,19 @@
         background-color: #00aaff;
         border-color: #00aaff;
     }
-    /* 批量操作按钮布局优化 */
     .batch-actions {
-        min-width: 280px;
+        min-width: 380px; /* 增加宽度以容纳新按钮 */
     }
 </style>
 
 <div class="animation-fadeIn">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="d-flex align-items-center">
-            <h4 class="m-0 text-custom-blue me-4">用户账号管理</h4>
-            <div class="batch-actions d-flex gap-2">
+            <h4 class="m-0">用户账号管理</h4>
+            <div class="batch-actions d-flex gap-2" style="margin-left: 20px;">
                 <button class="btn btn-sm btn-outline-success px-3" id="btnBatchEnable">批量启用</button>
                 <button class="btn btn-sm btn-outline-warning px-3" id="btnBatchDisable">批量禁用</button>
+                <button class="btn btn-sm btn-outline-danger px-3" id="btnBatchReset">批量重置密码</button>
             </div>
         </div>
 
@@ -142,7 +141,6 @@
 
         // 美化弹窗工具封装
         const Toast = {
-            // 成功提示（右上角自动消失）
             success: (msg) => {
                 Swal.fire({
                     icon: 'success',
@@ -151,26 +149,21 @@
                     position: 'top-end',
                     showConfirmButton: false,
                     timer: 2000,
-                    width: '220px', // 强制宽度
-                    padding: '0.5rem', // 极简内边距
+                    width: '220px',
+                    padding: '0.5rem',
                 });
             },
-            // 错误/失败提示（中间弹窗）
             error: (msg) => {
                 Swal.fire({
                     icon: 'error',
                     title: '操作失败',
                     text: msg,
                     confirmButtonColor: '#00aaff',
-                    width: '320px', // 锁定宽度，不再显得巨大
+                    width: '320px',
                     padding: '1.25rem',
-                    customClass: {
-                        title: 'fs-6', // 使用 Bootstrap 字体类缩小标题
-                        htmlContainer: 'small' // 缩小内容字体
-                    }
+                    customClass: { title: 'fs-6', htmlContainer: 'small' }
                 });
             },
-            // 确认对话框
             confirm: (title, text, callback) => {
                 Swal.fire({
                     title: title,
@@ -181,12 +174,9 @@
                     cancelButtonColor: '#6c757d',
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
-                    width: '350px', // 确认框稍宽一点点以便容纳两个按钮
+                    width: '350px',
                     padding: '1.25rem',
-                    customClass: {
-                        title: 'fs-6',
-                        htmlContainer: 'small'
-                    }
+                    customClass: { title: 'fs-6', htmlContainer: 'small' }
                 }).then((result) => {
                     if (result.isConfirmed) callback();
                 });
@@ -214,7 +204,7 @@
             }
             let html = '';
             list.forEach(u => {
-                const isChecked = u.status === 1 ? 'checked' : '';
+                const isChecked = u.state === 1 ? 'checked' : '';
                 html += `<tr>
                 <td><input type="checkbox" class="form-check-input user-checkbox" value="${u.id}"></td>
                 <td>${u.id}</td>
@@ -229,18 +219,21 @@
                     </div>
                 </td>
                 <td>
-                    <button class="btn btn-sm btn-link text-custom-blue p-0 btn-edit-user" data-id="${u.id}"><i class="fa fa-edit"></i></button>
+                    <button class="btn btn-sm btn-link text-custom-blue p-0 btn-edit-user me-2" data-id="${u.id}" title="编辑"><i class="fa fa-edit"></i></button>
+                    <button class="btn btn-sm btn-link text-danger p-0 btn-reset-pwd" data-id="${u.id}" title="重置密码"><i class="fa fa-key"></i></button>
                 </td>
             </tr>`;
             });
             $tbody.html(html);
 
+            // 状态切换监听
             $('.status-switch').off('change').on('change', function() {
                 const id = $(this).data('id');
-                const status = this.checked ? 1 : 0;
-                updateUserStatus([id], status);
+                const state = this.checked ? 1 : 0;
+                updateUserStatus([id], state);
             });
 
+            // 编辑按钮监听
             $('.btn-edit-user').off('click').on('click', function() {
                 const id = $(this).data('id');
                 const user = allUsersData.find(item => item.id == id);
@@ -255,17 +248,37 @@
                     $('#editUserModal').modal('show');
                 }
             });
+
+            // 新增：行内重置密码监听
+            $('.btn-reset-pwd').off('click').on('click', function() {
+                const id = $(this).data('id');
+                Toast.confirm('重置确认', '确定要将该用户的密码重置为 a12345678 吗？', () => {
+                    resetPassword([id]);
+                });
+            });
         }
 
-        function updateUserStatus(ids, status) {
-            $.post('/school/admin/updateUserStatus', { ids: ids.join(','), status: status }, function(res) {
+        // 修改：状态更新函数（保持不变，增加回调支持更好）
+        function updateUserStatus(ids, state) {
+            $.post('/school/admin/updateUserStatus', { ids: ids.join(','), state: state }, function(res) {
                 if (res.status === 0) {
                     Toast.success('状态更新成功');
-                    loadUsers(currentPage);
                 } else {
                     Toast.error(res.msg);
-                    loadUsers(currentPage);
                 }
+                loadUsers(currentPage);
+            });
+        }
+
+        // 新增：密码重置 Ajax 函数
+        function resetPassword(ids) {
+            $.post('/school/admin/resetPassword', { ids: ids.join(',') }, function(res) {
+                if (res.status === 0) {
+                    Toast.success('密码已成功重置');
+                } else {
+                    Toast.error(res.msg);
+                }
+                loadUsers(currentPage);
             });
         }
 
@@ -331,29 +344,15 @@
         $('#btnBatchEnable').on('click', function() {
             const selectedItems = $('.user-checkbox:checked');
             if (selectedItems.length === 0) { Toast.error('请先选择用户'); return; }
-
             const idsToUpdate = [];
             let skipCount = 0;
-
             selectedItems.each(function() {
                 const id = $(this).val();
-                // 查找该行对应的状态开关
-                const isAlreadyEnabled = $(`.status-switch[data-id="${id}"]`).prop('checked');
-
-                if (!isAlreadyEnabled) {
-                    idsToUpdate.push(id);
-                } else {
-                    skipCount++;
-                }
+                if (!$(`.status-switch[data-id="${id}"]`).prop('checked')) idsToUpdate.push(id);
+                else skipCount++;
             });
-
-            if (idsToUpdate.length === 0) {
-                Toast.success('选中的用户已全部处于启用状态');
-                return;
-            }
-
+            if (idsToUpdate.length === 0) { Toast.success('选中的用户已全部处于启用状态'); return; }
             const tip = skipCount > 0 ? `确认启用选中的 ${idsToUpdate.length} 个账号吗？(已跳过 ${skipCount} 个已启用账号)` : `确认启用选中的 ${idsToUpdate.length} 个账号吗？`;
-
             Toast.confirm('确认批量启用', tip, () => updateUserStatus(idsToUpdate, 1));
         });
 
@@ -361,29 +360,25 @@
         $('#btnBatchDisable').on('click', function() {
             const selectedItems = $('.user-checkbox:checked');
             if (selectedItems.length === 0) { Toast.error('请先选择用户'); return; }
-
             const idsToUpdate = [];
             let skipCount = 0;
-
             selectedItems.each(function() {
                 const id = $(this).val();
-                const isAlreadyDisabled = !$(`.status-switch[data-id="${id}"]`).prop('checked');
-
-                if (!isAlreadyDisabled) {
-                    idsToUpdate.push(id);
-                } else {
-                    skipCount++;
-                }
+                if ($(`.status-switch[data-id="${id}"]`).prop('checked')) idsToUpdate.push(id);
+                else skipCount++;
             });
-
-            if (idsToUpdate.length === 0) {
-                Toast.success('选中的用户已全部处于禁用状态');
-                return;
-            }
-
+            if (idsToUpdate.length === 0) { Toast.success('选中的用户已全部处于禁用状态'); return; }
             const tip = skipCount > 0 ? `确认禁用选中的 ${idsToUpdate.length} 个账号吗？(已跳过 ${skipCount} 个已禁用账号)` : `确认禁用选中的 ${idsToUpdate.length} 个账号吗？`;
-
             Toast.confirm('确认批量禁用', tip, () => updateUserStatus(idsToUpdate, 0));
+        });
+
+        // 新增：批量重置密码监听逻辑
+        $('#btnBatchReset').on('click', function() {
+            const ids = $('.user-checkbox:checked').map((i, el) => el.value).get();
+            if (ids.length === 0) { Toast.error('请先选择用户'); return; }
+            Toast.confirm('批量重置确认', `确认要将选中的 ${ids.length} 个用户的密码重置为 a12345678 吗？`, () => {
+                resetPassword(ids);
+            });
         });
 
         function doSearch() {

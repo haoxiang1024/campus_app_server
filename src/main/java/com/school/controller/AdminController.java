@@ -3,6 +3,7 @@ package com.school.controller;
 import com.school.entity.User;
 import com.school.services.impl.UserService;
 import com.school.services.interfaces.Admin;
+import com.school.services.interfaces.UserInterface;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ public class AdminController {
     @Autowired
     private Admin admin;
     @Autowired
-    private UserService userService;
+    private UserInterface userInterface;
     @Autowired
     private Util util;
     //管理员登录
@@ -67,7 +68,7 @@ public class AdminController {
 
 
             //  获取现有用户信息
-            User user = userService.getUserById(id);
+            User user = userInterface.getUserById(id);
             if (user == null) {
                 return ServerResponse.createServerResponseByFail(500, "用户不存在");
             }
@@ -83,12 +84,18 @@ public class AdminController {
                 // 数据库只存文件名
                 user.setPhoto(fileName);
             }
-        return userService.updateUserInfo(user);
+        return userInterface.updateUserInfo(user);
     }
     @ResponseBody
     @PostMapping("/updateUserStatus")
     public ServerResponse updateUserStatus(@RequestParam("ids") String ids,
-                                           @RequestParam("status") Integer status) {
-        return userService.updateUserStatus(ids, status);
+                                           @RequestParam("state") Integer state) {
+        return userInterface.updateUserStatus(ids, state);
+    }
+
+    @PostMapping("/resetPassword")
+    @ResponseBody
+    public ServerResponse resetPassword(String ids) {
+        return admin.resetPassword(ids);
     }
 }

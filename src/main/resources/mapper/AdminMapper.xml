@@ -3,4 +3,12 @@
 <mapper namespace="com.school.mapper.AdminMapper">
 
 
+    <update id="batchResetPassword">
+        update user
+        set password = #{password}
+        where id in
+        <foreach collection="idList" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
 </mapper>

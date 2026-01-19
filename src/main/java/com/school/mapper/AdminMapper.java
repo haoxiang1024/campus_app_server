@@ -23,7 +23,7 @@ public interface AdminMapper {
     @Select("SELECT COUNT(*) FROM found")
     int getAllFoundCount();
     //获取所有用户信息
-    @Select("select id,nickname,photo,phone,sex,reg_date,email,status from user")
+    @Select("select id,nickname,photo,phone,sex,reg_date,email,state from user")
     List<User> getAllUserInfo();
     /**
      * 根据关键字模糊查询用户
@@ -35,5 +35,6 @@ public interface AdminMapper {
             "email LIKE CONCAT('%', #{keyword}, '%')")
     List<User> searchUsers(@Param("keyword") String keyword);
 
-
+    //批量重置密码
+    int batchResetPassword(@Param("idList") List<Integer> idList, @Param("password") String password);
 }
