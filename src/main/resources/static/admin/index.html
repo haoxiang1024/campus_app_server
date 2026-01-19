@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <title>校园失物招领后台</title>
     <link href="./css/bootstrap.min.css" rel="stylesheet">
-    <link href="./css/all.min.css" rel="stylesheet">    <style>
+    <link href="./css/all.min.css" rel="stylesheet">
+    <link href="./css/sweetalert2.min.css" rel="stylesheet">
+
+    <style>
+
         :root { --sky-blue: #00aaff; --bg-color: #f0f8ff; --sidebar-dark: #2c3e50; }
         body { font-size: .875rem; background-color: var(--bg-color); overflow-x: hidden; }
         .navbar { background: #fff !important; border-bottom: 2px solid var(--sky-blue); height: 56px; z-index: 1001; }
@@ -57,6 +61,7 @@
 
 <script src="./js/jquery.min.js"></script>
 <script src="./js/bootstrap.bundle.min.js"></script>
+<script src="./js/sweetalert2@11.js"></script>
 
 <script>
     $(function() {
@@ -83,8 +88,64 @@
     }
 
     function logout() {
-        if(confirm('确定退出吗？')) { sessionStorage.clear(); window.location.href = 'login.html'; }
-    }
+        // 美化弹窗工具封装
+        const Toast = {
+            // 成功提示（右上角自动消失）
+            success: (msg) => {
+                Swal.fire({
+                    icon: 'success',
+                    title: msg,
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    width: '220px', // 强制宽度
+                    padding: '0.5rem', // 极简内边距
+                });
+            },
+            // 错误/失败提示（中间弹窗）
+            error: (msg) => {
+                Swal.fire({
+                    icon: 'error',
+                    title: '操作失败',
+                    text: msg,
+                    confirmButtonColor: '#00aaff',
+                    width: '320px', // 锁定宽度，不再显得巨大
+                    padding: '1.25rem',
+                    customClass: {
+                        title: 'fs-6', // 使用 Bootstrap 字体类缩小标题
+                        htmlContainer: 'small' // 缩小内容字体
+                    }
+                });
+            },
+            // 确认对话框
+            confirm: (title, text, callback) => {
+                Swal.fire({
+                    title: title,
+                    text: text,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#00aaff',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    width: '350px', // 确认框稍宽一点点以便容纳两个按钮
+                    padding: '1.25rem',
+                    customClass: {
+                        title: 'fs-6',
+                        htmlContainer: 'small'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) callback();
+                });
+            }
+        };
+
+// 修改后的退出逻辑
+        Toast.confirm('确定退出吗？', '您的会话将被清除', () => {
+            sessionStorage.clear();
+            window.location.href = 'login.html';
+        });    }
 </script>
 </body>
 </html>

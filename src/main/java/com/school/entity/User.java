@@ -16,6 +16,15 @@ public class User {
     private Integer prestige;
     private Date reg_date;
     private String email;
+    private int status;
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
 
     public User(String phone, String password, String email) {
         this.phone = phone;
@@ -166,19 +175,6 @@ public class User {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(password, user.password) && Objects.equals(nickname, user.nickname) && Objects.equals(photo, user.photo) && Objects.equals(sex, user.sex) && Objects.equals(phone, user.phone) && Objects.equals(balance, user.balance) && Objects.equals(prestige, user.prestige) && Objects.equals(reg_date, user.reg_date);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, password, nickname, photo, sex, phone, balance, prestige, reg_date, email);
-    }
-
-    @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
@@ -191,6 +187,7 @@ public class User {
                 ", prestige=" + prestige +
                 ", reg_date=" + reg_date +
                 ", email='" + email + '\'' +
+                ", status=" + status +
                 '}';
     }
 }

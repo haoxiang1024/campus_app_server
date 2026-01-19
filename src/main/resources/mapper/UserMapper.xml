@@ -25,6 +25,27 @@
             sex=#{sex}
         where id = #{id}
     </update>
+    <update id="updateUserInfo" parameterType="com.school.entity.User">
+        UPDATE user
+        <set>
+            <if test="nickname != null">
+                nickname = #{nickname},
+            </if>
+            <if test="sex != null">
+                sex = #{sex},
+            </if>
+            <if test="phone != null">
+                phone = #{phone},
+            </if>
+            <if test="email != null">
+                email = #{email},
+            </if>
+            <if test="photo != null">
+                photo = #{photo},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
     <select id="findUserByPhone" resultType="java.lang.Integer">
         select id
         from user
@@ -39,7 +60,9 @@
                sex,
                balance,
                prestige,
-               reg_date
+               reg_date,
+               email,
+               status
         from user
         where id = #{id}
     </select>

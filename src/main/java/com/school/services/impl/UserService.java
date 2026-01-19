@@ -80,7 +80,7 @@ public class UserService implements UserInterface {
                 //验证密码是否正确
                 boolean isMatch = Util.verifyPwd(pwd, hashedPwd);
                 if (isMatch) {
-                    //密码正确
+                    //密码正确 看有没有被禁用被禁用了无法登录
                     User userInfo = userMapper.userInfo(userid);
                     //设置头像
                     String pic = Util.updatePic(userInfo.getPhoto());
@@ -148,5 +148,24 @@ public class UserService implements UserInterface {
         return ServerResponse.createServerResponseBySuccess(userInfo, "查询成功");
     }
 
+    @Override
+    public ServerResponse updateUserInfo(User user) {
+        int resultCount = userMapper.updateUserInfo(user);
 
+        if (resultCount > 0) {
+            return ServerResponse.createServerResponseBySuccess("用户信息更新成功");
+        } else {
+            return ServerResponse.createServerResponseByFail(500,"用户信息更新失败");
+        }
+    }
+
+    @Override
+    public User getUserById(Integer id) {
+        return userMapper.getUserById(id);
+    }
 }
+
+
+
+
+

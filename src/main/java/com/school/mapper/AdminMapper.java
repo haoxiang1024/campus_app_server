@@ -23,7 +23,7 @@ public interface AdminMapper {
     @Select("SELECT COUNT(*) FROM found")
     int getAllFoundCount();
     //获取所有用户信息
-    @Select("select id,nickname,photo,phone,sex,reg_date,email from user")
+    @Select("select id,nickname,photo,phone,sex,reg_date,email,status from user")
     List<User> getAllUserInfo();
     /**
      * 根据关键字模糊查询用户

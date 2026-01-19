@@ -1,5 +1,6 @@
 package com.school.services.interfaces;
 
+import com.school.entity.User;
 import com.school.utils.ServerResponse;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,10 @@ public interface UserInterface {
     ServerResponse updatePhoto(String photo,int id);
     //用户资料修改
     ServerResponse updateAc(String nickname,String sex,int id);
-
+    //根据id查询用户信息
     ServerResponse getUser(int id);
-
+    // 管理员更新用户信息
+    ServerResponse updateUserInfo(User user);
+    // 获取单个用户信息
+    User getUserById(Integer id);
 }

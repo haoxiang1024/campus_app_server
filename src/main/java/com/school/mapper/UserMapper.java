@@ -3,6 +3,7 @@ package com.school.mapper;
 import com.school.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 @Mapper
@@ -34,5 +35,10 @@ public interface UserMapper {
 
 //获取所有用户信息
     List<User>getalll();
+    // 更新用户信息
+    int updateUserInfo(User user);
+    @Select("SELECT * FROM user WHERE id = #{id}")
+    // 根据ID获取用户
+    User getUserById(@Param("id") Integer id);
 
 }
