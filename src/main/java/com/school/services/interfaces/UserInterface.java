@@ -24,4 +24,10 @@ public interface UserInterface {
     ServerResponse updateUserInfo(User user);
     // 获取单个用户信息
     User getUserById(Integer id);
+    /**
+     * 修改用户状态
+     * @param ids 逗号分隔的ID字符串，如 "1,2,3"
+     * @param status 目标状态
+     */
+    ServerResponse updateUserStatus(String ids, Integer status);
 }

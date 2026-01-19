@@ -327,16 +327,63 @@
 
         $('#selectAll').on('change', function() { $('.user-checkbox').prop('checked', this.checked); });
 
+        // 批量启用
         $('#btnBatchEnable').on('click', function() {
-            const ids = $('.user-checkbox:checked').map((i, el) => el.value).get();
-            if (ids.length === 0) { Toast.error('请先选择用户'); return; }
-            Toast.confirm('确认启用', `确认启用选中的 ${ids.length} 个账号吗？`, () => updateUserStatus(ids, 1));
+            const selectedItems = $('.user-checkbox:checked');
+            if (selectedItems.length === 0) { Toast.error('请先选择用户'); return; }
+
+            const idsToUpdate = [];
+            let skipCount = 0;
+
+            selectedItems.each(function() {
+                const id = $(this).val();
+                // 查找该行对应的状态开关
+                const isAlreadyEnabled = $(`.status-switch[data-id="${id}"]`).prop('checked');
+
+                if (!isAlreadyEnabled) {
+                    idsToUpdate.push(id);
+                } else {
+                    skipCount++;
+                }
+            });
+
+            if (idsToUpdate.length === 0) {
+                Toast.success('选中的用户已全部处于启用状态');
+                return;
+            }
+
+            const tip = skipCount > 0 ? `确认启用选中的 ${idsToUpdate.length} 个账号吗？(已跳过 ${skipCount} 个已启用账号)` : `确认启用选中的 ${idsToUpdate.length} 个账号吗？`;
+
+            Toast.confirm('确认批量启用', tip, () => updateUserStatus(idsToUpdate, 1));
         });
 
+        // 批量禁用
         $('#btnBatchDisable').on('click', function() {
-            const ids = $('.user-checkbox:checked').map((i, el) => el.value).get();
-            if (ids.length === 0) { Toast.error('请先选择用户'); return; }
-            Toast.confirm('确认禁用', `确认禁用选中的 ${ids.length} 个账号吗？`, () => updateUserStatus(ids, 0));
+            const selectedItems = $('.user-checkbox:checked');
+            if (selectedItems.length === 0) { Toast.error('请先选择用户'); return; }
+
+            const idsToUpdate = [];
+            let skipCount = 0;
+
+            selectedItems.each(function() {
+                const id = $(this).val();
+                const isAlreadyDisabled = !$(`.status-switch[data-id="${id}"]`).prop('checked');
+
+                if (!isAlreadyDisabled) {
+                    idsToUpdate.push(id);
+                } else {
+                    skipCount++;
+                }
+            });
+
+            if (idsToUpdate.length === 0) {
+                Toast.success('选中的用户已全部处于禁用状态');
+                return;
+            }
+
+            const tip = skipCount > 0 ? `确认禁用选中的 ${idsToUpdate.length} 个账号吗？(已跳过 ${skipCount} 个已禁用账号)` : `确认禁用选中的 ${idsToUpdate.length} 个账号吗？`;
+
+            Toast.confirm('确认批量禁用', tip, () => updateUserStatus(idsToUpdate, 0));
         });
 
         function doSearch() {

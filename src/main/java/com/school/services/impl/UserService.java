@@ -7,10 +7,14 @@ import com.school.utils.DateUtil;
 import com.school.utils.EmailVerificationUtils;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.school.utils.EmailVerificationUtils.verifyCode;
 
@@ -163,7 +167,32 @@ public class UserService implements UserInterface {
     public User getUserById(Integer id) {
         return userMapper.getUserById(id);
     }
-}
+
+    @Override
+    public ServerResponse updateUserStatus(String ids, Integer status) {
+        if (StringUtils.isEmpty(ids)) {
+            return ServerResponse.createServerResponseByFail(500,"参数错误：ID不能为空");
+        }
+
+        try {
+            // 将前端传来的 "1,2,3" 字符串转为 List<Integer>
+            List<Integer> idList = Arrays.stream(ids.split(","))
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toList());
+
+            int result = userMapper.updateUserStatus(idList, status);
+
+            if (result > 0) {
+                return ServerResponse.createServerResponseBySuccess("状态更新成功");
+            } else {
+                return ServerResponse.createServerResponseByFail(500,"更新失败，未找到指定用户");
+            }
+        } catch (Exception e) {
+            return ServerResponse.createServerResponseByFail(500,"服务器内部错误：" + e.getMessage());
+        }
+    }
+    }
+
 
 
 

@@ -40,5 +40,12 @@ public interface UserMapper {
     @Select("SELECT * FROM user WHERE id = #{id}")
     // 根据ID获取用户
     User getUserById(@Param("id") Integer id);
+    /**
+     * 批量修改用户状态
+     * @param ids 用户ID集合
+     * @param status 目标状态 (1:正常, 0:禁用)
+     * @return 影响行数
+     */
+    int updateUserStatus(@Param("ids") List<Integer> ids, @Param("status") Integer status);
 
 }

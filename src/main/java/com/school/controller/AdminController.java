@@ -84,4 +84,11 @@ public class AdminController {
                 user.setPhoto(fileName);
             }
         return userService.updateUserInfo(user);
-    }}
+    }
+    @ResponseBody
+    @PostMapping("/updateUserStatus")
+    public ServerResponse updateUserStatus(@RequestParam("ids") String ids,
+                                           @RequestParam("status") Integer status) {
+        return userService.updateUserStatus(ids, status);
+    }
+}
