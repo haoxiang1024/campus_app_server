@@ -1,7 +1,6 @@
 package com.school.services.interfaces;
 
 import com.school.utils.ServerResponse;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 

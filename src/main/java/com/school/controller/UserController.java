@@ -1,29 +1,16 @@
 package com.school.controller;
 
-import com.school.entity.User;
-import com.school.mapper.UserMapper;
 import com.school.services.interfaces.UserInterface;
 import com.school.utils.EmailVerificationUtils;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.UUID;
 
 
 @SuppressWarnings("rawtypes")

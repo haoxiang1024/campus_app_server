@@ -6,14 +6,12 @@ import com.school.services.impl.UserService;
 import com.school.services.interfaces.FoundDetail;
 import com.school.services.interfaces.LostDetail;
 import com.school.utils.EmailVerificationUtils;
-import com.school.utils.Ip;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ResourceLoader;
+
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;

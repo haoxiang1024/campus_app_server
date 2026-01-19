@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>校园失物招领系统 - 管理员登录</title>
     <link href="./css/bootstrap.min.css" rel="stylesheet">
+    <link href="./css/sweetalert2.min.css" rel="stylesheet">
     <style>
         body { background-color: #f8f9fa; display: flex; align-items: center; height: 100vh; }
         .login-card { width: 100%; max-width: 400px; margin: auto; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); background: #fff; border-radius: 10px; }
@@ -25,7 +26,7 @@
         <button type="submit" class="btn btn-primary w-100">登录</button>
     </form>
 </div>
-
+<script src="./js/sweetalert2@11.js"></script>
 <script src="./js/jquery.min.js"></script>
 <script>
     $('#loginForm').on('submit', function(e) {
@@ -36,7 +37,48 @@
             username: $('input[name="username"]').val(),
             password: $('input[name="password"]').val()
         };
-
+        const Toast = {
+            success: (msg) => {
+                Swal.fire({
+                    icon: 'success',
+                    title: msg,
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    width: '220px',
+                    padding: '0.5rem',
+                });
+            },
+            error: (msg) => {
+                Swal.fire({
+                    icon: 'error',
+                    title: '操作失败',
+                    text: msg,
+                    confirmButtonColor: '#00aaff',
+                    width: '320px',
+                    padding: '1.25rem',
+                    customClass: { title: 'fs-6', htmlContainer: 'small' }
+                });
+            },
+            confirm: (title, text, callback) => {
+                Swal.fire({
+                    title: title,
+                    text: text,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#00aaff',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    width: '350px',
+                    padding: '1.25rem',
+                    customClass: { title: 'fs-6', htmlContainer: 'small' }
+                }).then((result) => {
+                    if (result.isConfirmed) callback();
+                });
+            }
+        };
         $.ajax({
             url: '/school/admin/login',
             type: 'POST',
@@ -45,16 +87,18 @@
                 console.log("服务器返回：", res);
                 if (res.status === 0) {
                    // alert('登录成功！');
+                    //Toast.success("登录成功")
                     // 将后端返回的完整的 Admin 对象存入 Session
                     sessionStorage.setItem("admin", JSON.stringify(res.data));
                     window.location.href = 'index.html';
                 } else {
                     // 显示后端返回的具体错误信息
-                    alert('错误：' + (res.msg || '用户名或密码不正确'));
+                    //alert('错误：' + (res.msg || '用户名或密码不正确'));
+                    Toast.error("用户名或密码不正确")
                 }
             },
             error: function() {
-                alert('服务器连接失败，请检查后端服务是否启动');
+                Toast.error("服务器内部错误")
             }
         });
     });

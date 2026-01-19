@@ -8,7 +8,6 @@ import com.school.services.interfaces.Admin;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
 import org.apache.commons.lang3.StringUtils;
-import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

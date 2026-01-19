@@ -1,7 +1,6 @@
 package com.school.controller;
 
 import com.school.entity.User;
-import com.school.services.impl.UserService;
 import com.school.services.interfaces.Admin;
 import com.school.services.interfaces.UserInterface;
 import com.school.utils.ServerResponse;

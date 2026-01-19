@@ -1,10 +1,9 @@
 package com.school.services.impl;
 
-import com.school.mapper.UserMapper;
 import com.school.entity.User;
+import com.school.mapper.UserMapper;
 import com.school.services.interfaces.UserInterface;
 import com.school.utils.DateUtil;
-import com.school.utils.EmailVerificationUtils;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
 import org.apache.commons.lang3.StringUtils;
@@ -15,8 +14,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.school.utils.EmailVerificationUtils.verifyCode;
 
 @Service
 public class UserService implements UserInterface {

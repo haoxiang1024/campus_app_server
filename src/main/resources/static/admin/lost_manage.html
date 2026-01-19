@@ -1,7 +1,47 @@
+<style>
+    .text-custom-blue { color: #ffffff !important; }
+    .btn-outline-custom {
+        color: #00aaff !important;
+        border-color: #00aaff !important;
+    }
+    .btn-outline-custom:hover {
+        background-color: #00aaff !important;
+        color: white !important;
+    }
+    .btn-link.text-custom-blue {
+        color: #00aaff !important;
+        text-decoration: none;
+    }
+    .btn-link.text-custom-blue:hover {
+        color: #0088cc !important;
+    }
+    .modal-content { border-radius: 12px; border: none; }
+    #avatarPreview {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #00aaff;
+        margin-bottom: 10px;
+    }
+    /* 开关颜色自定义 */
+    .form-check-input:checked {
+        background-color: #00aaff;
+        border-color: #00aaff;
+    }
+    .batch-actions {
+        min-width: 380px; /* 增加宽度以容纳新按钮 */
+    }
+</style>
 <div class="animation-fadeIn">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="m-0">失物信息管理</h4>
-        <button class="btn btn-warning btn-sm text-white"><i class="fa fa-plus me-1"></i>登记丢失信息</button>
+    <div class="d-flex justify-content-between align-items-center mb-4 gap-3">
+        <div class="input-group" style="max-width: 380px; flex-shrink: 0;">
+            <input type="text" id="userKeyword" class="form-control border-end-0 border-secondary" placeholder="搜索丢失物品(名称/联系人),为空则显示所有">
+            <button class="btn btn-outline-custom border-start-0" type="button" id="btnSearchUser">
+                <i class="fa fa-search"></i>
+            </button>
+        </div>
+
     </div>
 
     <div class="table-card">
@@ -25,44 +65,118 @@
     </div>
 </div>
 
+<div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title">失物详细信息</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detailContent">
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-    (function() {
-        // 请求后端获取所有失物数据
+    $(document).ready(function() {
+        loadLostData();
+    });
+
+    // 1. 加载数据（带搜索）
+    function loadLostData() {
+        const keyword = $('#searchInput').val();
         $.ajax({
-            url: '/school/admin/getAllLost',
+            url: '/school/admin/getAllLost', // 注意：请确保后端Controller对应此路径
             type: 'GET',
+            data: { keyword: keyword },
             success: function(res) {
                 if(res.status === 0) {
                     renderLostTable(res.data);
                 } else {
-                    $('#lostTableBody').html('<tr><td colspan="6" class="text-center text-danger">数据获取失败：' + res.msg + '</td></tr>');
+                    $('#lostTableBody').html(`<tr><td colspan="6" class="text-center text-danger">失败：${res.msg}</td></tr>`);
                 }
-            },
-            error: function() {
-                $('#lostTableBody').html('<tr><td colspan="6" class="text-center text-danger">服务器连接失败</td></tr>');
             }
         });
+    }
 
-        function renderLostTable(data) {
-            if (!data || data.length === 0) {
-                $('#lostTableBody').html('<tr><td colspan="6" class="text-center">暂无失物记录</td></tr>');
-                return;
-            }
-            let html = '';
-            data.forEach(item => {
-                html += `<tr>
-                    <td><span class="fw-bold">${item.itemName}</span></td>
-                    <td><i class="fa fa-map-marker-alt text-danger me-1"></i>${item.location}</td>
-                    <td>${item.createTime || '未记录'}</td>
-                    <td>${item.userName || '匿名'}</td>
-                    <td><span class="badge bg-warning">寻找中</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-link text-primary p-0 me-2">详情</button>
-                        <button class="btn btn-sm btn-link text-danger p-0">删除</button>
-                    </td>
-                </tr>`;
-            });
-            $('#lostTableBody').html(html);
+    // 2. 渲染表格
+    function renderLostTable(data) {
+        if (!data || data.length === 0) {
+            $('#lostTableBody').html('<tr><td colspan="6" class="text-center">暂无失物记录</td></tr>');
+            return;
         }
-    })();
+        let html = '';
+        data.forEach(item => {
+            // 根据状态显示不同颜色标签
+            let statusBadge = item.isFound === 1 ?
+                '<span class="badge bg-success">已找回</span>' :
+                '<span class="badge bg-warning">寻找中</span>';
+
+            html += `<tr>
+                <td><span class="fw-bold">${item.itemName}</span></td>
+                <td><i class="fa fa-map-marker-alt text-danger me-1"></i>${item.location}</td>
+                <td>${item.createTime || '未记录'}</td>
+                <td>${item.userName || '匿名'}</td>
+                <td>${statusBadge}</td>
+                <td>
+                    <button class="btn btn-sm btn-link text-primary p-0 me-2" onclick="showDetail(${item.lostId})">详情</button>
+                    ${item.isFound !== 1 ? `<button class="btn btn-sm btn-link text-success p-0 me-2" onclick="markFound(${item.lostId})">确认找回</button>` : ''}
+                    <button class="btn btn-sm btn-link text-danger p-0" onclick="deleteLost(${item.lostId})">删除</button>
+                </td>
+            </tr>`;
+        });
+        $('#lostTableBody').html(html);
+    }
+
+    // 3. 查看详情
+    function showDetail(id) {
+        $.get('/school/admin/getLostById', { lostId: id }, function(res) {
+            if(res.status === 0) {
+                let item = res.data;
+                let content = `
+                    <div class="mb-2"><strong>物品：</strong>${item.itemName}</div>
+                    <div class="mb-2"><strong>特征：</strong>${item.description || '无'}</div>
+                    <div class="mb-2"><strong>时间：</strong>${item.lostTime || '未知'}</div>
+                    <div class="mb-2"><strong>联系电话：</strong>${item.phone}</div>
+                    <div class="text-center mt-3">
+                        <img src="${item.imageUrl || '/static/images/no-image.png'}" class="img-fluid rounded" style="max-height:200px">
+                    </div>
+                `;
+                $('#detailContent').html(content);
+                new bootstrap.Modal($('#detailModal')).show();
+            }
+        });
+    }
+
+    // 4. 删除逻辑 (使用SweetAlert2)
+    function deleteLost(id) {
+        Swal.fire({
+            title: '确定要删除吗？',
+            text: "此操作不可撤销！",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            confirmButtonText: '确定删除',
+            cancelButtonText: '取消'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post('/school/admin/deleteLost', { lostId: id }, function(res) {
+                    if(res.status === 0) {
+                        Swal.fire('已删除', '失物信息已成功移除', 'success');
+                        loadLostData();
+                    }
+                });
+            }
+        });
+    }
+
+    // 5. 变更状态逻辑
+    function markFound(id) {
+        $.post('/school/admin/updateLostStatus', { lostId: id, isFound: 1 }, function(res) {
+            if(res.status === 0) {
+                loadLostData();
+            }
+        });
+    }
 </script>

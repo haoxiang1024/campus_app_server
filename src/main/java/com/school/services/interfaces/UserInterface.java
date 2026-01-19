@@ -2,7 +2,6 @@ package com.school.services.interfaces;
 
 import com.school.entity.User;
 import com.school.utils.ServerResponse;
-import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Service;
 
 @SuppressWarnings("rawtypes")
