@@ -106,25 +106,20 @@
             const d = new Date(ts);
             return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
         }
-
+        let lostKeyword = ""; // 新增变量存储关键字
         // 分页模式加载数据
         function loadLostData(page) {
             currentLostPage = page;
-            $('#lostTableBody').html('<tr><td colspan="7" class="text-center text-muted">正在检索分页数据...</td></tr>');
-            $('#paginationWrapper').show(); // 确保分页条可见
+            lostKeyword = $('#searchLostInput').val() || ""; // 获取搜索框内容
 
-            $.ajax({
-                url: '/school/admin/getLostListByPage',
-                type: 'GET',
-                cache: false,
-                data: { page: page, size: pageSize, _t: new Date().getTime() },
-                success: function(res) {
-                    if(res.status === 0 && res.data) {
-                        renderLostTable(res.data.list);
-                        updatePaginationUI(res.data.total);
-                    } else {
-                        window.Toast.error(res.msg || "无法获取分页数据");
-                    }
+            $.get('/school/admin/getLostList', {
+                page: page,
+                pageSize: 10,
+                keyword: lostKeyword
+            }, function(res) {
+                if(res.status === 0) {
+                    renderLostTable(res.data.list);
+                    renderPagination(res.data.totalPages, res.data.total);
                 }
             });
         }

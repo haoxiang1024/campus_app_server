@@ -70,7 +70,7 @@
                prestige,
                reg_date,
                email,
-               status
+               state
         from user
         where id = #{id}
     </select>
@@ -82,6 +82,24 @@
     </select>
     <select id="getalll" resultType="com.school.entity.User">
         select * from user
+    </select>
+    <select id="getUserPage" resultType="com.school.entity.User">
+        SELECT * FROM user
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (username LIKE CONCAT('%', #{keyword}, '%') OR nickname LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="getUserCount" resultType="int">
+        SELECT COUNT(*) FROM user
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (username LIKE CONCAT('%', #{keyword}, '%') OR nickname LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
     </select>
 
 </mapper>

@@ -121,10 +121,10 @@ public class AdminController {
         return lostDetail.updateLostStatus(lostId, state);
     }
     @ResponseBody
-    @GetMapping("/getLostListByPage")
-    public ServerResponse getLostListByPage(
-            @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size) {
-        return lostDetail.getLostListByPage(page, size);
+    @GetMapping("/getLostList")
+    public ServerResponse getLostList(@RequestParam(defaultValue = "1") int page,
+                                      @RequestParam(defaultValue = "10") int pageSize,
+                                      @RequestParam(required = false) String keyword) {
+        return admin.getLostPage(page, pageSize, keyword);
     }
 }

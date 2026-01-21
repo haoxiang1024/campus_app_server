@@ -47,5 +47,7 @@ public interface UserMapper {
      * @return 影响行数
      */
     int updateUserStatus(@Param("ids") List<Integer> ids, @Param("state") Integer state);
-
+    //分页用户信息
+    List<User> getUserPage(@Param("offset") int offset, @Param("pageSize") int pageSize, @Param("keyword") String keyword);
+    int getUserCount(@Param("keyword") String keyword);
 }

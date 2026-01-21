@@ -6,7 +6,9 @@ import com.school.utils.ServerResponse;
 import com.school.utils.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -75,6 +77,13 @@ public class UserController {
             return ServerResponse.createServerResponseBySuccess( "验证码验证失败");
 
         }
+    }
+    @ResponseBody
+    @GetMapping("/list")
+    public ServerResponse list(@RequestParam(defaultValue = "1") int page,
+                               @RequestParam(defaultValue = "10") int pageSize,
+                               @RequestParam(required = false) String keyword) {
+        return userInterface.getUserList(page, pageSize, keyword);
     }
 
 }

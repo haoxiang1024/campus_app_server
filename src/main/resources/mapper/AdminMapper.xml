@@ -11,4 +11,23 @@
             #{id}
         </foreach>
     </update>
+    <select id="getLostPage" resultType="com.school.entity.Lost">
+        SELECT * FROM lost
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (title LIKE CONCAT('%', #{keyword}, '%') OR place LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY pub_date DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="getLostCount" resultType="int">
+        SELECT COUNT(*) FROM lost
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (title LIKE CONCAT('%', #{keyword}, '%') OR place LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+    </select>
 </mapper>

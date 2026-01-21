@@ -16,5 +16,6 @@ public interface Admin {
     ServerResponse searchUsers(String keyword);
     //批量重置密码
     ServerResponse resetPassword(String ids);
-
+    //分页查询信息
+    ServerResponse getLostPage(int page, int pageSize, String keyword);
 }

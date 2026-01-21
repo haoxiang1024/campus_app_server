@@ -29,4 +29,6 @@ public interface UserInterface {
      * @param status 目标状态
      */
     ServerResponse updateUserStatus(String ids, Integer status);
+    //分页查询
+    ServerResponse getUserList(int page, int pageSize, String keyword);
 }

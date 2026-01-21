@@ -10,9 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -188,7 +186,19 @@ public class UserService implements UserInterface {
             return ServerResponse.createServerResponseByFail(500,"服务器内部错误：" + e.getMessage());
         }
     }
+
+    @Override
+    public ServerResponse getUserList(int page, int pageSize, String keyword) {
+        int offset = (page - 1) * pageSize;
+        List<User> list = userMapper.getUserPage(offset, pageSize, keyword);
+        int total = userMapper.getUserCount(keyword);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("list", list);
+        result.put("totalPages", (int) Math.ceil((double) total / pageSize));
+        return ServerResponse.createServerResponseBySuccess(result);
     }
+}
 
 
 

@@ -1,6 +1,7 @@
 package com.school.mapper;
 
 import com.school.entity.Admin;
+import com.school.entity.Lost;
 import com.school.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -37,4 +38,7 @@ public interface AdminMapper {
 
     //批量重置密码
     int batchResetPassword(@Param("idList") List<Integer> idList, @Param("password") String password);
+    //分页查询
+    List<Lost> getLostPage(@Param("offset") int offset, @Param("pageSize") int pageSize, @Param("keyword") String keyword);
+    int getLostCount(@Param("keyword") String keyword);
 }
