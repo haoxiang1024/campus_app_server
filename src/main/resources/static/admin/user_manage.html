@@ -1,23 +1,34 @@
 <link href="./css/sweetalert2.min.css" rel="stylesheet">
 
 <style>
-    .text-custom-blue { color: #ffffff !important; }
+    /* 核心变量与基础样式 - 与 Lost 保持一致 */
+    .text-custom-blue { color: #00aaff !important; }
+
+    .content-wrapper {
+        background: #ffffff !important;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        padding: 25px;
+        margin: 15px;
+        color: #333 !important;
+    }
+
+    .table-light th {
+        background-color: #f8f9fa !important;
+        color: #666 !important;
+        font-weight: 600;
+    }
+
     .btn-outline-custom {
         color: #00aaff !important;
-        border-color: #00aaff !important;
+        border-color: #dee2e6 !important;
     }
-    .btn-outline-custom:hover {
+    .btn-outline-custom:hover:not(:disabled) {
         background-color: #00aaff !important;
         color: white !important;
     }
-    .btn-link.text-custom-blue {
-        color: #00aaff !important;
-        text-decoration: none;
-    }
-    .btn-link.text-custom-blue:hover {
-        color: #0088cc !important;
-    }
-    .modal-content { border-radius: 12px; border: none; }
+
+    /* 用户管理特有样式 */
     #avatarPreview {
         width: 80px;
         height: 80px;
@@ -26,71 +37,73 @@
         border: 2px solid #00aaff;
         margin-bottom: 10px;
     }
-    /* 开关颜色自定义 */
     .form-check-input:checked {
         background-color: #00aaff;
         border-color: #00aaff;
     }
-    .batch-actions {
-        min-width: 380px; /* 增加宽度以容纳新按钮 */
-    }
+    .modal-content { border-radius: 12px; border: none; }
 </style>
 
-<div class="animation-fadeIn">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div class="d-flex align-items-center">
-            <div class="batch-actions d-flex gap-2" style="margin-left: 20px;">
-                <button class="btn btn-sm btn-outline-success px-3" id="btnBatchEnable">批量启用</button>
-                <button class="btn btn-sm btn-outline-warning px-3" id="btnBatchDisable">批量禁用</button>
-                <button class="btn btn-sm btn-outline-danger px-3" id="btnBatchReset">批量重置密码</button>
-            </div>
+<div class="content-wrapper">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-success btn-sm" id="btnBatchEnable">批量启用</button>
+            <button class="btn btn-outline-warning btn-sm" id="btnBatchDisable">批量禁用</button>
+            <button class="btn btn-outline-danger btn-sm" id="btnBatchReset">重置密码</button>
         </div>
 
-        <div class="input-group" style="max-width: 380px; flex-shrink: 0;">
-            <input type="text" id="userKeyword" class="form-control border-end-0 border-secondary" placeholder="搜索(昵称/手机号/email),为空则显示所有">
-            <button class="btn btn-outline-custom border-start-0" type="button" id="btnSearchUser">
+        <div class="input-group input-group-sm" style="width: 320px;">
+            <input type="text" id="userKeyword" class="form-control" placeholder="搜索昵称/手机号/Email...">
+            <button class="btn btn-primary" type="button" id="btnSearchUser">
                 <i class="fa fa-search"></i>
             </button>
         </div>
     </div>
 
-    <div class="table-card" style="border-radius: 12px; padding: 20px;">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead>
-                <tr>
-                    <th><input type="checkbox" id="selectAll" class="form-check-input"></th>
-                    <th>ID</th><th>头像</th><th>昵称</th>
-                    <th class="text-center">性别</th>
-                    <th>注册时间</th><th>手机号码</th><th>状态</th><th>操作</th>
-                </tr>
-                </thead>
-                <tbody id="userTableBody">
-                <tr><td colspan="9" class="text-center">加载中...</td></tr>
-                </tbody>
-            </table>
-        </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+            <tr>
+                <th style="width: 45px;"><input type="checkbox" id="selectAll" class="form-check-input"></th>
+                <th>ID</th>
+                <th>头像</th>
+                <th>昵称</th>
+                <th class="text-center">性别</th>
+                <th>注册时间</th>
+                <th>手机号码</th>
+                <th>Email</th>
+                <th>状态</th>
+                <th class="text-center">操作</th>
+            </tr>
+            </thead>
+            <tbody id="userTableBody">
+            <tr><td colspan="10" class="text-center text-muted">正在检索数据...</td></tr>
+            </tbody>
+        </table>
+    </div>
 
-        <div class="d-flex justify-content-between mt-3" id="paginationBar">
+    <div class="d-flex flex-column align-items-center mt-4">
+        <div class="d-flex align-items-center gap-3">
             <div class="btn-group">
-                <button class="btn btn-sm btn-outline-custom" id="btnFirstPage">首页</button>
-                <button class="btn btn-sm btn-outline-custom" id="btnPrevPage">上一页</button>
+                <button class="btn btn-sm btn-outline-custom px-3" id="btnFirstPage">首页</button>
+                <button class="btn btn-sm btn-outline-custom px-3" id="btnPrevPage">上一页</button>
             </div>
-            <span id="pageInfo" class="align-self-center text-custom-blue fw-bold">第 1 页 / 共 1 页</span>
+            <span id="pageInfo" class="text-custom-blue fw-bold">第 1 页 / 共 1 页</span>
             <div class="btn-group">
-                <button class="btn btn-sm btn-outline-custom" id="btnNextPage">下一页</button>
-                <button class="btn btn-sm btn-outline-custom" id="btnLastPage">末页</button>
+                <button class="btn btn-sm btn-outline-custom px-3" id="btnNextPage">下一页</button>
+                <button class="btn btn-sm btn-outline-custom px-3" id="btnLastPage">末页</button>
             </div>
         </div>
+        <div class="mt-2 text-muted small">共 <span id="TotalCount">0</span> 条记录</div>
     </div>
 </div>
 
-<div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered " style="max-width: 400px;max-height: 600px;" >
-        <div class="modal-content">
+<div class="modal fade" id="editUserModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+        <div class="modal-content shadow-lg">
             <div class="modal-header">
-                <h5 class="modal-title text-custom-blue">编辑用户信息</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title fw-bold text-custom-blue">编辑用户信息</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <form id="editUserForm" enctype="multipart/form-data">
@@ -102,28 +115,28 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">昵称</label>
-                        <input type="text" class="form-control" name="nickname" id="editNickname">
+                        <input type="text" class="form-control form-control-sm" name="nickname" id="editNickname">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">性别</label>
-                        <select class="form-select" name="sex" id="editSex">
+                        <select class="form-select form-select-sm" name="sex" id="editSex">
                             <option value="男">男</option>
                             <option value="女">女</option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">手机号码</label>
-                        <input type="text" class="form-control" name="phone" id="editPhone" maxlength="11">
+                        <input type="text" class="form-control form-control-sm" name="phone" id="editPhone" maxlength="11">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Email</label>
-                        <input type="email" class="form-control" name="email" id="editEmail">
+                        <input type="email" class="form-control form-control-sm" name="email" id="editEmail">
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" id="btnSubmitEdit" style="background-color: #00aaff; border: none;">保存修改</button>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary btn-sm px-3" id="btnSubmitEdit" style="background-color: #00aaff; border: none;">保存修改</button>
             </div>
         </div>
     </div>
@@ -138,47 +151,16 @@
         const pageSize = 10;
         let allUsersData = [];
 
-        // 美化弹窗工具封装
-        const Toast = {
+        // 统一弹窗工具 - 保持与 Lost 一致
+        window.Toast = window.Toast || {
             success: (msg) => {
-                Swal.fire({
-                    icon: 'success',
-                    title: msg,
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 2000,
-                    width: '220px',
-                    padding: '0.5rem',
-                });
+                Swal.fire({ icon: 'success', title: msg, toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, width: '220px', padding: '0.5rem' });
             },
             error: (msg) => {
-                Swal.fire({
-                    icon: 'error',
-                    title: '操作失败',
-                    text: msg,
-                    confirmButtonColor: '#00aaff',
-                    width: '320px',
-                    padding: '1.25rem',
-                    customClass: { title: 'fs-6', htmlContainer: 'small' }
-                });
+                Swal.fire({ icon: 'error', title: '操作失败', text: msg, confirmButtonColor: '#00aaff', width: '320px' });
             },
             confirm: (title, text, callback) => {
-                Swal.fire({
-                    title: title,
-                    text: text,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#00aaff',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    width: '350px',
-                    padding: '1.25rem',
-                    customClass: { title: 'fs-6', htmlContainer: 'small' }
-                }).then((result) => {
-                    if (result.isConfirmed) callback();
-                });
+                Swal.fire({ title: title, text: text, icon: 'warning', showCancelButton: true, confirmButtonColor: '#00aaff', cancelButtonColor: '#6c757d', confirmButtonText: '确定', cancelButtonText: '取消' }).then((result) => { if (result.isConfirmed) callback(); });
             }
         };
 
@@ -198,7 +180,7 @@
             allUsersData = list;
             const $tbody = $('#userTableBody');
             if (!list || list.length === 0) {
-                $tbody.html('<tr><td colspan="9" class="text-center text-muted">暂无匹配的数据</td></tr>');
+                $tbody.html('<tr><td colspan="10" class="text-center text-muted">暂无匹配的数据</td></tr>');
                 return;
             }
             let html = '';
@@ -208,34 +190,32 @@
                 <td><input type="checkbox" class="form-check-input user-checkbox" value="${u.id}"></td>
                 <td>${u.id}</td>
                 <td><img src="${getPhotoUrl(u.photo)}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;" onerror="this.src='./svgs/solid/circle-user.svg'"></td>
-                <td>${u.nickname || '未设置'}</td>
+                <td class="fw-bold">${u.nickname || '-'}</td>
                 <td class="text-center">${u.sex || '-'}</td>
                 <td><small class="text-muted">${formatDate(u.reg_date)}</small></td>
                 <td>${u.phone || '-'}</td>
+                <td>${u.email || '-'}</td>
                 <td>
                     <div class="form-check form-switch">
                         <input class="form-check-input status-switch" type="checkbox" data-id="${u.id}" ${isChecked}>
                     </div>
                 </td>
-                <td>
-                    <button class="btn btn-sm btn-link text-custom-blue p-0 btn-edit-user me-2" data-id="${u.id}" title="编辑"><i class="fa fa-edit"></i></button>
-                    <button class="btn btn-sm btn-link text-danger p-0 btn-reset-pwd" data-id="${u.id}" title="重置密码"><i class="fa fa-key"></i></button>
+                <td class="text-center">
+                    <button class="btn btn-sm btn-link text-custom-blue p-0 btn-edit-user me-2" data-id="${u.id}" style="text-decoration: none"> 编辑</button>
+                    <button class="btn btn-sm btn-link text-danger p-0 btn-reset-pwd" data-id="${u.id}" style="text-decoration: none"> 重置密码</button>
                 </td>
             </tr>`;
             });
             $tbody.html(html);
 
-            // 状态切换监听
+            // 重新绑定开关监听
             $('.status-switch').off('change').on('change', function() {
-                const id = $(this).data('id');
-                const state = this.checked ? 1 : 0;
-                updateUserStatus([id], state);
+                updateUserStatus([$(this).data('id')], this.checked ? 1 : 0);
             });
 
-            // 编辑按钮监听
+            // 重新绑定编辑监听
             $('.btn-edit-user').off('click').on('click', function() {
-                const id = $(this).data('id');
-                const user = allUsersData.find(item => item.id == id);
+                const user = allUsersData.find(item => item.id == $(this).data('id'));
                 if (user) {
                     $('#editUserId').val(user.id);
                     $('#editNickname').val(user.nickname || '');
@@ -243,45 +223,53 @@
                     $('#editPhone').val(user.phone || '');
                     $('#editEmail').val(user.email || '');
                     $('#avatarPreview').attr('src', getPhotoUrl(user.photo));
-                    $('#editPhoto').val('');
                     $('#editUserModal').modal('show');
                 }
             });
 
-            // 新增：行内重置密码监听
+            // 行内重置密码
             $('.btn-reset-pwd').off('click').on('click', function() {
                 const id = $(this).data('id');
-                Toast.confirm('重置确认', '确定要将该用户的密码重置为 a12345678 吗？', () => {
-                    resetPassword([id]);
-                });
+                window.Toast.confirm('重置确认', '确定要将该用户的密码重置为 a12345678 吗？', () => resetPassword([id]));
             });
         }
 
-        // 修改：状态更新函数（保持不变，增加回调支持更好）
+        function loadUsers(page) {
+            currentPage = page;
+            $('#userTableBody').html('<tr><td colspan="10" class="text-center text-muted">正在检索最新数据...</td></tr>');
+            $.get(`/school/admin/getAllUserInfo`, { page: page, size: pageSize, _t: new Date().getTime() }, function(res) {
+                if (res.status === 0) {
+                    const list = res.data.list || [];
+                    const total = res.data.total || 0;
+                    totalPages = Math.ceil(total / pageSize) || 1;
+                    renderUserTable(list);
+                    $('#pageInfo').text(`第 ${currentPage} 页 / 共 ${totalPages} 页`);
+                    $('#btnFirstPage, #btnPrevPage').prop('disabled', currentPage === 1);
+                    $('#btnNextPage, #btnLastPage').prop('disabled', currentPage === totalPages);
+                    $('#selectAll').prop('checked', false);
+                    $('#TotalCount').text(total);
+                }
+            });
+        }
+
         function updateUserStatus(ids, state) {
             $.post('/school/admin/updateUserStatus', { ids: ids.join(','), state: state }, function(res) {
-                if (res.status === 0) {
-                    Toast.success('状态更新成功');
-                } else {
-                    Toast.error(res.msg);
-                }
+                if (res.status === 0) window.Toast.success('状态更新成功');
+                else window.Toast.error(res.msg);
                 loadUsers(currentPage);
             });
         }
 
-        // 新增：密码重置 Ajax 函数
         function resetPassword(ids) {
             $.post('/school/admin/resetPassword', { ids: ids.join(',') }, function(res) {
-                if (res.status === 0) {
-                    Toast.success('密码已成功重置');
-                } else {
-                    Toast.error(res.msg);
-                }
+                if (res.status === 0) window.Toast.success('密码已成功重置');
+                else window.Toast.error(res.msg);
                 loadUsers(currentPage);
             });
         }
 
-        $('#editPhoto').on('change', function() {
+        // 头像预览处理
+        $('#editPhoto').off('change').on('change', function() {
             const file = this.files[0];
             if (file) {
                 const reader = new FileReader();
@@ -290,34 +278,8 @@
             }
         });
 
-        function loadUsers(page) {
-            $.get(`/school/admin/getAllUserInfo`, { page: page, size: pageSize }, function(res) {
-                if (res.status === 0) {
-                    const list = res.data.list || [];
-                    const total = res.data.total || 0;
-                    totalPages = Math.ceil(total / pageSize) || 1;
-                    currentPage = page;
-                    renderUserTable(list);
-                    $('#pageInfo').text(`第 ${currentPage} 页 / 共 ${totalPages} 页`);
-                    $('#btnFirstPage, #btnPrevPage').prop('disabled', currentPage === 1);
-                    $('#btnNextPage, #btnLastPage').prop('disabled', currentPage === totalPages);
-                    $('#selectAll').prop('checked', false);
-                    $('#paginationBar').show();
-                }
-            });
-        }
-
-        $('#btnSubmitEdit').on('click', function() {
-            const nickname = $('#editNickname').val().trim();
-            const phone = $('#editPhone').val().trim();
-            const email = $('#editEmail').val().trim();
-
-            if (!nickname) { Toast.error('昵称不能为空'); return; }
-            if (!phone) { Toast.error('手机号不能为空'); return; }
-            if (!email) { Toast.error('Email 不能为空'); return; }
-            if (!/^\d{11}$/.test(phone)) { Toast.error('请输入11位手机号'); return; }
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { Toast.error('Email格式不正确'); return; }
-
+        // 提交编辑
+        $('#btnSubmitEdit').off('click').on('click', function() {
             const formData = new FormData(document.getElementById('editUserForm'));
             $.ajax({
                 url: '/school/admin/updateUserInfo',
@@ -328,77 +290,58 @@
                 success: function(res) {
                     if (res.status === 0) {
                         $('#editUserModal').modal('hide');
-                        Toast.success('用户信息修改成功');
+                        window.Toast.success('用户信息修改成功');
                         loadUsers(currentPage);
                     } else {
-                        Toast.error(res.msg);
+                        window.Toast.error(res.msg);
                     }
                 }
             });
         });
 
-        $('#selectAll').on('change', function() { $('.user-checkbox').prop('checked', this.checked); });
-
-        // 批量启用
-        $('#btnBatchEnable').on('click', function() {
-            const selectedItems = $('.user-checkbox:checked');
-            if (selectedItems.length === 0) { Toast.error('请先选择用户'); return; }
-            const idsToUpdate = [];
-            let skipCount = 0;
-            selectedItems.each(function() {
-                const id = $(this).val();
-                if (!$(`.status-switch[data-id="${id}"]`).prop('checked')) idsToUpdate.push(id);
-                else skipCount++;
-            });
-            if (idsToUpdate.length === 0) { Toast.success('选中的用户已全部处于启用状态'); return; }
-            const tip = skipCount > 0 ? `确认启用选中的 ${idsToUpdate.length} 个账号吗？(已跳过 ${skipCount} 个已启用账号)` : `确认启用选中的 ${idsToUpdate.length} 个账号吗？`;
-            Toast.confirm('确认批量启用', tip, () => updateUserStatus(idsToUpdate, 1));
-        });
-
-        // 批量禁用
-        $('#btnBatchDisable').on('click', function() {
-            const selectedItems = $('.user-checkbox:checked');
-            if (selectedItems.length === 0) { Toast.error('请先选择用户'); return; }
-            const idsToUpdate = [];
-            let skipCount = 0;
-            selectedItems.each(function() {
-                const id = $(this).val();
-                if ($(`.status-switch[data-id="${id}"]`).prop('checked')) idsToUpdate.push(id);
-                else skipCount++;
-            });
-            if (idsToUpdate.length === 0) { Toast.success('选中的用户已全部处于禁用状态'); return; }
-            const tip = skipCount > 0 ? `确认禁用选中的 ${idsToUpdate.length} 个账号吗？(已跳过 ${skipCount} 个已禁用账号)` : `确认禁用选中的 ${idsToUpdate.length} 个账号吗？`;
-            Toast.confirm('确认批量禁用', tip, () => updateUserStatus(idsToUpdate, 0));
-        });
-
-        // 新增：批量重置密码监听逻辑
-        $('#btnBatchReset').on('click', function() {
-            const ids = $('.user-checkbox:checked').map((i, el) => el.value).get();
-            if (ids.length === 0) { Toast.error('请先选择用户'); return; }
-            Toast.confirm('批量重置确认', `确认要将选中的 ${ids.length} 个用户的密码重置为 a12345678 吗？`, () => {
-                resetPassword(ids);
-            });
-        });
-
+        // 搜索功能
         function doSearch() {
             const kw = $('#userKeyword').val().trim();
             if (!kw) { loadUsers(1); return; }
+            $('#userTableBody').html('<tr><td colspan="10" class="text-center text-muted">搜索中...</td></tr>');
             $.get('/school/admin/searchUsers', { keyword: kw }, function(res) {
                 if (res.status === 0) {
                     renderUserTable(res.data);
                     $('#pageInfo').text(`搜索结果: ${res.data.length} 条`);
-                    $('#paginationBar').hide();
+                    $('#TotalCount').text(res.data.length);
                 }
             });
         }
 
-        $('#btnSearchUser').on('click', doSearch);
-        $('#userKeyword').on('keypress', e => { if(e.which===13) doSearch(); });
-        $('#btnFirstPage').on('click', () => loadUsers(1));
-        $('#btnLastPage').on('click', () => loadUsers(totalPages));
-        $('#btnPrevPage').on('click', () => { if(currentPage > 1) loadUsers(currentPage - 1); });
-        $('#btnNextPage').on('click', () => { if(currentPage < totalPages) loadUsers(currentPage + 1); });
+        // 事件解绑与绑定 - 解决重复加载问题
+        $('#btnSearchUser').off('click').on('click', doSearch);
+        $('#userKeyword').off('keypress').on('keypress', e => { if(e.which===13) doSearch(); });
+        $('#btnFirstPage').off('click').on('click', () => loadUsers(1));
+        $('#btnLastPage').off('click').on('click', () => loadUsers(totalPages));
+        $('#btnPrevPage').off('click').on('click', () => { if(currentPage > 1) loadUsers(currentPage - 1); });
+        $('#btnNextPage').off('click').on('click', () => { if(currentPage < totalPages) loadUsers(currentPage + 1); });
+        $('#selectAll').off('change').on('change', function() { $('.user-checkbox').prop('checked', this.checked); });
 
+        // 批量操作按钮
+        $('#btnBatchEnable').off('click').on('click', function() {
+            const ids = $('.user-checkbox:checked').map((i, el) => el.value).get();
+            if (!ids.length) return window.Toast.error('请选择用户');
+            window.Toast.confirm('确认批量启用', `确认启用选中的 ${ids.length} 个账号吗？`, () => updateUserStatus(ids, 1));
+        });
+
+        $('#btnBatchDisable').off('click').on('click', function() {
+            const ids = $('.user-checkbox:checked').map((i, el) => el.value).get();
+            if (!ids.length) return window.Toast.error('请选择用户');
+            window.Toast.confirm('确认批量禁用', `确认禁用选中的 ${ids.length} 个账号吗？`, () => updateUserStatus(ids, 0));
+        });
+
+        $('#btnBatchReset').off('click').on('click', function() {
+            const ids = $('.user-checkbox:checked').map((i, el) => el.value).get();
+            if (!ids.length) return window.Toast.error('请选择用户');
+            window.Toast.confirm('批量重置确认', `确认重置选中的 ${ids.length} 个用户的密码吗？`, () => resetPassword(ids));
+        });
+
+        // 首次加载
         loadUsers(1);
     })();
 </script>

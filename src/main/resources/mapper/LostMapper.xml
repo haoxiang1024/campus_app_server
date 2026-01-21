@@ -96,4 +96,5 @@
         where stick = #{stick}
           and state = '未找到'
     </select>
+
 </mapper>

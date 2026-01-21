@@ -7,49 +7,27 @@ import java.util.Objects;
 
 public class Lost implements Serializable {
     private static final long serialVersionUID = 1L;
-    /**
-     *
-     */
+    
     private Integer id;
-    /**
-     *
-     */
+    
     private String title;
-    /**
-     *
-     */
+    
     private String img;
-    /**
-     *
-     */
+    
     private Date pub_date;
-    /**
-     *
-     */
+    
     private String content;
-    /**
-     *
-     */
+    
     private String place;
-    /**
-     *
-     */
+    
     private String phone;
-    /**
-     *
-     */
+    
     private String state;
-    /**
-     *
-     */
+    
     private Integer stick;
-    /**
-     *
-     */
+    
     private Integer lostfoundtype_id;
-    /**
-     *
-     */
+    
 
     private Lostfoundtype lostfoundtype;
 
@@ -89,156 +67,112 @@ public class Lost implements Serializable {
         this.nickname = nickname;
     }
 
-    /**
-     *
-     */
+    
     public Integer getId() {
         return id;
     }
 
-    /**
-     *
-     */
+    
     public void setId(Integer id) {
         this.id = id;
     }
 
-    /**
-     *
-     */
+    
     public String getTitle() {
         return title;
     }
 
-    /**
-     *
-     */
+    
     public void setTitle(String title) {
         this.title = title;
     }
 
-    /**
-     *
-     */
+    
     public String getImg() {
         return img;
     }
 
-    /**
-     *
-     */
+    
     public void setImg(String img) {
         this.img = img;
     }
 
-    /**
-     *
-     */
+    
     public Date getPubDate() {
         return pub_date;
     }
 
-    /**
-     *
-     */
+    
     public void setPubDate(Date pubDate) {
         this.pub_date = pubDate;
     }
 
-    /**
-     *
-     */
+    
     public String getContent() {
         return content;
     }
 
-    /**
-     *
-     */
+    
     public void setContent(String content) {
         this.content = content;
     }
 
-    /**
-     *
-     */
+    
     public String getPlace() {
         return place;
     }
 
-    /**
-     *
-     */
+    
     public void setPlace(String place) {
         this.place = place;
     }
 
-    /**
-     *
-     */
+    
     public String getPhone() {
         return phone;
     }
 
-    /**
-     *
-     */
+    
     public void setPhone(String phone) {
         this.phone = phone;
     }
 
-    /**
-     *
-     */
+    
     public String getState() {
         return state;
     }
 
-    /**
-     *
-     */
+    
     public void setState(String state) {
         this.state = state;
     }
 
-    /**
-     *
-     */
+    
     public Integer getStick() {
         return stick;
     }
 
-    /**
-     *
-     */
+    
     public void setStick(Integer stick) {
         this.stick = stick;
     }
 
-    /**
-     *
-     */
+    
     public Integer getLostfoundtypeId() {
         return lostfoundtype_id;
     }
 
-    /**
-     *
-     */
+    
     public void setLostfoundtypeId(Integer lostfoundtype_id) {
         this.lostfoundtype_id = lostfoundtype_id;
     }
 
-    /**
-     *
-     */
+    
     public Integer getUserId() {
         return user_id;
     }
 
-    /**
-     *
-     */
+    
     public void setUserId(Integer user_id) {
         this.user_id = user_id;
     }

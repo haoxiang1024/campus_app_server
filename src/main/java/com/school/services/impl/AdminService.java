@@ -52,13 +52,10 @@ public class AdminService implements Admin {
     public ServerResponse getAllUserInfo(int page, int size) {
         // 开启分页
         PageHelper.startPage(page, size);
-
         // 执行查询
         List<User> list = adminMapper.getAllUserInfo();
-
         //  将结果封装进 PageInfo 对象，它包含了 total (总条数)
         PageInfo<User> pageInfo = new PageInfo<>(list);
-
         //  返回封装好的数据
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("list", pageInfo.getList()); // 当前页数据

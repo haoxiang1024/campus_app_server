@@ -1,6 +1,8 @@
 package com.school.services.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.school.entity.Lost;
 import com.school.entity.Lostfoundtype;
 import com.school.mapper.LostFoundMapper;
@@ -12,12 +14,13 @@ import com.school.utils.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
 public class LostDetailService implements LostDetail {
-    String key = "lost";//key值用于redsi存储
     @Autowired
     private LostMapper lostMapper;
 
@@ -128,6 +131,47 @@ public class LostDetailService implements LostDetail {
             lost.setImg(updatePic);
         }
         return ServerResponse.createServerResponseBySuccess(lists, "置顶信息");
+    }
+
+    @Override
+    public ServerResponse getAllLost(String keyword) {
+        List<Lost> list = lostMapper.selectAllLost(keyword);
+        return ServerResponse.createServerResponseBySuccess(list);
+    }
+
+    @Override
+    public ServerResponse getLostById(Integer id) {
+        Lost lost = lostMapper.selectByPrimaryKey(id);
+        if (lost == null) return ServerResponse.createServerResponseByFail("信息不存在");
+        return ServerResponse.createServerResponseBySuccess(lost);    }
+
+    @Override
+    public ServerResponse deleteLost(Integer id) {
+        int result = lostMapper.deleteByPrimaryKey(id);
+        return result > 0 ? ServerResponse.createServerResponseBySuccess("删除成功") : ServerResponse.createServerResponseByFail("删除失败");    }
+
+    @Override
+    public ServerResponse updateLostStatus(Integer id, String state) {
+        boolean isSuccess=lostMapper.updateState(id, state);
+        if(isSuccess){
+            return ServerResponse.createServerResponseBySuccess("修改成功");
+        }
+        return ServerResponse.createServerResponseByFail("修改失败");
+    }
+
+    @Override
+    public ServerResponse getLostListByPage(int page, int size) {
+        // 开启分页
+        PageHelper.startPage(page, size);
+        // 执行查询
+        List<Lost> list = lostMapper.selectLostByPage();
+        //  封装 PageInfo
+        PageInfo<Lost> pageInfo = new PageInfo<>(list);
+        // 封装返回结果
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("list", pageInfo.getList());
+        resultMap.put("total", pageInfo.getTotal());
+        return ServerResponse.createServerResponseBySuccess(resultMap);
     }
 
 

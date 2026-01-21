@@ -12,7 +12,7 @@ import lombok.Data;
 @Data
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)//只包含非空字段
 public class ServerResponse<T> {
-    private int status; //状态 0；接口调用成功,1调用失败
+    private int status; //状态 0；接口调用成功,1调用失败,500表示出错了
     private T data; //泛型T，当status=0，将返回的数据封装到data中
     private String msg; //提示信息
 
@@ -64,6 +64,9 @@ public class ServerResponse<T> {
 
     public static ServerResponse createServerResponseByFail(int status, String msg) {
         return new ServerResponse(status, null, msg);
+    }
+    public static ServerResponse createServerResponseByFail( String msg) {
+        return new ServerResponse( 500, msg);
     }
 
     @JsonIgnore

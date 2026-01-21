@@ -15,14 +15,22 @@ public interface LostDetail {
     //添加丢失物品信息(json格式)
     ServerResponse addLost(String lostJson);
 
-
-
     //根据用户id获取用户发布的信息
     ServerResponse getAllByIdLostList(int user_id);
 
-    //修改状态
+    //用户自己修改状态
     ServerResponse updateState(int id,String state,int user_id);
 
     //显示置顶信息
     ServerResponse showLostList(@Param("stick")int stick);
+    //模糊查询
+    ServerResponse getAllLost(String keyword);
+    //根据id获取信息
+    ServerResponse getLostById(Integer id);
+    //根据id删除信息
+    ServerResponse deleteLost(Integer id);
+    //管理员审核lost(修改状态)
+    ServerResponse updateLostStatus(Integer id, String state);
+    //分页查询
+    ServerResponse getLostListByPage(int page, int size);
 }

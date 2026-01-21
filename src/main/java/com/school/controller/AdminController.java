@@ -2,6 +2,7 @@ package com.school.controller;
 
 import com.school.entity.User;
 import com.school.services.interfaces.Admin;
+import com.school.services.interfaces.LostDetail;
 import com.school.services.interfaces.UserInterface;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
@@ -19,6 +20,8 @@ public class AdminController {
     private UserInterface userInterface;
     @Autowired
     private Util util;
+    @Autowired
+    private LostDetail lostDetail;
     //管理员登录
     @ResponseBody
     @RequestMapping("/login")
@@ -96,5 +99,32 @@ public class AdminController {
     @ResponseBody
     public ServerResponse resetPassword(String ids) {
         return admin.resetPassword(ids);
+    }
+    @ResponseBody
+    @GetMapping("/getAllLost")
+    public ServerResponse getAllLost(String keyword) {
+        return lostDetail.getAllLost(keyword);
+    }
+    @ResponseBody
+    @GetMapping("/getLostById")
+    public ServerResponse getLostById(Integer lostId) {
+        return lostDetail.getLostById(lostId);
+    }
+    @ResponseBody
+    @PostMapping("/deleteLost")
+    public ServerResponse deleteLost(Integer lostId) {
+        return lostDetail.deleteLost(lostId);
+    }
+    @ResponseBody
+    @PostMapping("/updateLostStatus")
+    public ServerResponse updateLostStatus(Integer lostId, String state) {
+        return lostDetail.updateLostStatus(lostId, state);
+    }
+    @ResponseBody
+    @GetMapping("/getLostListByPage")
+    public ServerResponse getLostListByPage(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        return lostDetail.getLostListByPage(page, size);
     }
 }

@@ -1,8 +1,10 @@
 package com.school.mapper;
 
 import com.school.entity.Lost;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -38,4 +40,22 @@ public interface LostMapper {
     //所有信息
     List<Lost> getAllList();
 
+    // 获取所有失物信息（支持搜索关键字）
+    @Select("SELECT title,place,pub_date,state,phone,content FROM lost " +
+            "WHERE (#{keyword} IS NULL OR #{keyword} = '' " +
+            "   OR title LIKE CONCAT('%', #{keyword}, '%') " +
+            "   OR content LIKE CONCAT('%', #{keyword}, '%') " +
+            "   OR place LIKE CONCAT('%', #{keyword}, '%') " +
+            "   OR phone LIKE CONCAT('%', #{keyword}, '%')) " +
+            "ORDER BY pub_date DESC") // 建议加上按发布时间降序排序
+    List<Lost> selectAllLost(@Param("keyword") String keyword);
+    // 根据ID删除
+    @Delete("DELETE FROM lost WHERE id = #{id}")
+    int deleteByPrimaryKey(Integer id);
+    // 根据ID查询详情
+    @Select("select * from lost where id=#{id}")
+    Lost selectByPrimaryKey(Integer id);
+    //分页查询所有信息
+    @Select("SELECT * FROM lost ORDER BY pub_date DESC")
+    List<Lost> selectLostByPage();
 }

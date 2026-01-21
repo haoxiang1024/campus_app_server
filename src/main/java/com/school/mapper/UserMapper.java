@@ -37,13 +37,13 @@ public interface UserMapper {
     List<User>getalll();
     // 更新用户信息
     int updateUserInfo(User user);
-    @Select("SELECT * FROM user WHERE id = #{id}")
     // 根据ID获取用户
+    @Select("SELECT * FROM user WHERE id = #{id}")
     User getUserById(@Param("id") Integer id);
     /**
      * 批量修改用户状态
      * @param ids 用户ID集合
-     * @param status 目标状态 (1:正常, 0:禁用)
+     * @param state 目标状态 (1:正常, 0:禁用)
      * @return 影响行数
      */
     int updateUserStatus(@Param("ids") List<Integer> ids, @Param("state") Integer state);
