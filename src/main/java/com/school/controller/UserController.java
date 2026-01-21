@@ -78,12 +78,6 @@ public class UserController {
 
         }
     }
-    @ResponseBody
-    @GetMapping("/list")
-    public ServerResponse list(@RequestParam(defaultValue = "1") int page,
-                               @RequestParam(defaultValue = "10") int pageSize,
-                               @RequestParam(required = false) String keyword) {
-        return userInterface.getUserList(page, pageSize, keyword);
-    }
+
 
 }

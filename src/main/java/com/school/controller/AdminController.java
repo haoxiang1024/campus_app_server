@@ -127,4 +127,11 @@ public class AdminController {
                                       @RequestParam(required = false) String keyword) {
         return admin.getLostPage(page, pageSize, keyword);
     }
+    @ResponseBody
+    @GetMapping("/searchList")
+    public ServerResponse list(@RequestParam(defaultValue = "1") int page,
+                               @RequestParam(defaultValue = "10") int pageSize,
+                               @RequestParam(required = false) String keyword) {
+        return userInterface.getUserList(page, pageSize, keyword);
+    }
 }

@@ -192,10 +192,13 @@ public class UserService implements UserInterface {
         int offset = (page - 1) * pageSize;
         List<User> list = userMapper.getUserPage(offset, pageSize, keyword);
         int total = userMapper.getUserCount(keyword);
+        int listSize=userMapper.getUserCount(null);//获取所有用户数量
 
         Map<String, Object> result = new HashMap<>();
         result.put("list", list);
-        result.put("totalPages", (int) Math.ceil((double) total / pageSize));
+        result.put("total", (int) Math.ceil((double) total / pageSize));
+        result.put("listSize", listSize);
+        result.put("total_if", total);//查询了之后的所有记录
         return ServerResponse.createServerResponseBySuccess(result);
     }
 }

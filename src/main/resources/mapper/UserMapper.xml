@@ -87,8 +87,7 @@
         SELECT * FROM user
         <where>
             <if test="keyword != null and keyword != ''">
-                AND (username LIKE CONCAT('%', #{keyword}, '%') OR nickname LIKE CONCAT('%', #{keyword}, '%'))
-            </if>
+                AND (phone LIKE CONCAT('%', #{keyword}, '%') OR nickname LIKE CONCAT('%', #{keyword}, '%')OR email LIKE CONCAT('%', #{keyword}, '%'))            </if>
         </where>
         LIMIT #{offset}, #{pageSize}
     </select>
@@ -97,7 +96,7 @@
         SELECT COUNT(*) FROM user
         <where>
             <if test="keyword != null and keyword != ''">
-                AND (username LIKE CONCAT('%', #{keyword}, '%') OR nickname LIKE CONCAT('%', #{keyword}, '%'))
+                AND (phone LIKE CONCAT('%', #{keyword}, '%') OR nickname LIKE CONCAT('%', #{keyword}, '%')OR email LIKE CONCAT('%', #{keyword}, '%'))
             </if>
         </where>
     </select>

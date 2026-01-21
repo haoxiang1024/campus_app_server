@@ -1,7 +1,7 @@
 <link href="./css/sweetalert2.min.css" rel="stylesheet">
 
 <style>
-    /* 核心变量与基础样式 - 与 Lost 保持一致 */
+    /* 核心变量与基础样式 */
     .text-custom-blue { color: #00aaff !important; }
 
     .content-wrapper {
@@ -28,7 +28,6 @@
         color: white !important;
     }
 
-    /* 用户管理特有样式 */
     #avatarPreview {
         width: 80px;
         height: 80px;
@@ -151,7 +150,6 @@
         const pageSize = 10;
         let allUsersData = [];
 
-        // 统一弹窗工具 - 保持与 Lost 一致
         window.Toast = window.Toast || {
             success: (msg) => {
                 Swal.fire({ icon: 'success', title: msg, toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, width: '220px', padding: '0.5rem' });
@@ -180,7 +178,7 @@
             allUsersData = list;
             const $tbody = $('#userTableBody');
             if (!list || list.length === 0) {
-                $tbody.html('<tr><td colspan="10" class="text-center text-muted">暂无匹配的数据</td></tr>');
+                $tbody.html('<tr><td colspan="10" class="text-center text-muted">未找到匹配的用户数据</td></tr>');
                 return;
             }
             let html = '';
@@ -208,12 +206,10 @@
             });
             $tbody.html(html);
 
-            // 重新绑定开关监听
             $('.status-switch').off('change').on('change', function() {
                 updateUserStatus([$(this).data('id')], this.checked ? 1 : 0);
             });
 
-            // 重新绑定编辑监听
             $('.btn-edit-user').off('click').on('click', function() {
                 const user = allUsersData.find(item => item.id == $(this).data('id'));
                 if (user) {
@@ -227,28 +223,59 @@
                 }
             });
 
-            // 行内重置密码
             $('.btn-reset-pwd').off('click').on('click', function() {
                 const id = $(this).data('id');
                 window.Toast.confirm('重置确认', '确定要将该用户的密码重置为 a12345678 吗？', () => resetPassword([id]));
             });
         }
 
+        // 核心修改：使用你确认可用的 8081 端口路径
         function loadUsers(page) {
             currentPage = page;
-            $('#userTableBody').html('<tr><td colspan="10" class="text-center text-muted">正在检索最新数据...</td></tr>');
-            $.get(`/school/admin/getAllUserInfo`, { page: page, size: pageSize, _t: new Date().getTime() }, function(res) {
-                if (res.status === 0) {
+            const kw = $('#userKeyword').val().trim();
+
+            $('#userTableBody').html('<tr><td colspan="10" class="text-center text-muted">正在检索数据...</td></tr>');
+
+            // 注意：如果前端代码部署在不同端口，这里需要写全路径，否则写相对路径
+            const apiUrl = `/school/admin/searchList`;
+
+            $.get(apiUrl, {
+                page: currentPage,
+                pageSize: pageSize,
+                keyword: kw
+            }, function(res) {
+                // 确保 status 为 0 且 data 存在
+                if (res.status === 0 && res.data) {
                     const list = res.data.list || [];
                     const total = res.data.total || 0;
-                    totalPages = Math.ceil(total / pageSize) || 1;
+                    const listSize=res.data.listSize||0;
+                    const total_if=res.data.total_if||0;//查询了之后的所有记录
+                   // console.log(res.data.total)
+
+                    // 计算总页数，确保至少有1页
+                    totalPages = Math.max(1, total);
+
                     renderUserTable(list);
+
+                    // 更新分页UI显示
                     $('#pageInfo').text(`第 ${currentPage} 页 / 共 ${totalPages} 页`);
-                    $('#btnFirstPage, #btnPrevPage').prop('disabled', currentPage === 1);
-                    $('#btnNextPage, #btnLastPage').prop('disabled', currentPage === totalPages);
+                    $('#TotalCount').text(listSize);
+                    if (!kw) {
+                        //初始记录
+                        $('#TotalCount').text(listSize);
+                    } else {
+                        //有搜索结果的记录
+                        $('#TotalCount').text(total_if);
+                    }
+                    // 按钮启用/禁用控制
+                    $('#btnFirstPage, #btnPrevPage').prop('disabled', currentPage <= 1);
+                    $('#btnNextPage, #btnLastPage').prop('disabled', currentPage >= totalPages);
                     $('#selectAll').prop('checked', false);
-                    $('#TotalCount').text(total);
+                } else {
+                    $('#userTableBody').html(`<tr><td colspan="10" class="text-center text-danger">加载失败: ${res.msg || '空数据'}</td></tr>`);
                 }
+            }).fail(function(xhr) {
+                $('#userTableBody').html(`<tr><td colspan="10" class="text-center text-danger">请求失败 (HTTP ${xhr.status})，请检查 CORS 跨域或路径</td></tr>`);
             });
         }
 
@@ -268,18 +295,19 @@
             });
         }
 
-        // 头像预览处理
-        $('#editPhoto').off('change').on('change', function() {
-            const file = this.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = e => $('#avatarPreview').attr('src', e.target.result);
-                reader.readAsDataURL(file);
-            }
-        });
+        // 搜索事件
+        $('#btnSearchUser').on('click', () => loadUsers(1));
+        $('#userKeyword').on('keypress', e => { if(e.which === 13) loadUsers(1); });
 
-        // 提交编辑
-        $('#btnSubmitEdit').off('click').on('click', function() {
+        // 分页按钮绑定
+        $('#btnFirstPage').on('click', () => loadUsers(1));
+        $('#btnLastPage').on('click', () => loadUsers(totalPages));
+        $('#btnPrevPage').on('click', () => { if(currentPage > 1) loadUsers(currentPage - 1); });
+        $('#btnNextPage').on('click', () => { if(currentPage < totalPages) loadUsers(currentPage + 1); });
+
+        $('#selectAll').on('change', function() { $('.user-checkbox').prop('checked', this.checked); });
+
+        $('#btnSubmitEdit').on('click', function() {
             const formData = new FormData(document.getElementById('editUserForm'));
             $.ajax({
                 url: '/school/admin/updateUserInfo',
@@ -290,7 +318,7 @@
                 success: function(res) {
                     if (res.status === 0) {
                         $('#editUserModal').modal('hide');
-                        window.Toast.success('用户信息修改成功');
+                        window.Toast.success('修改成功');
                         loadUsers(currentPage);
                     } else {
                         window.Toast.error(res.msg);
@@ -299,46 +327,68 @@
             });
         });
 
-        // 搜索功能
-        function doSearch() {
-            const kw = $('#userKeyword').val().trim();
-            if (!kw) { loadUsers(1); return; }
-            $('#userTableBody').html('<tr><td colspan="10" class="text-center text-muted">搜索中...</td></tr>');
-            $.get('/school/admin/searchUsers', { keyword: kw }, function(res) {
-                if (res.status === 0) {
-                    renderUserTable(res.data);
-                    $('#pageInfo').text(`搜索结果: ${res.data.length} 条`);
-                    $('#TotalCount').text(res.data.length);
+        // 批量操作
+        // 批量操作逻辑增强
+        $('#btnBatchEnable').off('click').on('click', function() {
+            const selectedIds = $('.user-checkbox:checked').map((i, el) => el.value).get();
+            if (!selectedIds.length) return window.Toast.error('请选择用户');
+
+            // 过滤：找出已经是禁用状态(state=0)的用户，即真正需要启用的
+            const targetIds = [];
+            let skipCount = 0;
+
+            selectedIds.forEach(id => {
+                const user = allUsersData.find(u => u.id == id);
+                if (user && user.state === 0) {
+                    targetIds.push(id);
+                } else {
+                    skipCount++;
                 }
             });
-        }
 
-        // 事件解绑与绑定 - 解决重复加载问题
-        $('#btnSearchUser').off('click').on('click', doSearch);
-        $('#userKeyword').off('keypress').on('keypress', e => { if(e.which===13) doSearch(); });
-        $('#btnFirstPage').off('click').on('click', () => loadUsers(1));
-        $('#btnLastPage').off('click').on('click', () => loadUsers(totalPages));
-        $('#btnPrevPage').off('click').on('click', () => { if(currentPage > 1) loadUsers(currentPage - 1); });
-        $('#btnNextPage').off('click').on('click', () => { if(currentPage < totalPages) loadUsers(currentPage + 1); });
-        $('#selectAll').off('change').on('change', function() { $('.user-checkbox').prop('checked', this.checked); });
+            if (targetIds.length === 0) {
+                return window.Toast.error(`选中的用户已全部处于启用状态，无需操作`);
+            }
 
-        // 批量操作按钮
-        $('#btnBatchEnable').off('click').on('click', function() {
-            const ids = $('.user-checkbox:checked').map((i, el) => el.value).get();
-            if (!ids.length) return window.Toast.error('请选择用户');
-            window.Toast.confirm('确认批量启用', `确认启用选中的 ${ids.length} 个账号吗？`, () => updateUserStatus(ids, 1));
+            const msg = skipCount > 0
+                ? `确认启用选中的 ${targetIds.length} 个账号吗？(已跳过 ${skipCount} 个已启用的账号)`
+                : `确认启用选中的 ${targetIds.length} 个账号吗？`;
+
+            window.Toast.confirm('确认批量启用', msg, () => updateUserStatus(targetIds, 1));
         });
 
         $('#btnBatchDisable').off('click').on('click', function() {
-            const ids = $('.user-checkbox:checked').map((i, el) => el.value).get();
-            if (!ids.length) return window.Toast.error('请选择用户');
-            window.Toast.confirm('确认批量禁用', `确认禁用选中的 ${ids.length} 个账号吗？`, () => updateUserStatus(ids, 0));
+            const selectedIds = $('.user-checkbox:checked').map((i, el) => el.value).get();
+            if (!selectedIds.length) return window.Toast.error('请选择用户');
+
+            // 过滤：找出已经是启用状态(state=1)的用户，即真正需要禁用的
+            const targetIds = [];
+            let skipCount = 0;
+
+            selectedIds.forEach(id => {
+                const user = allUsersData.find(u => u.id == id);
+                if (user && user.state === 1) {
+                    targetIds.push(id);
+                } else {
+                    skipCount++;
+                }
+            });
+
+            if (targetIds.length === 0) {
+                return window.Toast.error(`选中的用户已全部处于禁用状态，无需操作`);
+            }
+
+            const msg = skipCount > 0
+                ? `确认禁用选中的 ${targetIds.length} 个账号吗？(已自动跳过 ${skipCount} 个已禁用的账号)`
+                : `确认禁用选中的 ${targetIds.length} 个账号吗？`;
+
+            window.Toast.confirm('确认批量禁用', msg, () => updateUserStatus(targetIds, 0));
         });
 
-        $('#btnBatchReset').off('click').on('click', function() {
+        $('#btnBatchReset').click(function() {
             const ids = $('.user-checkbox:checked').map((i, el) => el.value).get();
             if (!ids.length) return window.Toast.error('请选择用户');
-            window.Toast.confirm('批量重置确认', `确认重置选中的 ${ids.length} 个用户的密码吗？`, () => resetPassword(ids));
+            window.Toast.confirm('重置确认', `确认重置选中用户的密码吗？`, () => resetPassword(ids));
         });
 
         // 首次加载
