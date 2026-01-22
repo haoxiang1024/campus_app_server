@@ -133,10 +133,10 @@ INSERT INTO `found` VALUES (41, '红色包包', 'https://i04piccdn.sogoucdn.com/
 INSERT INTO `found` VALUES (42, '身份证', 'https://i01piccdn.sogoucdn.com/e541137a3489da25', '2023-05-08 14:00:00', '在三号楼的卫生间捡到的', '三号楼', '16954986375', '已认领', 1, 3, 52);
 
 -- ----------------------------
--- Table structure for lost
+-- Table structure for lostFound
 -- ----------------------------
-DROP TABLE IF EXISTS `lost`;
-CREATE TABLE `lost`  (
+DROP TABLE IF EXISTS `lostFound`;
+CREATE TABLE `lostFound`  (
   `id` int NOT NULL AUTO_INCREMENT,
   `title` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `img` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
@@ -156,75 +156,75 @@ CREATE TABLE `lost`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 68 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Records of lost
+-- Records of lostFound
 -- ----------------------------
-INSERT INTO `lost` VALUES (1, '手机', 'https://i03piccdn.sogoucdn.com/8752c6a0ef3cda8c', '2023-05-23 00:00:00', '我丢失了一个华为手机', '软件大楼', '13794916353', '未找到', 0, 1, 1);
-INSERT INTO `lost` VALUES (2, '电脑', 'https://img02.sogoucdn.com/app/a/100520020/30de8fb57e3b6788414814ffb1854ea2', '2023-06-02 10:34:52', '我丢失了一个点电脑', '软件大楼10楼320', '13794916353', '未找到', 0, 1, 1);
-INSERT INTO `lost` VALUES (3, '硬盘', 'https://img02.sogoucdn.com/app/a/100520020/70402067f4c0b59cbde63dff31fdeb72', '2023-06-20 10:38:40', '丢失了一个硬盘', '学院', '15082411712', '未找到', 0, 1, 2);
-INSERT INTO `lost` VALUES (4, '钥匙', 'https://i01piccdn.sogoucdn.com/7aee565d9d829b29', '2023-05-30 13:15:00', '在行政楼拾得一串钥匙，请失主尽快联系领取。', '行政楼', '18682675515', '未找到', 0, 3, 3);
-INSERT INTO `lost` VALUES (5, '灰色双肩包', 'https://i04piccdn.sogoucdn.com/e19c1efb22971560', '2023-06-02 08:45:00', '在教学大楼B区上丢失一只灰色双肩包，里面有重要物品，请拾到者速与我联系，谢谢。', '教学大楼B区', '1', '已找到', 0, 4, 4);
-INSERT INTO `lost` VALUES (6, '钱包', 'https://img03.sogoucdn.com/app/a/100520020/7158ddb5d551266ca8b4fbde666d0982', '2023-05-29 16:20:00', '在行政楼拾得一个红色钱包，里面有身份证、银行卡等，请失主尽快联系。', '行政楼', '10802788799', '未找到', 1, 3, 5);
-INSERT INTO `lost` VALUES (7, '蓝色小熊', 'https://img01.sogoucdn.com/app/a/100520020/3dcffd98537a6a1195da1f5f55ca0f50', '2023-05-28 11:50:00', '小孩子爱睡觉时突然不见了他最爱的小熊，希望有拾到者能够联系我，感激不尽。', '行政楼', '11155904369', '未找到', 0, 3, 6);
-INSERT INTO `lost` VALUES (8, '银色项链', 'https://img03.sogoucdn.com/app/a/100520020/4f5d9f90d1e14bc9757db969c014131e', '2023-05-31 09:00:00', '在餐厅用餐时不小心掉落了银色项链，希望拾到者能够归还，谢谢！', '学校餐厅', '19260441509', '未找到', 0, 4, 7);
-INSERT INTO `lost` VALUES (9, '小狗', 'https://i01piccdn.sogoucdn.com/a83029296616a06d', '2023-05-20 15:30:00', '在操场拾得一只小狗，毛色金黄，颈系红色项圈，希望失主尽快联系领取。', '操场', '16027175827', '未找到', 0, 5, 8);
-INSERT INTO `lost` VALUES (10, '学生证', 'https://i02piccdn.sogoucdn.com/3bec202a13382012', '2023-05-26 11:10:00', '在校园篮球场上丢失了一张学生证，上面有很多重要信息，请拾到者联系我。', '高新校园', '17870449127', '未找到', 1, 2, 9);
-INSERT INTO `lost` VALUES (11, '背包', 'https://img04.sogoucdn.com/app/a/100520020/b286f506e6aee125e540688e980d4835', '2023-05-19 17:20:00', '在教学大楼B区拾得一个黑色背包，请失主联系我领取。', '教学大楼B区', '19468331823', '未找到', 0, 4, 10);
-INSERT INTO `lost` VALUES (12, '手套', 'https://i04piccdn.sogoucdn.com/e07be08df401dbe9', '2023-05-23 14:45:00', '在行政楼遗失一副深蓝色手套，希望有拾到者能够联系我。', '行政楼', '17713690064', '未找到', 0, 4, 11);
-INSERT INTO `lost` VALUES (13, '电脑', 'https://img03.sogoucdn.com/app/a/100520020/e2412a3d7fc0fce63c77e4d67e989e9a', '2023-05-27 09:00:00', '在软件大楼等车时丢失一台黑色笔记本电脑，请在拾到者看到时及时联系我。', '软件大楼', '16060383911', '未找到', 0, 1, 12);
-INSERT INTO `lost` VALUES (14, '雨伞', 'https://i03piccdn.sogoucdn.com/dca70d6ddcb164b7', '2023-05-25 12:10:00', '在学校拾得一把蓝色雨伞，请失主联系我领取。', '某校园', '10939380459', '未找到', 0, 3, 13);
-INSERT INTO `lost` VALUES (15, '红包', 'https://img01.sogoucdn.com/app/a/100520020/3dcffd98537a6a1195da1f5f55ca0f50', '2023-06-02 13:30:00', '在软件大楼上不慎遗失一个红色小红包，内有钱财，请拾到者速与我联系，谢谢！', '软件大楼', '16166175424', '未找到', 0, 3, 14);
-INSERT INTO `lost` VALUES (16, '钥匙串', 'https://i01piccdn.sogoucdn.com/6a01dfcf13cbef0b', '2023-05-23 16:20:00', '在学生公寓3拾得一串钥匙，请失主联系我领取。', '学生公寓3', '13681837802', '未找到', 0, 3, 15);
-INSERT INTO `lost` VALUES (17, '童车', 'https://img04.sogoucdn.com/app/a/100520020/b286f506e6aee125e540688e980d4835', '2023-05-19 09:00:00', '在学生公寓3丢失一辆红色童车，敬请拾到者联系我，感谢！', '学生公寓3', '11066576765', '未找到', 0, 5, 16);
-INSERT INTO `lost` VALUES (18, '紫色背包', 'https://img03.sogoucdn.com/app/a/100520020/06c89d445c79be53c45a0f2730ee5ed3', '2023-05-31 12:30:00', '在教学大楼B区丢失一只紫色背包，请拾到者归还，感谢！', '教学大楼B区', '12631694074', '未找到', 0, 4, 17);
-INSERT INTO `lost` VALUES (19, '大熊猫', 'https://i03piccdn.sogoucdn.com/f939a925786fd0ff', '2023-05-24 14:50:00', '在公园拾得一只大熊猫，失主请快联系我领取。', '温江公园', '10481984190', '未找到', 0, 5, 18);
-INSERT INTO `lost` VALUES (20, '音响', 'https://i04piccdn.sogoucdn.com/23f7ed9f625347e0', '2023-05-20 15:20:00', '在派对上遗失了一只音响，请拾到者尽快联系我，谢谢！', '某聚会场所', '10313633788', '未找到', 0, 1, 19);
-INSERT INTO `lost` VALUES (21, '手机', 'https://img03.sogoucdn.com/app/a/100520020/ecd916c5e9393012764a27796defc118', '2022-05-10 00:00:00', '在学校图书馆丢失了一部iPhone11，有拾到者请联系我', '软件大楼', '13789259851', '未找到', 0, 1, 20);
-INSERT INTO `lost` VALUES (22, '钱包', 'https://img03.sogoucdn.com/app/a/100520020/ba6deda77b333b7fb3ed677835744d35', '2022-05-12 00:00:00', '在教学楼A区捡到一个钱包，内有身份证和银行卡，请失主与我联系', '教学楼A区', '11292232565', '未找到', 0, 3, 21);
-INSERT INTO `lost` VALUES (23, 'U盘', 'https://img02.sogoucdn.com/app/a/100520020/70ebd7f19fce3d15cc2495ca853cc474', '2022-05-14 00:00:00', '在教学楼A区丢失了一个白色U盘，里面存有重要文件，请拾到者归还，谢谢', '教学楼A区', '15841745484', '未找到', 0, 1, 22);
-INSERT INTO `lost` VALUES (24, '钥匙串', 'https://i02piccdn.sogoucdn.com/9956b683efec8ba1', '2022-05-16 00:00:00', '在教学楼A区拾到一串钥匙，请失主与我联系', '教学楼A区', '11934391401', '未找到', 0, 3, 23);
-INSERT INTO `lost` VALUES (25, '护照', 'https://img02.sogoucdn.com/app/a/100520020/30de8fb57e3b6788414814ffb1854ea2', '2022-05-20 00:00:00', '在益食堂上遗失了一本护照，请拾到者与我联系，感激不尽', '益食堂', '14318088405', '未找到', 0, 2, 24);
-INSERT INTO `lost` VALUES (26, '电子手表', 'https://img03.sogoucdn.com/app/a/100520020/a852be285106f2e9d76eafb661333327', '2022-05-22 00:00:00', '在捡到一块电子手表，请失主与我联系', '益食堂', '16898622832', '未找到', 0, 1, 25);
-INSERT INTO `lost` VALUES (27, '行李', 'https://i02piccdn.sogoucdn.com/d0b854b7f2c5c999', '2022-05-24 00:00:00', '益食堂遗失了一件黑色旅行箱，请拾到者归还，谢谢', '益食堂', '17897210753', '未找到', 0, 5, 26);
-INSERT INTO `lost` VALUES (28, '耳机', 'https://i04piccdn.sogoucdn.com/fbe75bb3e38ca04e', '2022-05-26 00:00:00', '在学生公寓1里捡到一只黑色耳机，请失主与我联系', '学生公寓1', '16476472203', '未找到', 0, 1, 27);
-INSERT INTO `lost` VALUES (29, '手环', 'https://img03.sogoucdn.com/app/a/100520020/4f5d9f90d1e14bc9757db969c014131e', '2022-05-28 00:00:00', '在学生公寓1遗失了一只手环，请有拾到者立即与我联系', '学生公寓1', '19132511855', '未找到', 0, 4, 28);
-INSERT INTO `lost` VALUES (30, '猫咪', 'https://img04.sogoucdn.com/app/a/100520020/0d797592ff8ec8ec96a2d30f36d74abc', '2022-05-30 00:00:00', '在体育馆内遇到一只迷路的小猫咪，请它的主人尽快联系我', '体育馆', '10885268347', '未找到', 1, 5, 29);
-INSERT INTO `lost` VALUES (31, '钥匙卡', 'https://img02.sogoucdn.com/app/a/100520020/99bc28b162e31d6630eec6b10f7f60bb', '2022-06-02 00:00:00', '在体育馆遗失了一张黑色钥匙卡，请有拾到者速速与我联系', '体育馆', '16884820950', '未找到', 0, 2, 30);
-INSERT INTO `lost` VALUES (32, '书包', 'https://i01piccdn.sogoucdn.com/69ef0f23fd380b98', '2022-06-04 00:00:00', '在体育馆上拾到一个蓝色书包，请失主尽快联系我', '体育馆', '18256522492', '未找到', 0, 4, 31);
-INSERT INTO `lost` VALUES (33, '身份证', 'https://i04piccdn.sogoucdn.com/2b26d546e7d9bc13', '2022-06-06 00:00:00', '在图书馆遗失了一张身份证，请拾到者联系我，感谢', '图书馆', '18605159603', '未找到', 0, 2, 32);
-INSERT INTO `lost` VALUES (34, '眼镜', 'https://img04.sogoucdn.com/app/a/100520020/3470c0a79d5043e240b0b170d6a8fa34', '2022-06-08 00:00:00', '在图书馆捡到一副眼镜，请失主速与我联系', '图书馆', '13117985544', '未找到', 0, 3, 33);
-INSERT INTO `lost` VALUES (35, '婴儿车', 'https://i01piccdn.sogoucdn.com/6a97458d700915ce', '2022-06-10 00:00:00', '在星期8超市遗失了一辆红色婴儿车，请有拾到者联系我', '星期8超市', '10525002053', '未找到', 0, 5, 34);
-INSERT INTO `lost` VALUES (36, '钱包', 'https://img01.sogoucdn.com/app/a/100520020/109f9ddbf2df587ea555d957412a41b8', '2022-06-12 00:00:00', '在星期8超市捡到一个钱包，请失主速与我联系', '星期8超市', '10185636767', '未找到', 0, 3, 35);
-INSERT INTO `lost` VALUES (37, '手提包', 'https://img03.sogoucdn.com/app/a/100520020/06c89d445c79be53c45a0f2730ee5ed3', '2022-06-14 00:00:00', '在钟楼上遗失了一个绿色手提包，请有心人速与我联系', '钟楼', '16822180855', '未找到', 0, 3, 36);
-INSERT INTO `lost` VALUES (38, '狗狗', 'https://img03.sogoucdn.com/app/a/100520020/378a2bacaa0a2dfb69b59fd3732e54b0', '2022-06-16 00:00:00', '在钟楼内遇到一只迷路的小狗狗，请主人尽快联系我', '钟楼', '14350279651', '未找到', 0, 5, 37);
-INSERT INTO `lost` VALUES (39, '笔记本电脑', 'https://i01piccdn.sogoucdn.com/a58d3e18f17db4b4', '2022-06-18 00:00:00', '在钟楼上遗失了一台苹果笔记本电脑，请拾到者与我联系', '钟楼', '13023893077', '未找到', 0, 1, 38);
-INSERT INTO `lost` VALUES (40, '自行车', 'https://img03.sogoucdn.com/app/a/100520020/3acff10bd3d8c617a3a51844479b23fe', '2022-06-20 00:00:00', '在钟楼捡到一辆蓝色山地自行车，请失主与我联系', '钟楼', '14890082310', '未找到', 0, 5, 39);
-INSERT INTO `lost` VALUES (41, '手表', 'https://img01.sogoucdn.com/app/a/100520020/a2c005282b3bad02aa8dc457ba45aea4', '2023-06-02 10:34:52', '本人于拾得手表一个，望失主前来认领。', '学术交流中心', '17481553826', '未找到', 1, 1, 40);
-INSERT INTO `lost` VALUES (42, 'U盘', 'https://i01piccdn.sogoucdn.com/1513861b0fc4fc49', '2023-06-02 10:34:52', '今日上午于教学楼B403捡到U盘一个，望失主前来认领。', '教学楼B区', '19429875684', '未找到', 0, 1, 41);
-INSERT INTO `lost` VALUES (43, '数码相机', 'https://i02piccdn.sogoucdn.com/c9f33770b5a6cbe8', '2023-06-02 10:34:52', '2月11号凌晨10分左右，在食堂门口，一部数码相机遗失在食堂门口桌子上，如有捡到请电话联系13706753298，望失主前来认领。', '二食堂', '19684380255', '未找到', 0, 1, 42);
-INSERT INTO `lost` VALUES (44, '笔记本电脑', 'https://img04.sogoucdn.com/app/a/100520020/ee994ae292a71e03cb1676fbbea0a67e', '2023-06-02 10:34:52', '晚上9:30左右在软件大楼前的步道上拾到笔记本电脑一个，锁屏是全家照片，望失主前来认领。', '软件大楼', '13300614196', '未找到', 0, 1, 43);
-INSERT INTO `lost` VALUES (45, '相机', 'https://img03.sogoucdn.com/app/a/100520020/a852be285106f2e9d76eafb661333327', '2023-06-02 10:34:52', '今天，行政楼今天捡到高级相机一部，希望找到失主。该相机为佳能6D，价值近万元。望失主看到消息和照片后，与之联系，望失主前来认领。', '行政楼', '14960399805', '未找到', 0, 1, 44);
-INSERT INTO `lost` VALUES (46, '鼠标', 'https://img03.sogoucdn.com/app/a/100520020/f7ef86aac285a5d5d7dbccf1cab37b50', '2023-06-02 10:34:52', '本人于今日在软件大楼拾得鼠标一个，望失主前来认领。', '软件大楼', '19688961952', '未找到', 0, 2, 45);
-INSERT INTO `lost` VALUES (47, '数据线', 'https://img01.sogoucdn.com/app/a/100520020/a2c005282b3bad02aa8dc457ba45aea4', '2023-06-02 10:34:52', '本人于今日拾得数据线一个，望失主前来认领。', '学术交流中心', '16169040399', '未找到', 0, 1, 46);
-INSERT INTO `lost` VALUES (48, '耳机盒', 'https://i03piccdn.sogoucdn.com/e9c14ad7c11fb3cb', '2023-06-02 10:34:52', '本人于拾得耳机盒一个，望失主前来认领。', '操场', '13788644367', '未找到', 0, 1, 47);
-INSERT INTO `lost` VALUES (49, '转换器', 'https://i02piccdn.sogoucdn.com/5b93fd3e07454bf0', '2023-06-02 10:34:52', '本人于拾得转换器一个，望失主前来认领。', '图书馆', '19126972389', '未找到', 0, 1, 48);
-INSERT INTO `lost` VALUES (50, '驾驶证', 'https://img03.sogoucdn.com/app/a/100520020/e2412a3d7fc0fce63c77e4d67e989e9a', '2023-06-02 10:34:52', '本人于今日拾得驾驶证一个，望失主前来认领。', '学术交流中心', '16296242740', '未找到', 0, 2, 49);
-INSERT INTO `lost` VALUES (51, '身份证', 'https://i04piccdn.sogoucdn.com/a077a8d77a80307b', '2023-06-02 10:34:52', '本人于拾得身份证一个，望失主前来认领。', '操场', '14843063924', '未找到', 0, 2, 50);
-INSERT INTO `lost` VALUES (52, '学生证', 'https://img03.sogoucdn.com/app/a/100520020/7158ddb5d551266ca8b4fbde666d0982', '2023-06-02 10:34:52', '本人于拾得学生证一个，望失主前来认领。', '图书馆', '12414423969', '未找到', 0, 2, 51);
-INSERT INTO `lost` VALUES (53, '身份证', 'https://i03piccdn.sogoucdn.com/3409a2442698ef96', '2023-06-02 10:34:52', '本人于拾得身份证一个，望失主前来认领。', '教学大楼A区', '16954986375', '未找到', 0, 2, 52);
-INSERT INTO `lost` VALUES (54, '驾驶证', 'https://i04piccdn.sogoucdn.com/0ec46ea760255823', '2023-06-02 10:34:52', '本人于拾得驾驶证一个，望失主前来认领。', '软件大楼', '15494122058', '未找到', 0, 2, 53);
-INSERT INTO `lost` VALUES (55, '戒指', 'https://img01.sogoucdn.com/app/a/100520020/3a3a600017b934b1bef0ab6ef3eb1612', '2023-06-02 10:34:52', '捡到一枚戒指💍本来以为不是，同事捡起来了[允悲]请看到的热心人帮忙转发', '益食堂门口', '14528186786', '未找到', 0, 4, 54);
-INSERT INTO `lost` VALUES (56, '手串', 'https://i01piccdn.sogoucdn.com/4080815410b57fae', '2023-06-02 10:34:52', '拾获手串一个', '教学楼B区', '10939380459', '未找到', 0, 4, 13);
-INSERT INTO `lost` VALUES (57, '项链', 'https://i01piccdn.sogoucdn.com/fdb311687dce887c', '2023-06-02 10:34:52', '在食堂门口，一条珠子项链遗失在食堂门口桌子上，如有捡到请电话联系13706753298，望失主前来认领。', '二食堂', '16166175424', '未找到', 0, 4, 14);
-INSERT INTO `lost` VALUES (58, '手镯', 'https://i02piccdn.sogoucdn.com/34c4de892ce8ec7a', '2023-06-02 10:34:52', '晚上9:30左右在软件大楼前的步道上拾获手镯1只，望失主前来认领。', '软件大楼', '16476472203', '未找到', 0, 4, 27);
-INSERT INTO `lost` VALUES (59, '白衬衣', 'https://i02piccdn.sogoucdn.com/68f9a901c3a5489c', '2023-06-02 10:34:52', '今天，行政楼今天捡到白衬衣和雨伞。', '行政楼', '19429875684', '未找到', 0, 4, 41);
-INSERT INTO `lost` VALUES (60, '衬衣', 'https://img04.sogoucdn.com/app/a/100520020/31cbb6c1f6e1d1a90dae5fa7d204ed63', '2023-06-02 10:34:52', '本人于今日在软件大楼拾得纯棉衬衣一件，望失主前来认领。', '软件大楼', '16822180855', '未找到', 0, 4, 36);
-INSERT INTO `lost` VALUES (61, '帽子', 'https://img04.sogoucdn.com/app/a/100520020/aff3e1f13023c46db237ed547c39fc56', '2023-06-02 10:34:52', '好心人拾获儿童帽子一个，望失主前来认领。', '学术交流中心', '10185636767', '未找到', 0, 4, 35);
-INSERT INTO `lost` VALUES (62, '童装购物袋', 'https://i02piccdn.sogoucdn.com/71340cac1aac588a', '2023-06-02 10:34:52', '操场上捡到一个童装购物袋，请到失物招领处领取。', '操场', '12631694074', '未找到', 0, 4, 17);
-INSERT INTO `lost` VALUES (63, '外套', 'https://img03.sogoucdn.com/app/a/100520020/f2ee1aca74c98ea933e96b70185a9845', '2023-06-02 10:34:52', '有同学在学校食堂二楼捡到一件校服外套，请丢失的同学到学校食堂二楼领取失物招领点领取。', '二食堂', '16296242740', '未找到', 1, 4, 49);
-INSERT INTO `lost` VALUES (64, '短袖', 'https://img01.sogoucdn.com/app/a/100520020/865da08836d4cb99193e3429d241f6b9', '2023-06-02 10:34:52', '本人于拾得短袖一件，望失主前来认领。', '教学大楼A区', '14890082310', '未找到', 0, 4, 39);
-INSERT INTO `lost` VALUES (65, '玉扳指', 'https://i02piccdn.sogoucdn.com/e899de03b8dc76c8', '2023-06-02 10:34:52', '本人于拾得玉扳指一个，望失主前来认领。', '软件大楼', '10802788799', '未找到', 0, 4, 5);
-INSERT INTO `lost` VALUES (66, '专用章', 'https://img04.sogoucdn.com/app/a/100520020/3470c0a79d5043e240b0b170d6a8fa34', '2023-06-02 10:34:52', '青岛传国物流有限公司提箱专用章。', '益食堂门口', '17897210753', '未找到', 1, 5, 26);
-INSERT INTO `lost` VALUES (67, '行李箱', 'https://i03piccdn.sogoucdn.com/65b0c07d0f0bb8b2', '2023-06-02 10:34:52', '在学生公寓门口捡到一个行李箱', '教学楼B区', '17713690064', '未找到', 1, 5, 11);
+INSERT INTO `lostFound` VALUES (1, '手机', 'https://i03piccdn.sogoucdn.com/8752c6a0ef3cda8c', '2023-05-23 00:00:00', '我丢失了一个华为手机', '软件大楼', '13794916353', '未找到', 0, 1, 1);
+INSERT INTO `lostFound` VALUES (2, '电脑', 'https://img02.sogoucdn.com/app/a/100520020/30de8fb57e3b6788414814ffb1854ea2', '2023-06-02 10:34:52', '我丢失了一个点电脑', '软件大楼10楼320', '13794916353', '未找到', 0, 1, 1);
+INSERT INTO `lostFound` VALUES (3, '硬盘', 'https://img02.sogoucdn.com/app/a/100520020/70402067f4c0b59cbde63dff31fdeb72', '2023-06-20 10:38:40', '丢失了一个硬盘', '学院', '15082411712', '未找到', 0, 1, 2);
+INSERT INTO `lostFound` VALUES (4, '钥匙', 'https://i01piccdn.sogoucdn.com/7aee565d9d829b29', '2023-05-30 13:15:00', '在行政楼拾得一串钥匙，请失主尽快联系领取。', '行政楼', '18682675515', '未找到', 0, 3, 3);
+INSERT INTO `lostFound` VALUES (5, '灰色双肩包', 'https://i04piccdn.sogoucdn.com/e19c1efb22971560', '2023-06-02 08:45:00', '在教学大楼B区上丢失一只灰色双肩包，里面有重要物品，请拾到者速与我联系，谢谢。', '教学大楼B区', '1', '已找到', 0, 4, 4);
+INSERT INTO `lostFound` VALUES (6, '钱包', 'https://img03.sogoucdn.com/app/a/100520020/7158ddb5d551266ca8b4fbde666d0982', '2023-05-29 16:20:00', '在行政楼拾得一个红色钱包，里面有身份证、银行卡等，请失主尽快联系。', '行政楼', '10802788799', '未找到', 1, 3, 5);
+INSERT INTO `lostFound` VALUES (7, '蓝色小熊', 'https://img01.sogoucdn.com/app/a/100520020/3dcffd98537a6a1195da1f5f55ca0f50', '2023-05-28 11:50:00', '小孩子爱睡觉时突然不见了他最爱的小熊，希望有拾到者能够联系我，感激不尽。', '行政楼', '11155904369', '未找到', 0, 3, 6);
+INSERT INTO `lostFound` VALUES (8, '银色项链', 'https://img03.sogoucdn.com/app/a/100520020/4f5d9f90d1e14bc9757db969c014131e', '2023-05-31 09:00:00', '在餐厅用餐时不小心掉落了银色项链，希望拾到者能够归还，谢谢！', '学校餐厅', '19260441509', '未找到', 0, 4, 7);
+INSERT INTO `lostFound` VALUES (9, '小狗', 'https://i01piccdn.sogoucdn.com/a83029296616a06d', '2023-05-20 15:30:00', '在操场拾得一只小狗，毛色金黄，颈系红色项圈，希望失主尽快联系领取。', '操场', '16027175827', '未找到', 0, 5, 8);
+INSERT INTO `lostFound` VALUES (10, '学生证', 'https://i02piccdn.sogoucdn.com/3bec202a13382012', '2023-05-26 11:10:00', '在校园篮球场上丢失了一张学生证，上面有很多重要信息，请拾到者联系我。', '高新校园', '17870449127', '未找到', 1, 2, 9);
+INSERT INTO `lostFound` VALUES (11, '背包', 'https://img04.sogoucdn.com/app/a/100520020/b286f506e6aee125e540688e980d4835', '2023-05-19 17:20:00', '在教学大楼B区拾得一个黑色背包，请失主联系我领取。', '教学大楼B区', '19468331823', '未找到', 0, 4, 10);
+INSERT INTO `lostFound` VALUES (12, '手套', 'https://i04piccdn.sogoucdn.com/e07be08df401dbe9', '2023-05-23 14:45:00', '在行政楼遗失一副深蓝色手套，希望有拾到者能够联系我。', '行政楼', '17713690064', '未找到', 0, 4, 11);
+INSERT INTO `lostFound` VALUES (13, '电脑', 'https://img03.sogoucdn.com/app/a/100520020/e2412a3d7fc0fce63c77e4d67e989e9a', '2023-05-27 09:00:00', '在软件大楼等车时丢失一台黑色笔记本电脑，请在拾到者看到时及时联系我。', '软件大楼', '16060383911', '未找到', 0, 1, 12);
+INSERT INTO `lostFound` VALUES (14, '雨伞', 'https://i03piccdn.sogoucdn.com/dca70d6ddcb164b7', '2023-05-25 12:10:00', '在学校拾得一把蓝色雨伞，请失主联系我领取。', '某校园', '10939380459', '未找到', 0, 3, 13);
+INSERT INTO `lostFound` VALUES (15, '红包', 'https://img01.sogoucdn.com/app/a/100520020/3dcffd98537a6a1195da1f5f55ca0f50', '2023-06-02 13:30:00', '在软件大楼上不慎遗失一个红色小红包，内有钱财，请拾到者速与我联系，谢谢！', '软件大楼', '16166175424', '未找到', 0, 3, 14);
+INSERT INTO `lostFound` VALUES (16, '钥匙串', 'https://i01piccdn.sogoucdn.com/6a01dfcf13cbef0b', '2023-05-23 16:20:00', '在学生公寓3拾得一串钥匙，请失主联系我领取。', '学生公寓3', '13681837802', '未找到', 0, 3, 15);
+INSERT INTO `lostFound` VALUES (17, '童车', 'https://img04.sogoucdn.com/app/a/100520020/b286f506e6aee125e540688e980d4835', '2023-05-19 09:00:00', '在学生公寓3丢失一辆红色童车，敬请拾到者联系我，感谢！', '学生公寓3', '11066576765', '未找到', 0, 5, 16);
+INSERT INTO `lostFound` VALUES (18, '紫色背包', 'https://img03.sogoucdn.com/app/a/100520020/06c89d445c79be53c45a0f2730ee5ed3', '2023-05-31 12:30:00', '在教学大楼B区丢失一只紫色背包，请拾到者归还，感谢！', '教学大楼B区', '12631694074', '未找到', 0, 4, 17);
+INSERT INTO `lostFound` VALUES (19, '大熊猫', 'https://i03piccdn.sogoucdn.com/f939a925786fd0ff', '2023-05-24 14:50:00', '在公园拾得一只大熊猫，失主请快联系我领取。', '温江公园', '10481984190', '未找到', 0, 5, 18);
+INSERT INTO `lostFound` VALUES (20, '音响', 'https://i04piccdn.sogoucdn.com/23f7ed9f625347e0', '2023-05-20 15:20:00', '在派对上遗失了一只音响，请拾到者尽快联系我，谢谢！', '某聚会场所', '10313633788', '未找到', 0, 1, 19);
+INSERT INTO `lostFound` VALUES (21, '手机', 'https://img03.sogoucdn.com/app/a/100520020/ecd916c5e9393012764a27796defc118', '2022-05-10 00:00:00', '在学校图书馆丢失了一部iPhone11，有拾到者请联系我', '软件大楼', '13789259851', '未找到', 0, 1, 20);
+INSERT INTO `lostFound` VALUES (22, '钱包', 'https://img03.sogoucdn.com/app/a/100520020/ba6deda77b333b7fb3ed677835744d35', '2022-05-12 00:00:00', '在教学楼A区捡到一个钱包，内有身份证和银行卡，请失主与我联系', '教学楼A区', '11292232565', '未找到', 0, 3, 21);
+INSERT INTO `lostFound` VALUES (23, 'U盘', 'https://img02.sogoucdn.com/app/a/100520020/70ebd7f19fce3d15cc2495ca853cc474', '2022-05-14 00:00:00', '在教学楼A区丢失了一个白色U盘，里面存有重要文件，请拾到者归还，谢谢', '教学楼A区', '15841745484', '未找到', 0, 1, 22);
+INSERT INTO `lostFound` VALUES (24, '钥匙串', 'https://i02piccdn.sogoucdn.com/9956b683efec8ba1', '2022-05-16 00:00:00', '在教学楼A区拾到一串钥匙，请失主与我联系', '教学楼A区', '11934391401', '未找到', 0, 3, 23);
+INSERT INTO `lostFound` VALUES (25, '护照', 'https://img02.sogoucdn.com/app/a/100520020/30de8fb57e3b6788414814ffb1854ea2', '2022-05-20 00:00:00', '在益食堂上遗失了一本护照，请拾到者与我联系，感激不尽', '益食堂', '14318088405', '未找到', 0, 2, 24);
+INSERT INTO `lostFound` VALUES (26, '电子手表', 'https://img03.sogoucdn.com/app/a/100520020/a852be285106f2e9d76eafb661333327', '2022-05-22 00:00:00', '在捡到一块电子手表，请失主与我联系', '益食堂', '16898622832', '未找到', 0, 1, 25);
+INSERT INTO `lostFound` VALUES (27, '行李', 'https://i02piccdn.sogoucdn.com/d0b854b7f2c5c999', '2022-05-24 00:00:00', '益食堂遗失了一件黑色旅行箱，请拾到者归还，谢谢', '益食堂', '17897210753', '未找到', 0, 5, 26);
+INSERT INTO `lostFound` VALUES (28, '耳机', 'https://i04piccdn.sogoucdn.com/fbe75bb3e38ca04e', '2022-05-26 00:00:00', '在学生公寓1里捡到一只黑色耳机，请失主与我联系', '学生公寓1', '16476472203', '未找到', 0, 1, 27);
+INSERT INTO `lostFound` VALUES (29, '手环', 'https://img03.sogoucdn.com/app/a/100520020/4f5d9f90d1e14bc9757db969c014131e', '2022-05-28 00:00:00', '在学生公寓1遗失了一只手环，请有拾到者立即与我联系', '学生公寓1', '19132511855', '未找到', 0, 4, 28);
+INSERT INTO `lostFound` VALUES (30, '猫咪', 'https://img04.sogoucdn.com/app/a/100520020/0d797592ff8ec8ec96a2d30f36d74abc', '2022-05-30 00:00:00', '在体育馆内遇到一只迷路的小猫咪，请它的主人尽快联系我', '体育馆', '10885268347', '未找到', 1, 5, 29);
+INSERT INTO `lostFound` VALUES (31, '钥匙卡', 'https://img02.sogoucdn.com/app/a/100520020/99bc28b162e31d6630eec6b10f7f60bb', '2022-06-02 00:00:00', '在体育馆遗失了一张黑色钥匙卡，请有拾到者速速与我联系', '体育馆', '16884820950', '未找到', 0, 2, 30);
+INSERT INTO `lostFound` VALUES (32, '书包', 'https://i01piccdn.sogoucdn.com/69ef0f23fd380b98', '2022-06-04 00:00:00', '在体育馆上拾到一个蓝色书包，请失主尽快联系我', '体育馆', '18256522492', '未找到', 0, 4, 31);
+INSERT INTO `lostFound` VALUES (33, '身份证', 'https://i04piccdn.sogoucdn.com/2b26d546e7d9bc13', '2022-06-06 00:00:00', '在图书馆遗失了一张身份证，请拾到者联系我，感谢', '图书馆', '18605159603', '未找到', 0, 2, 32);
+INSERT INTO `lostFound` VALUES (34, '眼镜', 'https://img04.sogoucdn.com/app/a/100520020/3470c0a79d5043e240b0b170d6a8fa34', '2022-06-08 00:00:00', '在图书馆捡到一副眼镜，请失主速与我联系', '图书馆', '13117985544', '未找到', 0, 3, 33);
+INSERT INTO `lostFound` VALUES (35, '婴儿车', 'https://i01piccdn.sogoucdn.com/6a97458d700915ce', '2022-06-10 00:00:00', '在星期8超市遗失了一辆红色婴儿车，请有拾到者联系我', '星期8超市', '10525002053', '未找到', 0, 5, 34);
+INSERT INTO `lostFound` VALUES (36, '钱包', 'https://img01.sogoucdn.com/app/a/100520020/109f9ddbf2df587ea555d957412a41b8', '2022-06-12 00:00:00', '在星期8超市捡到一个钱包，请失主速与我联系', '星期8超市', '10185636767', '未找到', 0, 3, 35);
+INSERT INTO `lostFound` VALUES (37, '手提包', 'https://img03.sogoucdn.com/app/a/100520020/06c89d445c79be53c45a0f2730ee5ed3', '2022-06-14 00:00:00', '在钟楼上遗失了一个绿色手提包，请有心人速与我联系', '钟楼', '16822180855', '未找到', 0, 3, 36);
+INSERT INTO `lostFound` VALUES (38, '狗狗', 'https://img03.sogoucdn.com/app/a/100520020/378a2bacaa0a2dfb69b59fd3732e54b0', '2022-06-16 00:00:00', '在钟楼内遇到一只迷路的小狗狗，请主人尽快联系我', '钟楼', '14350279651', '未找到', 0, 5, 37);
+INSERT INTO `lostFound` VALUES (39, '笔记本电脑', 'https://i01piccdn.sogoucdn.com/a58d3e18f17db4b4', '2022-06-18 00:00:00', '在钟楼上遗失了一台苹果笔记本电脑，请拾到者与我联系', '钟楼', '13023893077', '未找到', 0, 1, 38);
+INSERT INTO `lostFound` VALUES (40, '自行车', 'https://img03.sogoucdn.com/app/a/100520020/3acff10bd3d8c617a3a51844479b23fe', '2022-06-20 00:00:00', '在钟楼捡到一辆蓝色山地自行车，请失主与我联系', '钟楼', '14890082310', '未找到', 0, 5, 39);
+INSERT INTO `lostFound` VALUES (41, '手表', 'https://img01.sogoucdn.com/app/a/100520020/a2c005282b3bad02aa8dc457ba45aea4', '2023-06-02 10:34:52', '本人于拾得手表一个，望失主前来认领。', '学术交流中心', '17481553826', '未找到', 1, 1, 40);
+INSERT INTO `lostFound` VALUES (42, 'U盘', 'https://i01piccdn.sogoucdn.com/1513861b0fc4fc49', '2023-06-02 10:34:52', '今日上午于教学楼B403捡到U盘一个，望失主前来认领。', '教学楼B区', '19429875684', '未找到', 0, 1, 41);
+INSERT INTO `lostFound` VALUES (43, '数码相机', 'https://i02piccdn.sogoucdn.com/c9f33770b5a6cbe8', '2023-06-02 10:34:52', '2月11号凌晨10分左右，在食堂门口，一部数码相机遗失在食堂门口桌子上，如有捡到请电话联系13706753298，望失主前来认领。', '二食堂', '19684380255', '未找到', 0, 1, 42);
+INSERT INTO `lostFound` VALUES (44, '笔记本电脑', 'https://img04.sogoucdn.com/app/a/100520020/ee994ae292a71e03cb1676fbbea0a67e', '2023-06-02 10:34:52', '晚上9:30左右在软件大楼前的步道上拾到笔记本电脑一个，锁屏是全家照片，望失主前来认领。', '软件大楼', '13300614196', '未找到', 0, 1, 43);
+INSERT INTO `lostFound` VALUES (45, '相机', 'https://img03.sogoucdn.com/app/a/100520020/a852be285106f2e9d76eafb661333327', '2023-06-02 10:34:52', '今天，行政楼今天捡到高级相机一部，希望找到失主。该相机为佳能6D，价值近万元。望失主看到消息和照片后，与之联系，望失主前来认领。', '行政楼', '14960399805', '未找到', 0, 1, 44);
+INSERT INTO `lostFound` VALUES (46, '鼠标', 'https://img03.sogoucdn.com/app/a/100520020/f7ef86aac285a5d5d7dbccf1cab37b50', '2023-06-02 10:34:52', '本人于今日在软件大楼拾得鼠标一个，望失主前来认领。', '软件大楼', '19688961952', '未找到', 0, 2, 45);
+INSERT INTO `lostFound` VALUES (47, '数据线', 'https://img01.sogoucdn.com/app/a/100520020/a2c005282b3bad02aa8dc457ba45aea4', '2023-06-02 10:34:52', '本人于今日拾得数据线一个，望失主前来认领。', '学术交流中心', '16169040399', '未找到', 0, 1, 46);
+INSERT INTO `lostFound` VALUES (48, '耳机盒', 'https://i03piccdn.sogoucdn.com/e9c14ad7c11fb3cb', '2023-06-02 10:34:52', '本人于拾得耳机盒一个，望失主前来认领。', '操场', '13788644367', '未找到', 0, 1, 47);
+INSERT INTO `lostFound` VALUES (49, '转换器', 'https://i02piccdn.sogoucdn.com/5b93fd3e07454bf0', '2023-06-02 10:34:52', '本人于拾得转换器一个，望失主前来认领。', '图书馆', '19126972389', '未找到', 0, 1, 48);
+INSERT INTO `lostFound` VALUES (50, '驾驶证', 'https://img03.sogoucdn.com/app/a/100520020/e2412a3d7fc0fce63c77e4d67e989e9a', '2023-06-02 10:34:52', '本人于今日拾得驾驶证一个，望失主前来认领。', '学术交流中心', '16296242740', '未找到', 0, 2, 49);
+INSERT INTO `lostFound` VALUES (51, '身份证', 'https://i04piccdn.sogoucdn.com/a077a8d77a80307b', '2023-06-02 10:34:52', '本人于拾得身份证一个，望失主前来认领。', '操场', '14843063924', '未找到', 0, 2, 50);
+INSERT INTO `lostFound` VALUES (52, '学生证', 'https://img03.sogoucdn.com/app/a/100520020/7158ddb5d551266ca8b4fbde666d0982', '2023-06-02 10:34:52', '本人于拾得学生证一个，望失主前来认领。', '图书馆', '12414423969', '未找到', 0, 2, 51);
+INSERT INTO `lostFound` VALUES (53, '身份证', 'https://i03piccdn.sogoucdn.com/3409a2442698ef96', '2023-06-02 10:34:52', '本人于拾得身份证一个，望失主前来认领。', '教学大楼A区', '16954986375', '未找到', 0, 2, 52);
+INSERT INTO `lostFound` VALUES (54, '驾驶证', 'https://i04piccdn.sogoucdn.com/0ec46ea760255823', '2023-06-02 10:34:52', '本人于拾得驾驶证一个，望失主前来认领。', '软件大楼', '15494122058', '未找到', 0, 2, 53);
+INSERT INTO `lostFound` VALUES (55, '戒指', 'https://img01.sogoucdn.com/app/a/100520020/3a3a600017b934b1bef0ab6ef3eb1612', '2023-06-02 10:34:52', '捡到一枚戒指💍本来以为不是，同事捡起来了[允悲]请看到的热心人帮忙转发', '益食堂门口', '14528186786', '未找到', 0, 4, 54);
+INSERT INTO `lostFound` VALUES (56, '手串', 'https://i01piccdn.sogoucdn.com/4080815410b57fae', '2023-06-02 10:34:52', '拾获手串一个', '教学楼B区', '10939380459', '未找到', 0, 4, 13);
+INSERT INTO `lostFound` VALUES (57, '项链', 'https://i01piccdn.sogoucdn.com/fdb311687dce887c', '2023-06-02 10:34:52', '在食堂门口，一条珠子项链遗失在食堂门口桌子上，如有捡到请电话联系13706753298，望失主前来认领。', '二食堂', '16166175424', '未找到', 0, 4, 14);
+INSERT INTO `lostFound` VALUES (58, '手镯', 'https://i02piccdn.sogoucdn.com/34c4de892ce8ec7a', '2023-06-02 10:34:52', '晚上9:30左右在软件大楼前的步道上拾获手镯1只，望失主前来认领。', '软件大楼', '16476472203', '未找到', 0, 4, 27);
+INSERT INTO `lostFound` VALUES (59, '白衬衣', 'https://i02piccdn.sogoucdn.com/68f9a901c3a5489c', '2023-06-02 10:34:52', '今天，行政楼今天捡到白衬衣和雨伞。', '行政楼', '19429875684', '未找到', 0, 4, 41);
+INSERT INTO `lostFound` VALUES (60, '衬衣', 'https://img04.sogoucdn.com/app/a/100520020/31cbb6c1f6e1d1a90dae5fa7d204ed63', '2023-06-02 10:34:52', '本人于今日在软件大楼拾得纯棉衬衣一件，望失主前来认领。', '软件大楼', '16822180855', '未找到', 0, 4, 36);
+INSERT INTO `lostFound` VALUES (61, '帽子', 'https://img04.sogoucdn.com/app/a/100520020/aff3e1f13023c46db237ed547c39fc56', '2023-06-02 10:34:52', '好心人拾获儿童帽子一个，望失主前来认领。', '学术交流中心', '10185636767', '未找到', 0, 4, 35);
+INSERT INTO `lostFound` VALUES (62, '童装购物袋', 'https://i02piccdn.sogoucdn.com/71340cac1aac588a', '2023-06-02 10:34:52', '操场上捡到一个童装购物袋，请到失物招领处领取。', '操场', '12631694074', '未找到', 0, 4, 17);
+INSERT INTO `lostFound` VALUES (63, '外套', 'https://img03.sogoucdn.com/app/a/100520020/f2ee1aca74c98ea933e96b70185a9845', '2023-06-02 10:34:52', '有同学在学校食堂二楼捡到一件校服外套，请丢失的同学到学校食堂二楼领取失物招领点领取。', '二食堂', '16296242740', '未找到', 1, 4, 49);
+INSERT INTO `lostFound` VALUES (64, '短袖', 'https://img01.sogoucdn.com/app/a/100520020/865da08836d4cb99193e3429d241f6b9', '2023-06-02 10:34:52', '本人于拾得短袖一件，望失主前来认领。', '教学大楼A区', '14890082310', '未找到', 0, 4, 39);
+INSERT INTO `lostFound` VALUES (65, '玉扳指', 'https://i02piccdn.sogoucdn.com/e899de03b8dc76c8', '2023-06-02 10:34:52', '本人于拾得玉扳指一个，望失主前来认领。', '软件大楼', '10802788799', '未找到', 0, 4, 5);
+INSERT INTO `lostFound` VALUES (66, '专用章', 'https://img04.sogoucdn.com/app/a/100520020/3470c0a79d5043e240b0b170d6a8fa34', '2023-06-02 10:34:52', '青岛传国物流有限公司提箱专用章。', '益食堂门口', '17897210753', '未找到', 1, 5, 26);
+INSERT INTO `lostFound` VALUES (67, '行李箱', 'https://i03piccdn.sogoucdn.com/65b0c07d0f0bb8b2', '2023-06-02 10:34:52', '在学生公寓门口捡到一个行李箱', '教学楼B区', '17713690064', '未找到', 1, 5, 11);
 
 -- ----------------------------
 -- Table structure for lostfoundtype

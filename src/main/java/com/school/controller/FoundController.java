@@ -2,7 +2,7 @@ package com.school.controller;
 
 import com.school.entity.Found;
 import com.school.entity.Lostfoundtype;
-import com.school.mapper.LostFoundMapper;
+import com.school.mapper.LostFoundTypeMapper;
 import com.school.services.interfaces.FoundDetail;
 import com.school.services.interfaces.LostFoundType;
 import com.school.utils.ServerResponse;
@@ -21,7 +21,7 @@ public class FoundController {
     @Autowired
     private FoundDetail foundDetail;
     @Autowired
-    private LostFoundMapper lostFoundMapper;
+    private LostFoundTypeMapper lostFoundTypeMapper;
     @Autowired
     private LostFoundType lostFoundType;
 
@@ -37,7 +37,7 @@ public class FoundController {
     public ServerResponse getDetailByTitle(String title) {
         //获取标题id
         int id = 0;
-        List<Lostfoundtype> lostfoundtypes = lostFoundMapper.GetAll();
+        List<Lostfoundtype> lostfoundtypes = lostFoundTypeMapper.GetAll();
         //中英文转换
         String[] en = {"Digital Devices", "Certificates", "Daily Necessities", "Clothing and Apparel", "Other"};
         String[] cn = {"数码设备", "证件", "日用品", "服饰", "其他"};

@@ -1,19 +1,100 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.school.mapper.LostFoundMapper">
+    <insert id="addLost" useGeneratedKeys="true" keyProperty="id">
+        insert into lostFound (title, img, pub_date, content, place, phone, state, stick, lostfoundtype_id, user_id)
+        VALUES (#{lostFound.title}, #{lostFound.img}, #{lostFound.pub_date}, #{lostFound.content}, #{lostFound.place}, #{lostFound.phone},
+                #{lostFound.state}, #{lostFound.stick}, #{lostFound.lostfoundtypeId}, #{lostFound.user_id})
+
+    </insert>
+    <insert id="addBatch">
+        insert into lostFound(user_id)
+        values (#{user_id})
+    </insert>
+    <update id="updateImg">
+        update lostFound
+        set phone=#{phone},
+            user_id=#{user_id}
+        where id = #{id}
+    </update>
+    <update id="updateImgs">
+        update lostFound
+        set img=#{img}
+        where id = #{id}
+
+    </update>
+    <update id="updateState">
+        update lostFound
+        set state=#{state}
+        where id = #{id}
+    </update>
 
 
-    <select id="GetAll" resultType="com.school.entity.Lostfoundtype">
-        select id, name
-        from lostfoundtype
+    <select id="selectByTypeId" resultType="com.school.entity.LostFound">
+        select id,
+               title,
+               img,
+               pub_date,
+               content,
+               place,
+               phone,
+               state,
+               stick,
+               user_id
+        from lostFound
+        where lostfoundtype_id = #{lostfoundtypeId}
+          and state = '未找到'
+        order by pub_date desc
     </select>
-    <select id="getAllType" resultType="java.lang.String">
-        select name
-        from lostfoundtype
+    <select id="searchUserNameId" resultType="java.lang.String">
+        select nickname
+        from user
+        where id = #{id}
     </select>
-    <select id="typeIdByName" resultType="java.lang.Integer">
-        select id
-        from school_app.lostfoundtype
-        where name = #{name}
+    <select id="getAllByIdLostList" resultType="com.school.entity.LostFound">
+        select id,
+               title,
+               img,
+               pub_date,
+               content,
+               place,
+               phone,
+               state,
+               stick,
+               user_id
+        from lostFound
+        where user_id = #{user_id}
+        order by pub_date desc
     </select>
+    <select id="getAllList" resultType="com.school.entity.LostFound">
+        select id,
+               title,
+               img,
+               pub_date,
+               content,
+               place,
+               phone,
+               state,
+               stick,
+               user_id
+        from lostFound
+        where state = '未找到'
+    </select>
+    <select id="showLostList" resultType="com.school.entity.LostFound">
+        select id,
+               title,
+               img,
+               pub_date,
+               content,
+               place,
+               phone,
+               state,
+               stick,
+               user_id,
+               lostfoundtype_id
+        from lostFound
+        where stick = #{stick}
+          and state = '未找到'
+    </select>
+
 </mapper>

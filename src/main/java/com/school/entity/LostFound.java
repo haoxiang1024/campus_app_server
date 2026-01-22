@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.Objects;
 
 
-public class Lost implements Serializable {
+public class LostFound implements Serializable {
     private static final long serialVersionUID = 1L;
     
     private Integer id;
@@ -33,11 +33,32 @@ public class Lost implements Serializable {
 
     private Integer user_id;
     private String nickname;
-
-    public Lost() {
+    private  String type;
+    public LostFound() {
     }
 
-    public Lost(String title, String img, Date pub_date, String content, String place, String phone, String state, Integer stick, Integer lostfoundtype_id, Integer user_id, String nickname) {
+    @Override
+    public String toString() {
+        return "LostFound{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", img='" + img + '\'' +
+                ", pub_date=" + pub_date +
+                ", content='" + content + '\'' +
+                ", place='" + place + '\'' +
+                ", phone='" + phone + '\'' +
+                ", state='" + state + '\'' +
+                ", stick=" + stick +
+                ", lostfoundtype_id=" + lostfoundtype_id +
+                ", lostfoundtype=" + lostfoundtype +
+                ", user_id=" + user_id +
+                ", nickname='" + nickname + '\'' +
+                ", type='" + type + '\'' +
+                '}';
+    }
+
+    public LostFound(Integer id, String title, String img, Date pub_date, String content, String place, String phone, String state, Integer stick, Integer lostfoundtype_id, Lostfoundtype lostfoundtype, Integer user_id, String nickname, String type) {
+        this.id = id;
         this.title = title;
         this.img = img;
         this.pub_date = pub_date;
@@ -47,8 +68,10 @@ public class Lost implements Serializable {
         this.state = state;
         this.stick = stick;
         this.lostfoundtype_id = lostfoundtype_id;
+        this.lostfoundtype = lostfoundtype;
         this.user_id = user_id;
         this.nickname = nickname;
+        this.type = type;
     }
 
     public Lostfoundtype getLostfoundtype() {
@@ -177,35 +200,6 @@ public class Lost implements Serializable {
         this.user_id = user_id;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Lost lost = (Lost) o;
-        return Objects.equals(id, lost.id) && Objects.equals(title, lost.title) && Objects.equals(img, lost.img) && Objects.equals(pub_date, lost.pub_date) && Objects.equals(content, lost.content) && Objects.equals(place, lost.place) && Objects.equals(phone, lost.phone) && Objects.equals(state, lost.state) && Objects.equals(stick, lost.stick) && Objects.equals(lostfoundtype_id, lost.lostfoundtype_id) && Objects.equals(user_id, lost.user_id) && Objects.equals(nickname, lost.nickname);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, title, img, pub_date, content, place, phone, state, stick, lostfoundtype_id, user_id, nickname);
-    }
 
-    @Override
-    public String toString() {
-        return "Lost{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", img='" + img + '\'' +
-                ", pub_date=" + pub_date +
-                ", content='" + content + '\'' +
-                ", place='" + place + '\'' +
-                ", phone='" + phone + '\'' +
-                ", state='" + state + '\'' +
-                ", stick=" + stick +
-                ", lostfoundtype_id=" + lostfoundtype_id +
-                ", lostfoundtype=" + lostfoundtype +
-                ", user_id=" + user_id +
-                ", nickname='" + nickname + '\'' +
-                '}';
-    }
 }

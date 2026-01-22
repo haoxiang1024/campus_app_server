@@ -1,10 +1,9 @@
 package com.school.controller;
 
 
-import com.school.entity.Lost;
 import com.school.entity.Lostfoundtype;
-import com.school.mapper.LostFoundMapper;
-import com.school.services.interfaces.LostDetail;
+import com.school.mapper.LostFoundTypeMapper;
+import com.school.services.interfaces.LostFound;
 import com.school.services.interfaces.LostFoundType;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
@@ -20,13 +19,13 @@ import java.util.Map;
 
 
 @Controller
-public class LostController {
+public class LostFoundController {
     @Autowired
     private LostFoundType lostFoundType;
     @Autowired
-    private LostDetail lostDetail;
+    private LostFound lostFound;
     @Autowired
-    private LostFoundMapper lostFoundMapper;
+    private LostFoundTypeMapper lostFoundTypeMapper;
 
 
     @ResponseBody
@@ -41,7 +40,7 @@ public class LostController {
     public ServerResponse getDetailByTitle(HttpSession session, String title) {
         //获取标题id
         int id = 0;
-        List<Lostfoundtype> lostfoundtypes = lostFoundMapper.GetAll();
+        List<Lostfoundtype> lostfoundtypes = lostFoundTypeMapper.GetAll();
         //中英文转换
         String[] en = {"Digital Devices", "Certificates", "Daily Necessities", "Clothing and Apparel", "Other"};
         String[] cn = {"数码设备", "证件", "日用品", "服饰", "其他"};
@@ -61,16 +60,16 @@ public class LostController {
                 }
             }
        }
-        ServerResponse lostDetailList = lostDetail.getLostDetailList(id);
+        ServerResponse lostDetailList = lostFound.getLostDetailList(id);
         //更新图片地址
-        List<Lost> data = (List<Lost>) lostDetailList.getData();
+        List<com.school.entity.LostFound> data = (List<com.school.entity.LostFound>) lostDetailList.getData();
         String updatePic = "";
-        for (Lost lost : data) {
-            if (lost.getImg() == null) {
+        for (com.school.entity.LostFound lostFound : data) {
+            if (lostFound.getImg() == null) {
                 break;
             } else {
-                updatePic = Util.updatePic(lost.getImg());
-                lost.setImg(updatePic);
+                updatePic = Util.updatePic(lostFound.getImg());
+                lostFound.setImg(updatePic);
             }
 
         }
@@ -85,7 +84,7 @@ public class LostController {
     @ResponseBody
     @RequestMapping("/getUname")
     public ServerResponse getUname(HttpSession session, int id) {
-        ServerResponse lostDetailUserName = lostDetail.getUserName(id);
+        ServerResponse lostDetailUserName = lostFound.getUserName(id);
         if (lostDetailUserName.isSuccess()) {
             session.setAttribute("nickname", lostDetailUserName.getData());
         }
@@ -105,20 +104,20 @@ public class LostController {
     @ResponseBody
     @RequestMapping("/getAllLostUserId")
     public ServerResponse getAllByUserId(int user_id) {
-        return lostDetail.getAllByIdLostList(user_id);
+        return lostFound.getAllByIdLostList(user_id);
     }
 
     //更改状态
     @ResponseBody
     @RequestMapping("/updateLostState")
     public ServerResponse updateState(int id, String state, int user_id) {
-        return lostDetail.updateState(id, state, user_id);
+        return lostFound.updateState(id, state, user_id);
     }
 
     //置顶信息
     @ResponseBody
     @RequestMapping("/showLostList")
     public ServerResponse showLostList(int stick) {
-        return lostDetail.showLostList(stick);
+        return lostFound.showLostList(stick);
     }
 }

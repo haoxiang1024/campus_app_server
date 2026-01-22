@@ -2,7 +2,7 @@ package com.school.controller;
 
 import com.school.entity.User;
 import com.school.services.interfaces.Admin;
-import com.school.services.interfaces.LostDetail;
+import com.school.services.interfaces.LostFound;
 import com.school.services.interfaces.UserInterface;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
@@ -21,7 +21,7 @@ public class AdminController {
     @Autowired
     private Util util;
     @Autowired
-    private LostDetail lostDetail;
+    private LostFound lostFound;
     //管理员登录
     @ResponseBody
     @RequestMapping("/login")
@@ -103,22 +103,22 @@ public class AdminController {
     @ResponseBody
     @GetMapping("/getAllLost")
     public ServerResponse getAllLost(String keyword) {
-        return lostDetail.getAllLost(keyword);
+        return lostFound.getAllLost(keyword);
     }
     @ResponseBody
     @GetMapping("/getLostById")
     public ServerResponse getLostById(Integer lostId) {
-        return lostDetail.getLostById(lostId);
+        return lostFound.getLostById(lostId);
     }
     @ResponseBody
     @PostMapping("/deleteLost")
     public ServerResponse deleteLost(Integer lostId) {
-        return lostDetail.deleteLost(lostId);
+        return lostFound.deleteLost(lostId);
     }
     @ResponseBody
     @PostMapping("/updateLostStatus")
     public ServerResponse updateLostStatus(Integer lostId, String state) {
-        return lostDetail.updateLostStatus(lostId, state);
+        return lostFound.updateLostStatus(lostId, state);
     }
     @ResponseBody
     @GetMapping("/getLostList")
@@ -129,7 +129,7 @@ public class AdminController {
     }
     @ResponseBody
     @GetMapping("/searchList")
-    public ServerResponse list(@RequestParam(defaultValue = "1") int page,
+    public ServerResponse searchList(@RequestParam(defaultValue = "1") int page,
                                @RequestParam(defaultValue = "10") int pageSize,
                                @RequestParam(required = false) String keyword) {
         return userInterface.getUserList(page, pageSize, keyword);

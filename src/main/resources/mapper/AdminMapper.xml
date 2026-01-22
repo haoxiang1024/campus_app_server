@@ -11,8 +11,8 @@
             #{id}
         </foreach>
     </update>
-    <select id="getLostPage" resultType="com.school.entity.Lost">
-        SELECT * FROM lost
+    <select id="getLostPage" resultType="com.school.entity.LostFound">
+        SELECT * FROM lostFound
         <where>
             <if test="keyword != null and keyword != ''">
                 AND (title LIKE CONCAT('%', #{keyword}, '%') OR place LIKE CONCAT('%', #{keyword}, '%'))
@@ -23,7 +23,7 @@
     </select>
 
     <select id="getLostCount" resultType="int">
-        SELECT COUNT(*) FROM lost
+        SELECT COUNT(*) FROM lostFound
         <where>
             <if test="keyword != null and keyword != ''">
                 AND (title LIKE CONCAT('%', #{keyword}, '%') OR place LIKE CONCAT('%', #{keyword}, '%'))

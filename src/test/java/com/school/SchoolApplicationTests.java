@@ -4,7 +4,7 @@ import com.school.mapper.UserMapper;
 import com.school.services.impl.LostFoundTypeService;
 import com.school.services.impl.UserService;
 import com.school.services.interfaces.FoundDetail;
-import com.school.services.interfaces.LostDetail;
+import com.school.services.interfaces.LostFound;
 import com.school.utils.EmailVerificationUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ class SchoolApplicationTests {
     @Autowired
     UserService userService;
     @Autowired
-    private LostDetail lostDetail;
+    private LostFound lostFound;
     @Autowired
     private FoundDetail foundDetail;
     @Test

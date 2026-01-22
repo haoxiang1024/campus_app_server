@@ -1,7 +1,7 @@
 package com.school.services.impl;
 
 import com.school.entity.Lostfoundtype;
-import com.school.mapper.LostFoundMapper;
+import com.school.mapper.LostFoundTypeMapper;
 import com.school.services.interfaces.LostFoundType;
 import com.school.utils.ResponseCode;
 import com.school.utils.ServerResponse;
@@ -16,13 +16,13 @@ import java.util.Map;
 public class LostFoundTypeService implements LostFoundType {
     String key = "typeList";//key值用于redsi存储
     @Autowired
-    private LostFoundMapper lostFoundMapper;
+    private LostFoundTypeMapper lostFoundTypeMapper;
 
 
     @Override
     public ServerResponse getAllType() {
 
-        List<String> lostfoundtypeList = lostFoundMapper.getAllType();
+        List<String> lostfoundtypeList = lostFoundTypeMapper.getAllType();
         if (lostfoundtypeList == null) {
             //数据为空
             return ServerResponse.createServerResponseByFail(ResponseCode.DATA_EMPTY.getCode(), ResponseCode.DATA_EMPTY.getMsg());
@@ -45,7 +45,7 @@ public class LostFoundTypeService implements LostFoundType {
         }
         //获取标题id
         int id = 0;
-        List<Lostfoundtype> lostfoundtypes = lostFoundMapper.GetAll();
+        List<Lostfoundtype> lostfoundtypes = lostFoundTypeMapper.GetAll();
         for (Lostfoundtype lostfoundtype : lostfoundtypes) {
             if (lostfoundtype.getName().equals(name)) {
                 //中文

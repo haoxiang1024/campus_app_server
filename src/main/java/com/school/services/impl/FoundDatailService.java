@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.school.entity.Found;
 import com.school.entity.Lostfoundtype;
 import com.school.mapper.FoundMapper;
-import com.school.mapper.LostFoundMapper;
+import com.school.mapper.LostFoundTypeMapper;
 import com.school.services.interfaces.FoundDetail;
 import com.school.utils.ResponseCode;
 import com.school.utils.ServerResponse;
@@ -22,7 +22,7 @@ public class FoundDatailService implements FoundDetail {
     private FoundMapper foundMapper;
 
     @Autowired
-    private LostFoundMapper lostFoundMapper;
+    private LostFoundTypeMapper lostFoundTypeMapper;
 
     @Override
     public ServerResponse getFoundDetailList(int lostfoundtypeId) {
@@ -116,7 +116,7 @@ public class FoundDatailService implements FoundDetail {
             //设置用户名
             found.setNickname(userNameId);
             //设置分类
-            List<Lostfoundtype> lostfoundtypes = lostFoundMapper.GetAll();
+            List<Lostfoundtype> lostfoundtypes = lostFoundTypeMapper.GetAll();
             for (Lostfoundtype type : lostfoundtypes) {
                 if (Objects.equals(type.getId(), lostfoundtypeId)) {
                     found.setLostfoundtype(type);

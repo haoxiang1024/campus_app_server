@@ -2,7 +2,7 @@ package com.school.services.impl;
 
 import com.school.entity.Lostfoundtype;
 import com.school.entity.SearchInfo;
-import com.school.mapper.LostFoundMapper;
+import com.school.mapper.LostFoundTypeMapper;
 import com.school.mapper.SearchMapper;
 import com.school.mapper.UserMapper;
 import com.school.services.interfaces.SearchNeedInfo;
@@ -21,7 +21,7 @@ public class SearchInfoService implements SearchNeedInfo {
     @Autowired
     private UserMapper userMapper;
     @Autowired
-    private LostFoundMapper lostFoundMapper;
+    private LostFoundTypeMapper lostFoundTypeMapper;
 
     @Override
     public ServerResponse searchInfo(String value) {
@@ -41,7 +41,7 @@ public class SearchInfoService implements SearchNeedInfo {
                 String updatePic = Util.updatePic(searchInfo.getImg());
                 searchInfo.setImg(updatePic);
                 //设置分类
-                List<Lostfoundtype> lostfoundtypes = lostFoundMapper.GetAll();
+                List<Lostfoundtype> lostfoundtypes = lostFoundTypeMapper.GetAll();
                 for (Lostfoundtype type : lostfoundtypes
                 ) {
                     if (Objects.equals(type.getId(), searchInfo.getLostfoundtype_id())) {

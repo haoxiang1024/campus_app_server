@@ -5,7 +5,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 
 @Service
-public interface LostDetail {
+public interface LostFound {
     //获取丢失物品的详细信息
     ServerResponse getLostDetailList(int lostfoundtypeId);
 

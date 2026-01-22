@@ -2,7 +2,7 @@ package com.school.services.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.school.entity.Lost;
+import com.school.entity.LostFound;
 import com.school.entity.User;
 import com.school.mapper.AdminMapper;
 import com.school.services.interfaces.Admin;
@@ -102,7 +102,7 @@ public class AdminService implements Admin {
     @Override
     public ServerResponse getLostPage(int page, int pageSize, String keyword) {
         int offset = (page - 1) * pageSize;
-        List<Lost> list = adminMapper.getLostPage(offset, pageSize, keyword);
+        List<LostFound> list = adminMapper.getLostPage(offset, pageSize, keyword);
         int total = adminMapper.getLostCount(keyword);
 
         Map<String, Object> result = new HashMap<>();

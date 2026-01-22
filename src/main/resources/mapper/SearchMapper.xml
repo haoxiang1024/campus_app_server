@@ -6,8 +6,8 @@
 
     <select id="searchInfoByValue" resultType="com.school.entity.SearchInfo">
         SELECT * FROM (
-                          SELECT id, title, img, pub_date, content, place, phone, state, stick, lostfoundtype_id, user_id, 'lost' AS type
-                          FROM lost
+                          SELECT id, title, img, pub_date, content, place, phone, state, stick, lostfoundtype_id, user_id, 'lostFound' AS type
+                          FROM lostFound
                           UNION ALL
                           SELECT id, title, img, pub_date, content, place, phone, state, stick, lostfoundtype_id, user_id, 'found' AS type
                           FROM found
