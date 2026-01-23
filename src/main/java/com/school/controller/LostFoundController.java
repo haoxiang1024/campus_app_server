@@ -1,10 +1,10 @@
 package com.school.controller;
 
 
-import com.school.entity.Lostfoundtype;
+import com.school.entity.LostFoundType;
 import com.school.mapper.LostFoundTypeMapper;
-import com.school.services.interfaces.LostFound;
-import com.school.services.interfaces.LostFoundType;
+import com.school.services.api.LostFoundService;
+import com.school.services.api.LostFoundTypeService;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,17 +21,17 @@ import java.util.Map;
 @Controller
 public class LostFoundController {
     @Autowired
-    private LostFoundType lostFoundType;
+    private LostFoundTypeService lostFoundTypeService;
     @Autowired
-    private LostFound lostFound;
+    private LostFoundService lostFoundService;
     @Autowired
     private LostFoundTypeMapper lostFoundTypeMapper;
 
 
     @ResponseBody
-    @RequestMapping("/getalltype")
-    public ServerResponse getalltype() {
-        return lostFoundType.getAllType();
+    @RequestMapping("/getAllType")
+    public ServerResponse getAllType() {
+        return lostFoundTypeService.getAllType();
     }
 
     @ResponseBody
@@ -40,7 +40,7 @@ public class LostFoundController {
     public ServerResponse getDetailByTitle(HttpSession session, String title) {
         //获取标题id
         int id = 0;
-        List<Lostfoundtype> lostfoundtypes = lostFoundTypeMapper.GetAll();
+        List<LostFoundType> lostFoundTypes = lostFoundTypeMapper.GetAll();
         //中英文转换
         String[] en = {"Digital Devices", "Certificates", "Daily Necessities", "Clothing and Apparel", "Other"};
         String[] cn = {"数码设备", "证件", "日用品", "服饰", "其他"};
@@ -48,7 +48,7 @@ public class LostFoundController {
         for (int i = 0; i < en.length; i++) {
             map.put(en[i], cn[i]);
         }
-        for (Lostfoundtype lostfoundtype : lostfoundtypes) {
+        for (LostFoundType lostfoundtype : lostFoundTypes) {
             if (lostfoundtype.getName().equals(title)) {
                 //中文
                 id = lostfoundtype.getId();
@@ -60,7 +60,7 @@ public class LostFoundController {
                 }
             }
        }
-        ServerResponse lostDetailList = lostFound.getLostDetailList(id);
+        ServerResponse lostDetailList = lostFoundService.getLostFoundDetail(id);
         //更新图片地址
         List<com.school.entity.LostFound> data = (List<com.school.entity.LostFound>) lostDetailList.getData();
         String updatePic = "";
@@ -84,7 +84,7 @@ public class LostFoundController {
     @ResponseBody
     @RequestMapping("/getUname")
     public ServerResponse getUname(HttpSession session, int id) {
-        ServerResponse lostDetailUserName = lostFound.getUserName(id);
+        ServerResponse lostDetailUserName = lostFoundService.getUserName(id);
         if (lostDetailUserName.isSuccess()) {
             session.setAttribute("nickname", lostDetailUserName.getData());
         }
@@ -95,29 +95,29 @@ public class LostFoundController {
 
     //获取类型id
     @ResponseBody
-    @RequestMapping("/getTypeid")
-    public ServerResponse getTypeIdByName(String name) {
-        return lostFoundType.getIdByName(name);
+    @RequestMapping("/getIdByName")
+    public ServerResponse getIdByName(String name) {
+        return lostFoundTypeService.getIdByName(name);
     }
 
     //获取发布信息
     @ResponseBody
-    @RequestMapping("/getAllLostUserId")
-    public ServerResponse getAllByUserId(int user_id) {
-        return lostFound.getAllByIdLostList(user_id);
+    @RequestMapping("/getLostFoundByUserId")
+    public ServerResponse getLostFoundByUserId(int user_id) {
+        return lostFoundService.getLostFoundByUserId(user_id);
     }
 
     //更改状态
     @ResponseBody
-    @RequestMapping("/updateLostState")
+    @RequestMapping("/updateState")
     public ServerResponse updateState(int id, String state, int user_id) {
-        return lostFound.updateState(id, state, user_id);
+        return lostFoundService.updateState(id, state, user_id);
     }
 
     //置顶信息
     @ResponseBody
-    @RequestMapping("/showLostList")
-    public ServerResponse showLostList(int stick) {
-        return lostFound.showLostList(stick);
+    @RequestMapping("/showTopList")
+    public ServerResponse showTopList(int stick) {
+        return lostFoundService.showTopList(stick);
     }
 }

@@ -1,7 +1,6 @@
 package com.school.controller;
 
-import com.school.services.interfaces.FoundDetail;
-import com.school.services.interfaces.LostFound;
+import com.school.services.api.LostFoundService;
 import com.school.utils.Json;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
@@ -16,9 +15,7 @@ public class UploadController {
 
     // 用于处理安卓客户端传过来的文件
     @Autowired
-    private LostFound lostFound;
-    @Autowired
-    private FoundDetail foundDetail;
+    private LostFoundService lostFoundService;
     @Autowired
     private Util util;
     /**
@@ -38,11 +35,11 @@ public class UploadController {
                 //添加物品信息,调用json-update设置图片名称
                 String newLostJson = Json.updateByKey(lostJson, "img", filename);
                 //System.out.println(newLostJson);
-                lostFound.addLost(newLostJson);
+                lostFoundService.addLostFound(newLostJson);
             } else {
                 //招领
                 String newFoundJson = Json.updateByKey(foundJson, "img", filename);
-                foundDetail.addFound(newFoundJson);
+                lostFoundService.addLostFound(newFoundJson);
             }
         } else {
             return ServerResponse.createServerResponseBySuccess("未选择失物or招领");

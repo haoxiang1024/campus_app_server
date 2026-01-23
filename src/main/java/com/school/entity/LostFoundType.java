@@ -3,22 +3,22 @@ package com.school.entity;
 import java.io.Serializable;
 
 /**
- * (Lostfoundtype)实体类
+ * (LostFoundTypeService)实体类
  *
  * @author makejava
  * @since 2023-05-13 13:45:40
  */
-public class Lostfoundtype implements Serializable {
+public class LostFoundType implements Serializable {
     private static final long serialVersionUID = 112447865142901463L;
 
     private Integer id;
 
     private String name;
 
-    public Lostfoundtype() {
+    public LostFoundType() {
     }
 
-    public Lostfoundtype(Integer id, String name) {
+    public LostFoundType(Integer id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -41,7 +41,7 @@ public class Lostfoundtype implements Serializable {
 
     @Override
     public String toString() {
-        return "Lostfoundtype{" +
+        return "LostFoundTypeService{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 '}';

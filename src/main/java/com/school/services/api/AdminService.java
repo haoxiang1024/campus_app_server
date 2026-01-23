@@ -1,15 +1,14 @@
-package com.school.services.interfaces;
+package com.school.services.api;
 
 import com.school.utils.ServerResponse;
 import org.springframework.stereotype.Service;
 @Service
-public interface Admin {
+public interface AdminService {
     //管理员的登陆
     ServerResponse getUser(String username, String password);
     //获取用户 失物招领信息数量
     ServerResponse getAllUser();
-    ServerResponse getAllLost();
-    ServerResponse getAllFound();
+    ServerResponse getAllLostFoundCount(String type);
     //获取所有用户详细信息
     ServerResponse getAllUserInfo(int page,int size);
     //模糊查询用户信息
@@ -17,5 +16,4 @@ public interface Admin {
     //批量重置密码
     ServerResponse resetPassword(String ids);
     //分页查询信息
-    ServerResponse getLostPage(int page, int pageSize, String keyword);
-}
+    ServerResponse getLostFoundByPage(int page, int pageSize, String keyword, String type, String state);}

@@ -11,22 +11,42 @@
             #{id}
         </foreach>
     </update>
-    <select id="getLostPage" resultType="com.school.entity.LostFound">
-        SELECT * FROM lostFound
+    <select id="getLostFoundByPage" resultType="com.school.entity.LostFound">
+        SELECT * FROM lostfound
         <where>
             <if test="keyword != null and keyword != ''">
                 AND (title LIKE CONCAT('%', #{keyword}, '%') OR place LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+            <if test="state != null and state != ''">
+                AND state = #{state}
             </if>
         </where>
         ORDER BY pub_date DESC
         LIMIT #{offset}, #{pageSize}
     </select>
 
-    <select id="getLostCount" resultType="int">
+
+    <select id="getAllLostFoundCount" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM lostfound
+        <where>
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+        </where>
+
+    </select>
+    <select id="getLostFoundCountByCondition" resultType="java.lang.Integer">
         SELECT COUNT(*) FROM lostFound
         <where>
-            <if test="keyword != null and keyword != ''">
-                AND (title LIKE CONCAT('%', #{keyword}, '%') OR place LIKE CONCAT('%', #{keyword}, '%'))
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+            <if test="state != null and state != ''">
+                AND state = #{state}
             </if>
         </where>
     </select>

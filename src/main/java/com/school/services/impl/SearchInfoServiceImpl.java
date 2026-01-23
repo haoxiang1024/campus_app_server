@@ -1,11 +1,11 @@
 package com.school.services.impl;
 
-import com.school.entity.Lostfoundtype;
+import com.school.entity.LostFoundType;
 import com.school.entity.SearchInfo;
 import com.school.mapper.LostFoundTypeMapper;
 import com.school.mapper.SearchMapper;
 import com.school.mapper.UserMapper;
-import com.school.services.interfaces.SearchNeedInfo;
+import com.school.services.api.SearchInfoService;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-public class SearchInfoService implements SearchNeedInfo {
+public class SearchInfoServiceImpl implements SearchInfoService {
     @Autowired
     private SearchMapper searchMapper;
     @Autowired
@@ -41,8 +41,8 @@ public class SearchInfoService implements SearchNeedInfo {
                 String updatePic = Util.updatePic(searchInfo.getImg());
                 searchInfo.setImg(updatePic);
                 //设置分类
-                List<Lostfoundtype> lostfoundtypes = lostFoundTypeMapper.GetAll();
-                for (Lostfoundtype type : lostfoundtypes
+                List<LostFoundType> lostFoundTypes = lostFoundTypeMapper.GetAll();
+                for (LostFoundType type : lostFoundTypes
                 ) {
                     if (Objects.equals(type.getId(), searchInfo.getLostfoundtype_id())) {
                         searchInfo.setLostfoundtype(type);

@@ -57,19 +57,18 @@
             }
         });
 
-        // 2. 获取丢失物品总数
-        $.get('/school/admin/getAllLost', function(res) {
+        // 获取丢失物品总数
+        $.get('/school/admin/getAllLostFoundCount', { type: '失物' }, function(res) {
             if(res.status === 0) {
-                const count = Array.isArray(res.data) ? res.data.length : res.data;
-                $('#s_totalLost').text(count);
+                // res.data
+                $('#s_totalLost').text(res.data);
             }
         });
 
-        // 3. 获取找回物品总数
-        $.get('/school/admin/getAllFound', function(res) {
+// 获取找回物品总数
+        $.get('/school/admin/getAllLostFoundCount', { type: '招领' }, function(res) {
             if(res.status === 0) {
-                const count = Array.isArray(res.data) ? res.data.length : res.data;
-                $('#s_totalFound').text(count);
+                $('#s_totalFound').text(res.data);
             }
         });
     })();

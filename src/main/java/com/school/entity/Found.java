@@ -79,13 +79,13 @@ public class Found implements Serializable {
     @ApiModelProperty("")
     private Integer user_id;
     private String nickname;
-    private Lostfoundtype lostfoundtype;
+    private LostFoundType lostfoundtype;
 
-    public Lostfoundtype getLostfoundtype() {
+    public LostFoundType getLostfoundtype() {
         return lostfoundtype;
     }
 
-    public void setLostfoundtype(Lostfoundtype lostfoundtype) {
+    public void setLostfoundtype(LostFoundType lostfoundtype) {
         this.lostfoundtype = lostfoundtype;
     }
 

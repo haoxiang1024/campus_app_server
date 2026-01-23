@@ -1,14 +1,12 @@
 package com.school.controller;
 
-import com.school.services.interfaces.UserInterface;
+import com.school.services.api.UserService;
 import com.school.utils.EmailVerificationUtils;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,35 +17,35 @@ import javax.mail.MessagingException;
 @Controller
 public class UserController {
     @Autowired
-    UserInterface userInterface;
+    UserService userService;
     @Autowired
     private Util util;
     @ResponseBody
     @RequestMapping("/login")
     public ServerResponse login(String phone) {
-        return userInterface.loginRegister(phone);
+        return userService.loginRegister(phone);
     }
     @ResponseBody
     @RequestMapping("/loginByPwd")
     public ServerResponse loginByPwd(String phone,String pwd){
-       return userInterface.loginByPwd(phone,pwd);
+       return userService.loginByPwd(phone,pwd);
     }
     @ResponseBody
     @RequestMapping("/resetPwd")
     public ServerResponse resetPwd(String phone,String newPwd,String email,String email_code){
-        return userInterface.resetPwd(phone, newPwd);
+        return userService.resetPwd(phone, newPwd);
     }
     @ResponseBody
     @RequestMapping("/updatePic")
     public ServerResponse updatePic(MultipartFile upload_file,int id) {
         //更新头像
         String fileName = util.getFileName(upload_file);
-        return userInterface.updatePhoto(fileName, id);
+        return userService.updatePhoto(fileName, id);
     }
     @ResponseBody
     @RequestMapping("/updateAc")
     public ServerResponse updateAc(String nickname,String sex,int id){
-        return userInterface.updateAc(nickname, sex, id);
+        return userService.updateAc(nickname, sex, id);
     }
     /**
      * 发送验证码接口

@@ -17,12 +17,12 @@ public interface AdminMapper {
     //获取所有用户数
     @Select("SELECT COUNT(*) FROM user")
     int getAllUserCount();
-    //获取所有丢失物品数量
-    @Select("SELECT COUNT(*) FROM lost")
-    int getAllLostCount();
-    //获取所有找回物品数量
-    @Select("SELECT COUNT(*) FROM found")
-    int getAllFoundCount();
+    //获取所有物品数量
+    /**
+     * 根据类型获取数量
+     * @param type 传入 "lost", "found" 或 null (查询全部)
+     */
+    int getAllLostFoundCount(@Param("type") String type);
     //获取所有用户信息
     @Select("select id,nickname,photo,phone,sex,reg_date,email,state from user")
     List<User> getAllUserInfo();
@@ -39,6 +39,14 @@ public interface AdminMapper {
     //批量重置密码
     int batchResetPassword(@Param("idList") List<Integer> idList, @Param("password") String password);
     //分页查询
-    List<LostFound> getLostPage(@Param("offset") int offset, @Param("pageSize") int pageSize, @Param("keyword") String keyword);
-    int getLostCount(@Param("keyword") String keyword);
+    List<LostFound> getLostFoundByPage(
+            @Param("offset") int offset,
+            @Param("pageSize") int pageSize,
+            @Param("keyword") String keyword,
+            @Param("type") String type,
+            @Param("state") String state
+    );
+    //查询总记录条数(含过滤条件)
+    int getLostFoundCountByCondition(@Param("type") String type,
+                                     @Param("state") String stat);
 }

@@ -5,7 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.school.entity.LostFound;
 import com.school.entity.User;
 import com.school.mapper.AdminMapper;
-import com.school.services.interfaces.Admin;
+import com.school.services.api.AdminService;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
 import org.apache.commons.lang3.StringUtils;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class AdminService implements Admin {
+public class AdminServiceImpl implements AdminService {
     @Autowired
     AdminMapper adminMapper;
     @Override
@@ -39,14 +39,11 @@ public class AdminService implements Admin {
     }
 
     @Override
-    public ServerResponse getAllLost() {
-        return ServerResponse.createServerResponseBySuccess(adminMapper.getAllLostCount());
+    public ServerResponse getAllLostFoundCount(String type) {
+        return ServerResponse.createServerResponseBySuccess(adminMapper.getAllLostFoundCount(type));
     }
 
-    @Override
-    public ServerResponse getAllFound() {
-        return ServerResponse.createServerResponseBySuccess(adminMapper.getAllFoundCount());
-    }
+
 
     // AdminServiceImpl.java
     @Override
@@ -100,10 +97,10 @@ public class AdminService implements Admin {
     }
 
     @Override
-    public ServerResponse getLostPage(int page, int pageSize, String keyword) {
+    public ServerResponse getLostFoundByPage(int page, int pageSize, String keyword, String type, String state){
         int offset = (page - 1) * pageSize;
-        List<LostFound> list = adminMapper.getLostPage(offset, pageSize, keyword);
-        int total = adminMapper.getLostCount(keyword);
+        List<LostFound> list = adminMapper.getLostFoundByPage(offset, pageSize, keyword, type, state);
+        int total = adminMapper.getLostFoundCountByCondition(type,state);
 
         Map<String, Object> result = new HashMap<>();
         result.put("list", list);

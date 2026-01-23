@@ -1,10 +1,9 @@
 package com.school;
 
 import com.school.mapper.UserMapper;
-import com.school.services.impl.LostFoundTypeService;
-import com.school.services.impl.UserService;
-import com.school.services.interfaces.FoundDetail;
-import com.school.services.interfaces.LostFound;
+import com.school.services.impl.LostFoundTypeServiceImpl;
+import com.school.services.impl.UserServiceImpl;
+import com.school.services.api.LostFoundService;
 import com.school.utils.EmailVerificationUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,15 +25,13 @@ class SchoolApplicationTests {
     private ResourceLoader resourceLoader;
 
     @Autowired
-    LostFoundTypeService lostFoundTypeService;
+    LostFoundTypeServiceImpl lostFoundTypeServiceImpl;
     @Autowired
     UserMapper userMapper;
     @Autowired
-    UserService userService;
+    UserServiceImpl userServiceImpl;
     @Autowired
-    private LostFound lostFound;
-    @Autowired
-    private FoundDetail foundDetail;
+    private LostFoundService lostFoundService;
     @Test
     void contextLoads() {
         //System.err.println(userService.resetPwd("18682675515", "p0000000"));
@@ -130,8 +127,7 @@ class SchoolApplicationTests {
                     );
 
                     // 3.4 核心：直接调用lostDetail.addLost插入数据库
-                    //lostDetail.addLost(newLostJson);
-                    foundDetail.addFound(newLostJson);
+                    //lostDetail.addLostFound(newLostJson);
                     // 统计成功数
 
                     // 延迟100ms，避免搜狗图片接口拦截

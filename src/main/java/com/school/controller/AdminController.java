@@ -1,9 +1,9 @@
 package com.school.controller;
 
 import com.school.entity.User;
-import com.school.services.interfaces.Admin;
-import com.school.services.interfaces.LostFound;
-import com.school.services.interfaces.UserInterface;
+import com.school.services.api.AdminService;
+import com.school.services.api.LostFoundService;
+import com.school.services.api.UserService;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,47 +15,42 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/admin")
 public class AdminController {
     @Autowired
-    private Admin admin;
+    private AdminService adminService;
     @Autowired
-    private UserInterface userInterface;
+    private UserService userService;
     @Autowired
     private Util util;
     @Autowired
-    private LostFound lostFound;
+    private LostFoundService lostFoundService;
     //管理员登录
     @ResponseBody
     @RequestMapping("/login")
     public ServerResponse login(String username, String password){
-        return admin.getUser(username,password);
+        return adminService.getUser(username,password);
     }
     //获取用户数据 失物招领数量
     @ResponseBody
     @RequestMapping("/getAllUser")
     public ServerResponse getAllUser(){
-        return admin.getAllUser();
+        return adminService.getAllUser();
     }
     @ResponseBody
-    @RequestMapping("/getAllLost")
-    public ServerResponse getAllLost(){
-        return admin.getAllLost();
-    }
-    @ResponseBody
-    @RequestMapping("/getAllFound")
-    public ServerResponse getAllFound(){
-        return admin.getAllFound();
+    @RequestMapping("/getAllLostFoundCount")
+    public ServerResponse getAllLostFoundCount(@RequestParam(value = "type", required = false) String type) {
+        return adminService.getAllLostFoundCount(type);
     }
     //获取用户详细信息
     @ResponseBody
     @RequestMapping("/getAllUserInfo")
     public ServerResponse getAllUserInfo(@RequestParam(defaultValue = "1") int page,
                                          @RequestParam(defaultValue = "10") int size) {
-        return admin.getAllUserInfo(page, size);
+        return adminService.getAllUserInfo(page, size);
     }
     //查询用户信息
     @ResponseBody
     @GetMapping("/searchUsers")
     public ServerResponse searchUsers(@RequestParam("keyword") String keyword) {
-        return admin.searchUsers(keyword);
+        return adminService.searchUsers(keyword);
     }
     //修改用户信息
     @ResponseBody
@@ -70,7 +65,7 @@ public class AdminController {
 
 
             //  获取现有用户信息
-            User user = userInterface.getUserById(id);
+            User user = userService.getUserById(id);
             if (user == null) {
                 return ServerResponse.createServerResponseByFail(500, "用户不存在");
             }
@@ -86,52 +81,55 @@ public class AdminController {
                 // 数据库只存文件名
                 user.setPhoto(fileName);
             }
-        return userInterface.updateUserInfo(user);
+        return userService.updateUserInfo(user);
     }
     @ResponseBody
     @PostMapping("/updateUserStatus")
     public ServerResponse updateUserStatus(@RequestParam("ids") String ids,
                                            @RequestParam("state") Integer state) {
-        return userInterface.updateUserStatus(ids, state);
+        return userService.updateUserStatus(ids, state);
     }
 
     @PostMapping("/resetPassword")
     @ResponseBody
     public ServerResponse resetPassword(String ids) {
-        return admin.resetPassword(ids);
+        return adminService.resetPassword(ids);
     }
     @ResponseBody
-    @GetMapping("/getAllLost")
-    public ServerResponse getAllLost(String keyword) {
-        return lostFound.getAllLost(keyword);
+    @GetMapping("/getInfoByKey")
+    public ServerResponse getInfoByKey(String keyword) {
+        return lostFoundService.getInfoByKey(keyword);
     }
     @ResponseBody
-    @GetMapping("/getLostById")
-    public ServerResponse getLostById(Integer lostId) {
-        return lostFound.getLostById(lostId);
+    @GetMapping("/getLostFoundById")
+    public ServerResponse getLostFoundById(Integer lostId) {
+        return lostFoundService.getLostFoundById(lostId);
     }
     @ResponseBody
-    @PostMapping("/deleteLost")
-    public ServerResponse deleteLost(Integer lostId) {
-        return lostFound.deleteLost(lostId);
+    @PostMapping("/deleteLostFoundById")
+    public ServerResponse deleteLostFoundById(Integer lostId) {
+        return lostFoundService.deleteLostFoundById(lostId);
     }
     @ResponseBody
-    @PostMapping("/updateLostStatus")
-    public ServerResponse updateLostStatus(Integer lostId, String state) {
-        return lostFound.updateLostStatus(lostId, state);
+    @PostMapping("/updateLostFoundStatus")
+    public ServerResponse updateLostFoundStatus(Integer lostId, String state) {
+        return lostFoundService.updateLostFoundStatus(lostId, state);
     }
     @ResponseBody
-    @GetMapping("/getLostList")
-    public ServerResponse getLostList(@RequestParam(defaultValue = "1") int page,
-                                      @RequestParam(defaultValue = "10") int pageSize,
-                                      @RequestParam(required = false) String keyword) {
-        return admin.getLostPage(page, pageSize, keyword);
+    @GetMapping("/getLostFoundByPage")
+    public ServerResponse getLostFoundByPage(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String state) {
+        return adminService.getLostFoundByPage(page, pageSize, keyword, type, state);
     }
     @ResponseBody
     @GetMapping("/searchList")
     public ServerResponse searchList(@RequestParam(defaultValue = "1") int page,
                                @RequestParam(defaultValue = "10") int pageSize,
                                @RequestParam(required = false) String keyword) {
-        return userInterface.getUserList(page, pageSize, keyword);
+        return userService.getUserList(page, pageSize, keyword);
     }
 }

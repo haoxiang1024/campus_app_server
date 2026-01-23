@@ -2,12 +2,9 @@ package com.school.entity;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Objects;
 
 
 public class LostFound implements Serializable {
-    private static final long serialVersionUID = 1L;
-    
     private Integer id;
     
     private String title;
@@ -27,9 +24,6 @@ public class LostFound implements Serializable {
     private Integer stick;
     
     private Integer lostfoundtype_id;
-    
-
-    private Lostfoundtype lostfoundtype;
 
     private Integer user_id;
     private String nickname;
@@ -37,27 +31,15 @@ public class LostFound implements Serializable {
     public LostFound() {
     }
 
-    @Override
-    public String toString() {
-        return "LostFound{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", img='" + img + '\'' +
-                ", pub_date=" + pub_date +
-                ", content='" + content + '\'' +
-                ", place='" + place + '\'' +
-                ", phone='" + phone + '\'' +
-                ", state='" + state + '\'' +
-                ", stick=" + stick +
-                ", lostfoundtype_id=" + lostfoundtype_id +
-                ", lostfoundtype=" + lostfoundtype +
-                ", user_id=" + user_id +
-                ", nickname='" + nickname + '\'' +
-                ", type='" + type + '\'' +
-                '}';
+    public String getType() {
+        return type;
     }
 
-    public LostFound(Integer id, String title, String img, Date pub_date, String content, String place, String phone, String state, Integer stick, Integer lostfoundtype_id, Lostfoundtype lostfoundtype, Integer user_id, String nickname, String type) {
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public LostFound(Integer id, String title, String img, Date pub_date, String content, String place, String phone, String state, Integer stick, Integer lostfoundtype_id, LostFoundType lostfoundtype, Integer user_id, String nickname, String type) {
         this.id = id;
         this.title = title;
         this.img = img;
@@ -68,19 +50,12 @@ public class LostFound implements Serializable {
         this.state = state;
         this.stick = stick;
         this.lostfoundtype_id = lostfoundtype_id;
-        this.lostfoundtype = lostfoundtype;
         this.user_id = user_id;
         this.nickname = nickname;
         this.type = type;
     }
 
-    public Lostfoundtype getLostfoundtype() {
-        return lostfoundtype;
-    }
 
-    public void setLostfoundtype(Lostfoundtype lostfoundtype) {
-        this.lostfoundtype = lostfoundtype;
-    }
 
     public String getNickname() {
         return nickname;

@@ -21,7 +21,7 @@ public class Admin {
     private Date reg_date;
 
     public String toString() {
-        return "Admin{" +
+        return "AdminService{" +
                 "id=" + id +
                 ", password='" + password + '\'' +
                 ", nickname='" + nickname + '\'' +

@@ -134,7 +134,7 @@
         let currentLostPage = 1;
         let totalLostPages = 1;
         const pageSize = 10;
-        let allLostData = []; // 当前页数据缓存
+        let allData = []; // 当前页数据缓存
 
         function formatDate(ts) {
             if (!ts) return '未设置';
@@ -143,7 +143,7 @@
         }
 
         // 加载数据
-        function loadLostData(page) {
+        function loadData(page) {
             currentLostPage = page;
             const keyword = $('#searchInput').val().trim();
             const state = $('#stateFilter').val();
@@ -151,7 +151,7 @@
 
             $('#lostTableBody').html('<tr><td colspan="8" class="text-center text-muted">正在检索最新数据...</td></tr>');
 
-            $.get('/school/admin/getLostList', {
+            $.get('/school/admin/getLostFoundByPage', {
                 page: page,
                 pageSize: pageSize,
                 keyword: keyword,
@@ -159,11 +159,11 @@
                 type: type
             }, function(res) {
                 if(res.status === 0 && res.data) {
-                    allLostData = res.data.list || [];
+                    allData = res.data.list || [];
                     const totalItems = res.data.total || 0;
                     totalLostPages = res.data.totalPages || 1;
 
-                    renderLostTable(allLostData);
+                    renderLostTable(allData);
 
                     $('#lostPageInfo').text(`第 ${currentLostPage} 页 / 共 ${totalLostPages} 页`);
                     $('#lostTotalCount').text(totalItems);
@@ -179,6 +179,7 @@
         // 渲染表格
         function renderLostTable(data) {
             let html = '';
+            console.log("后端返回的原始数据样例:", data[0]);
             if (!data.length) {
                 html = '<tr><td colspan="8" class="text-center text-muted">未找到匹配的记录</td></tr>';
             } else {
@@ -215,8 +216,6 @@
             $('#lostTableBody').html(html);
         }
 
-        // --- 批量操作逻辑  ---
-
         $('#batchApproveBtn').on('click', function() {
             const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get();
             if (!selectedIds.length) return window.Toast.error('请先勾选项目');
@@ -224,7 +223,7 @@
             const targetIds = [];
             let skipCount = 0;
             selectedIds.forEach(id => {
-                const item = allLostData.find(u => u.id == id);
+                const item = allData.find(u => u.id == id);
                 if (item && item.state === '待审核') targetIds.push(id);
                 else skipCount++;
             });
@@ -237,7 +236,7 @@
 
             window.Toast.confirm('批量通过', msg, () => {
                 $.post('/school/admin/batchUpdateStatus', { ids: targetIds.join(','), state: '未找到' }, (res) => {
-                    if(res.status === 0) { window.Toast.success("批量审核通过"); loadLostData(currentLostPage); }
+                    if(res.status === 0) { window.Toast.success("批量审核通过"); loadData(currentLostPage); }
                 });
             });
         });
@@ -249,7 +248,7 @@
             const targetIds = [];
             let skipCount = 0;
             selectedIds.forEach(id => {
-                const item = allLostData.find(u => u.id == id);
+                const item = allData.find(u => u.id == id);
                 if (item && item.state === '待审核') targetIds.push(id);
                 else skipCount++;
             });
@@ -259,7 +258,7 @@
             const title = skipCount > 0 ? `批量驳回 (跳过 ${skipCount} 项)` : '批量驳回';
             window.Toast.prompt(title, '请输入统一驳回原因', (reason) => {
                 $.post('/school/admin/batchUpdateStatus', { ids: targetIds.join(','), state: '已驳回', reason: reason }, (res) => {
-                    if(res.status === 0) { window.Toast.success("操作成功"); loadLostData(currentLostPage); }
+                    if(res.status === 0) { window.Toast.success("操作成功"); loadData(currentLostPage); }
                 });
             });
         });
@@ -269,17 +268,16 @@
             if (!ids.length) return window.Toast.error('请选择项目');
             window.Toast.confirm("批量删除", `确定永久删除选中的 ${ids.length} 项记录吗？`, () => {
                 $.post('/school/admin/batchDeleteLost', { ids: ids.join(',') }, (res) => {
-                    if(res.status === 0) { window.Toast.success("删除成功"); loadLostData(1); }
+                    if(res.status === 0) { window.Toast.success("删除成功"); loadData(1); }
                 });
             });
         });
 
-        // --- 单项操作逻辑 ---
 
         window.approveSingle = (id) => {
             window.Toast.confirm('审核通过', '确认发布该信息吗？', () => {
                 $.post('/school/admin/updateLostStatus', { lostId: id, state: '未找到' }, (res) => {
-                    if(res.status === 0) { window.Toast.success("已发布"); loadLostData(currentLostPage); }
+                    if(res.status === 0) { window.Toast.success("已发布"); loadData(currentLostPage); }
                 });
             });
         };
@@ -287,7 +285,7 @@
         window.rejectSingle = (id) => {
             window.Toast.prompt('审核驳回', '说明驳回理由', (reason) => {
                 $.post('/school/admin/updateLostStatus', { lostId: id, state: '已驳回', reason: reason }, (res) => {
-                    if(res.status === 0) { window.Toast.success("已驳回"); loadLostData(currentLostPage); }
+                    if(res.status === 0) { window.Toast.success("已驳回"); loadData(currentLostPage); }
                 });
             });
         };
@@ -314,24 +312,24 @@
         window.deleteLostItem = (id) => {
             window.Toast.confirm("删除确认", "确定永久删除此信息吗？", () => {
                 $.post('/school/admin/deleteLost', { lostId: id }, (res) => {
-                    if(res.status === 0) { window.Toast.success("已删除"); loadLostData(currentLostPage); }
+                    if(res.status === 0) { window.Toast.success("已删除"); loadData(currentLostPage); }
                 });
             });
         };
 
         // --- 事件监听 ---
 
-        $('#searchBtn').on('click', () => loadLostData(1));
-        $('#searchInput').on('keypress', e => { if(e.which === 13) loadLostData(1); });
-        $('#stateFilter, #typeFilter').on('change', () => loadLostData(1));
+        $('#searchBtn').on('click', () => loadData(1));
+        $('#searchInput').on('keypress', e => { if(e.which === 13) loadData(1); });
+        $('#stateFilter, #typeFilter').on('change', () => loadData(1));
         $('#selectAll').on('change', function() { $('.item-checkbox').prop('checked', this.checked); });
 
-        $('#btnLostFirstPage').on('click', () => loadLostData(1));
-        $('#btnLostLastPage').on('click', () => loadLostData(totalLostPages));
-        $('#btnLostPrevPage').on('click', () => { if(currentLostPage > 1) loadLostData(currentLostPage - 1); });
-        $('#btnLostNextPage').on('click', () => { if(currentLostPage < totalLostPages) loadLostData(currentLostPage + 1); });
+        $('#btnLostFirstPage').on('click', () => loadData(1));
+        $('#btnLostLastPage').on('click', () => loadData(totalLostPages));
+        $('#btnLostPrevPage').on('click', () => { if(currentLostPage > 1) loadData(currentLostPage - 1); });
+        $('#btnLostNextPage').on('click', () => { if(currentLostPage < totalLostPages) loadData(currentLostPage + 1); });
 
         // 首次加载
-        loadLostData(1);
+        loadData(1);
     })();
 </script>

@@ -9,9 +9,10 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 public class SchoolApplication {
 
     public static void main(String[] args) {
-        SpringApplicationBuilder builder = new SpringApplicationBuilder(SchoolApplication.class);
-        // 强制关闭 headless 模式
-        builder.headless(false).run(args);
+//        SpringApplicationBuilder builder = new SpringApplicationBuilder(SchoolApplication.class);
+//        // 强制关闭 headless 模式
+//        builder.headless(false).run(args);
+        SpringApplication.run(SchoolApplication.class, args);
 
     }
 

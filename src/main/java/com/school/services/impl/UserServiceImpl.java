@@ -2,7 +2,7 @@ package com.school.services.impl;
 
 import com.school.entity.User;
 import com.school.mapper.UserMapper;
-import com.school.services.interfaces.UserInterface;
+import com.school.services.api.UserService;
 import com.school.utils.DateUtil;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
@@ -14,7 +14,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class UserService implements UserInterface {
+public class UserServiceImpl implements UserService {
     @Autowired
     UserMapper userMapper;
 

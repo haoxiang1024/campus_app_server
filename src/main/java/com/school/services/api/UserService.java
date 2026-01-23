@@ -1,4 +1,4 @@
-package com.school.services.interfaces;
+package com.school.services.api;
 
 import com.school.entity.User;
 import com.school.utils.ServerResponse;
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 @SuppressWarnings("rawtypes")
 @Service
-public interface UserInterface {
+public interface UserService {
     //登录注册
     ServerResponse loginRegister(String phone);
     //密码登录

@@ -1,8 +1,8 @@
 package com.school.services.impl;
 
-import com.school.entity.Lostfoundtype;
+import com.school.entity.LostFoundType;
 import com.school.mapper.LostFoundTypeMapper;
-import com.school.services.interfaces.LostFoundType;
+import com.school.services.api.LostFoundTypeService;
 import com.school.utils.ResponseCode;
 import com.school.utils.ServerResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class LostFoundTypeService implements LostFoundType {
+public class LostFoundTypeServiceImpl implements LostFoundTypeService {
     String key = "typeList";//key值用于redsi存储
     @Autowired
     private LostFoundTypeMapper lostFoundTypeMapper;
@@ -45,8 +45,8 @@ public class LostFoundTypeService implements LostFoundType {
         }
         //获取标题id
         int id = 0;
-        List<Lostfoundtype> lostfoundtypes = lostFoundTypeMapper.GetAll();
-        for (Lostfoundtype lostfoundtype : lostfoundtypes) {
+        List<LostFoundType> lostFoundTypes = lostFoundTypeMapper.GetAll();
+        for (LostFoundType lostfoundtype : lostFoundTypes) {
             if (lostfoundtype.getName().equals(name)) {
                 //中文
                 id = lostfoundtype.getId();

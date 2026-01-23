@@ -3,7 +3,7 @@
 <mapper namespace="com.school.mapper.LostFoundTypeMapper">
 
 
-    <select id="GetAll" resultType="com.school.entity.Lostfoundtype">
+    <select id="GetAll" resultType="com.school.entity.LostFoundType">
         select id, name
         from lostfoundtype
     </select>

@@ -17,11 +17,11 @@ public class SpringMvcSupport extends WebMvcConfigurationSupport {
 
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // 1. 原有static目录映射（保留）
+        // 原有static目录映射（保留）
         registry.addResourceHandler("/**")
                 .addResourceLocations("classpath:/static/");
 
-        // 2. 核心修正：映射upload目录
+        // 映射upload目录
         // URL前缀：/upload/**（不要加/school，上下文路径会自动拼接）
         registry.addResourceHandler("/upload/**")
                 // 关键：file: + 项目根目录下的upload（与src同级）
