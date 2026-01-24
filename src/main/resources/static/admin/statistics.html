@@ -48,7 +48,7 @@
 
 <script>
     (function() {
-        // 1. 获取总用户数
+        // 获取总用户数
         $.get('/school/admin/getAllUser', function(res) {
             if(res.status === 0) {
                 // 如果 res.data 是数组，则用 .length；如果是直接返回的数字，则直接填入

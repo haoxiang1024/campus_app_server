@@ -57,9 +57,9 @@ public class LostFoundServiceImpl implements LostFoundService {
     }
 
     @Override
-    public ServerResponse addLostFound(String lostJson) {
+    public ServerResponse addLostFound(String lostfoundJson) {
         //json字符串转java对象
-        com.school.entity.LostFound lostFound = JSON.parseObject(lostJson, com.school.entity.LostFound.class);
+        com.school.entity.LostFound lostFound = JSON.parseObject(lostfoundJson, com.school.entity.LostFound.class);
         //添加信息
         if (lostFoundMapper.addLostFound(lostFound)) {
             return ServerResponse.createServerResponseBySuccess(ResponseCode.ADD_LOST_SUCCESS.getMsg());

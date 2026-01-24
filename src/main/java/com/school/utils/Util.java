@@ -116,13 +116,13 @@ public class Util {
             if (!dir.exists()) {
                 dir.mkdirs(); // 不存在则创建，存在则无影响
             }
-            // 2. 生成唯一文件名，避免覆盖
+            // 生成唯一文件名，避免覆盖
             String originalName = upload_file.getOriginalFilename();
             String suffix = originalName.substring(originalName.lastIndexOf("."));
             fileName = UUID.randomUUID() + suffix;
-            // 3. 拼接最终文件路径
+            // 拼接最终文件路径
             filePath = uploadPath + fileName;
-            // 4. 写入文件
+            //写入文件
             try (InputStream in = upload_file.getInputStream();
                  FileOutputStream out = new FileOutputStream(filePath)) {
                 byte[] buffer = new byte[1024];

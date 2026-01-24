@@ -229,14 +229,12 @@
             });
         }
 
-        // 核心修改：使用你确认可用的 8081 端口路径
         function loadUsers(page) {
             currentPage = page;
             const kw = $('#userKeyword').val().trim();
 
             $('#userTableBody').html('<tr><td colspan="10" class="text-center text-muted">正在检索数据...</td></tr>');
 
-            // 注意：如果前端代码部署在不同端口，这里需要写全路径，否则写相对路径
             const apiUrl = `/school/admin/searchList`;
 
             $.get(apiUrl, {
@@ -333,7 +331,6 @@
             const selectedIds = $('.user-checkbox:checked').map((i, el) => el.value).get();
             if (!selectedIds.length) return window.Toast.error('请选择用户');
 
-            // 过滤：找出已经是禁用状态(state=0)的用户，即真正需要启用的
             const targetIds = [];
             let skipCount = 0;
 

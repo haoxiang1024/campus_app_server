@@ -47,6 +47,9 @@ public interface AdminMapper {
             @Param("state") String state
     );
     //查询总记录条数(含过滤条件)
-    int getLostFoundCountByCondition(@Param("type") String type,
-                                     @Param("state") String stat);
+    int getLostFoundCountByCondition(
+            @Param("keyword") String keyword,
+            @Param("type") String type,
+            @Param("state") String state
+    );
 }

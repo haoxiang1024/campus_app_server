@@ -13,7 +13,7 @@ public interface LostFoundService {
     ServerResponse getUserName(int id);
 
     //添加物品信息(json格式)
-    ServerResponse addLostFound(String lostJson);
+    ServerResponse addLostFound(String lostfoundtJson);
 
     //根据用户id获取用户发布的信息
     ServerResponse getLostFoundByUserId(int user_id);

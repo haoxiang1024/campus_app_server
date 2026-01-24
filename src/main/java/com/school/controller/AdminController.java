@@ -102,18 +102,18 @@ public class AdminController {
     }
     @ResponseBody
     @GetMapping("/getLostFoundById")
-    public ServerResponse getLostFoundById(Integer lostId) {
-        return lostFoundService.getLostFoundById(lostId);
+    public ServerResponse getLostFoundById(Integer lostFoundId) {
+        return lostFoundService.getLostFoundById(lostFoundId);
     }
     @ResponseBody
     @PostMapping("/deleteLostFoundById")
-    public ServerResponse deleteLostFoundById(Integer lostId) {
-        return lostFoundService.deleteLostFoundById(lostId);
+    public ServerResponse deleteLostFoundById(Integer lostFoundId) {
+        return lostFoundService.deleteLostFoundById(lostFoundId);
     }
     @ResponseBody
     @PostMapping("/updateLostFoundStatus")
-    public ServerResponse updateLostFoundStatus(Integer lostId, String state) {
-        return lostFoundService.updateLostFoundStatus(lostId, state);
+    public ServerResponse updateLostFoundStatus(Integer lostFoundId, String state) {
+        return lostFoundService.updateLostFoundStatus(lostFoundId, state);
     }
     @ResponseBody
     @GetMapping("/getLostFoundByPage")

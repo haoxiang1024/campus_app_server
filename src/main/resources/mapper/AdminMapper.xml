@@ -39,9 +39,15 @@
         </where>
 
     </select>
-    <select id="getLostFoundCountByCondition" resultType="java.lang.Integer">
-        SELECT COUNT(*) FROM lostFound
+    <sql id="lostFoundQueryFilter">
         <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                title LIKE CONCAT('%', #{keyword}, '%')
+                OR place LIKE CONCAT('%', #{keyword}, '%')
+                OR phone LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
             <if test="type != null and type != ''">
                 AND type = #{type}
             </if>
@@ -49,5 +55,9 @@
                 AND state = #{state}
             </if>
         </where>
+    </sql>
+    <select id="getLostFoundCountByCondition" resultType="int">
+        SELECT COUNT(*) FROM lostfound
+        <include refid="lostFoundQueryFilter" />
     </select>
 </mapper>

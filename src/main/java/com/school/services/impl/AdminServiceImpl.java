@@ -45,7 +45,6 @@ public class AdminServiceImpl implements AdminService {
 
 
 
-    // AdminServiceImpl.java
     @Override
     public ServerResponse getAllUserInfo(int page, int size) {
         // 开启分页
@@ -100,8 +99,7 @@ public class AdminServiceImpl implements AdminService {
     public ServerResponse getLostFoundByPage(int page, int pageSize, String keyword, String type, String state){
         int offset = (page - 1) * pageSize;
         List<LostFound> list = adminMapper.getLostFoundByPage(offset, pageSize, keyword, type, state);
-        int total = adminMapper.getLostFoundCountByCondition(type,state);
-
+        int total = adminMapper.getLostFoundCountByCondition(keyword,type,state);
         Map<String, Object> result = new HashMap<>();
         result.put("list", list);
         result.put("total", total);

@@ -36,12 +36,12 @@
             <select id="stateFilter" class="form-select form-select-sm" style="width: 110px;">
                 <option value="">所有状态</option>
                 <option value="待审核">待审核</option>
-                <option value="未找到">未找到</option>
-                <option value="已找到">已找到</option>
+                <option value="寻找中">寻找中</option>
+                <option value="待认领">待认领</option>
                 <option value="已驳回">已驳回</option>
             </select>
             <div class="input-group input-group-sm" style="width: 250px;">
-                <input type="text" id="searchInput" class="form-control" placeholder="搜索名称/地点/联系人...">
+                <input type="text" id="searchInput" class="form-control" placeholder="搜索名称/地点/联系电话...">
                 <button class="btn btn-primary" type="button" id="searchBtn">
                     <i class="fa fa-search"></i>
                 </button>
@@ -99,7 +99,53 @@
         </div>
     </div>
 </div>
-
+<div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold text-custom-blue">信息登记</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addForm">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">发布类型</label>
+                            <select class="form-select" name="op" id="addOp" required>
+                                <option value="丢失">失物登记 (我丢了东西)</option>
+                                <option value="招领">招领登记 (我捡了东西)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">物品名称</label>
+                            <input type="text" class="form-control" name="title" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">地点</label>
+                            <input type="text" class="form-control" name="place" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">联系电话</label>
+                            <input type="text" class="form-control" name="phone" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">详细描述</label>
+                            <textarea class="form-control" name="content" rows="3"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">上传图片</label>
+                            <input type="file" class="form-control" name="upload_file" id="upload_file" accept="image/*" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="submitRegistration()">立即发布</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="./js/jquery.min.js"></script>
 <script src="./js/bootstrap.bundle.min.js"></script>
 <script src="./js/sweetalert2@11.js"></script>
@@ -162,6 +208,7 @@
                     allData = res.data.list || [];
                     const totalItems = res.data.total || 0;
                     totalLostPages = res.data.totalPages || 1;
+                    console.log(res.data)
 
                     renderLostTable(allData);
 
@@ -179,7 +226,6 @@
         // 渲染表格
         function renderLostTable(data) {
             let html = '';
-            console.log("后端返回的原始数据样例:", data[0]);
             if (!data.length) {
                 html = '<tr><td colspan="8" class="text-center text-muted">未找到匹配的记录</td></tr>';
             } else {
@@ -190,8 +236,8 @@
 
                     let badgeClass = 'bg-secondary';
                     if(item.state === '待审核') badgeClass = 'bg-info';
-                    else if(item.state === '未找到') badgeClass = 'bg-primary';
-                    else if(item.state === '已找到') badgeClass = 'bg-success';
+                    else if(item.state === '寻找中') badgeClass = 'bg-primary';
+                    else if(item.state === '已认领') badgeClass = 'bg-success';
                     else if(item.state === '已驳回') badgeClass = 'bg-danger';
 
                     let btns = `<button class="btn btn-sm btn-link text-custom-blue p-0 me-2" onclick="showLostDetail(${item.id})">详情</button>`;
@@ -199,7 +245,7 @@
                         btns += `<button class="btn btn-sm btn-link text-success p-0 me-2 fw-bold" onclick="approveSingle(${item.id})">通过</button>`;
                         btns += `<button class="btn btn-sm btn-link text-warning p-0 me-2 fw-bold" onclick="rejectSingle(${item.id})">驳回</button>`;
                     }
-                    btns += `<button class="btn btn-sm btn-link text-danger p-0" onclick="deleteLostItem(${item.id})">删除</button>`;
+                    btns += `<button class="btn btn-sm btn-link text-danger p-0" onclick="deleteItem(${item.id})">删除</button>`;
 
                     html += `<tr>
                         <td><input type="checkbox" class="item-checkbox form-check-input" value="${item.id}"></td>
@@ -217,84 +263,148 @@
         }
 
         $('#batchApproveBtn').on('click', function() {
+            //获取选中的 ID
             const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get();
             if (!selectedIds.length) return window.Toast.error('请先勾选项目');
 
-            const targetIds = [];
-            let skipCount = 0;
-            selectedIds.forEach(id => {
-                const item = allData.find(u => u.id == id);
-                if (item && item.state === '待审核') targetIds.push(id);
-                else skipCount++;
-            });
+            //从本地缓存 allData 中过滤出真正属于“待审核”状态的项
+            const targetItems = allData.filter(item =>
+                selectedIds.includes(item.id.toString()) && item.state === '待审核'
+            );
 
-            if (!targetIds.length) return window.Toast.error('选中项中没有需要审核的记录');
+            if (targetItems.length === 0) {
+                return window.Toast.error('选中的记录中没有待审核的项');
+            }
 
-            const msg = skipCount > 0
-                ? `确认通过选中的 ${targetIds.length} 项记录吗？(已跳过 ${skipCount} 项非待审核记录)`
-                : `确认通过选中的 ${targetIds.length} 项待审核记录吗？`;
+            //弹出确认框
+            window.Toast.confirm('批量通过', `确定要审核通过这 ${targetItems.length} 条记录吗？`, () => {
+                //构建并发请求数组
+                const promises = targetItems.map(item => {
+                    const targetState = (item.type === '失物') ? '寻找中' : '待认领';
 
-            window.Toast.confirm('批量通过', msg, () => {
-                $.post('/school/admin/batchUpdateStatus', { ids: targetIds.join(','), state: '未找到' }, (res) => {
-                    if(res.status === 0) { window.Toast.success("批量审核通过"); loadData(currentLostPage); }
+                    return $.post('/school/admin/updateLostFoundStatus', {
+                        lostFoundId: item.id,
+                        state: targetState
+                    });
+                });
+
+                Promise.all(promises).then(results => {
+                    // 统计执行成功的数量
+                    const successCount = results.filter(res => res.status === 0).length;
+
+                    if (successCount === targetItems.length) {
+                        window.Toast.success(`批量操作成功，共处理 ${successCount} 条记录`);
+                    } else {
+                        window.Toast.success(`操作完成：${successCount} 条成功，${targetItems.length - successCount} 条失败`);
+                    }
+
+                    // 重新加载当前页数据以刷新表格状态
+                    loadData(currentLostPage);
+                }).catch(err => {
+                    window.Toast.error("网络异常，批量请求未能全部完成");
+                    console.error(err);
                 });
             });
         });
 
         $('#batchRejectBtn').on('click', function() {
+            // 获取选中的 ID 数组
             const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get();
             if (!selectedIds.length) return window.Toast.error('请先勾选项目');
 
+            //  过滤出真正可以被驳回的项（只有“待审核”状态的才行）
             const targetIds = [];
             let skipCount = 0;
             selectedIds.forEach(id => {
                 const item = allData.find(u => u.id == id);
-                if (item && item.state === '待审核') targetIds.push(id);
-                else skipCount++;
+                if (item && item.state === '待审核') {
+                    targetIds.push(id);
+                } else {
+                    skipCount++;
+                }
             });
 
-            if (!targetIds.length) return window.Toast.error('只有待审核的记录可以执行驳回');
+            if (!targetIds.length) return window.Toast.error('选中项中没有符合驳回条件（待审核）的记录');
 
-            const title = skipCount > 0 ? `批量驳回 (跳过 ${skipCount} 项)` : '批量驳回';
-            window.Toast.prompt(title, '请输入统一驳回原因', (reason) => {
-                $.post('/school/admin/batchUpdateStatus', { ids: targetIds.join(','), state: '已驳回', reason: reason }, (res) => {
-                    if(res.status === 0) { window.Toast.success("操作成功"); loadData(currentLostPage); }
+            //  提示输入原因
+            const title = skipCount > 0 ? `批量驳回 (将跳过 ${skipCount} 项)` : '批量驳回';
+            window.Toast.prompt(title, '请输入统一的驳回原因', (reason) => {
+
+                //  构建并发请求：循环调用单条接口
+                const promises = targetIds.map(id => {
+                    return $.post('/school/admin/updateLostFoundStatus', {
+                        lostFoundId: id,
+                        state: '已驳回',
+                        reason: reason
+                    });
+                });
+
+                // 执行并处理结果
+                Promise.all(promises).then(results => {
+                    const successCount = results.filter(res => res.status === 0).length;
+                    window.Toast.success(`操作完成：成功驳回 ${successCount} 条记录`);
+                    loadData(currentLostPage); // 刷新当前页
+                }).catch(err => {
+                    window.Toast.error("部分请求失败，请检查网络");
+                    loadData(currentLostPage);
                 });
             });
         });
 
+        // 批量删除
         $('#batchDeleteBtn').on('click', function() {
-            const ids = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get();
-            if (!ids.length) return window.Toast.error('请选择项目');
-            window.Toast.confirm("批量删除", `确定永久删除选中的 ${ids.length} 项记录吗？`, () => {
-                $.post('/school/admin/batchDeleteLost', { ids: ids.join(',') }, (res) => {
-                    if(res.status === 0) { window.Toast.success("删除成功"); loadData(1); }
+            const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get();
+            if (!selectedIds.length) return window.Toast.error('请勾选要删除的项目');
+
+            window.Toast.confirm("批量删除", `确定永久删除选中的 ${selectedIds.length} 项记录吗？`, () => {
+                const promises = selectedIds.map(id => {
+                    return $.post('/school/admin/deleteLostFoundById', { lostFoundId: id });
+                });
+                Promise.all(promises).then(() => {
+                    window.Toast.success("删除操作完成");
+                    loadData(1); // 删除后建议回到第一页
+                }).catch(err => {
+                    window.Toast.error("部分请求失败");
+                    loadData(currentLostPage);
                 });
             });
         });
 
 
         window.approveSingle = (id) => {
-            window.Toast.confirm('审核通过', '确认发布该信息吗？', () => {
-                $.post('/school/admin/updateLostStatus', { lostId: id, state: '未找到' }, (res) => {
-                    if(res.status === 0) { window.Toast.success("已发布"); loadData(currentLostPage); }
+            // 从缓存中获取当前项的数据以判断类型
+            const item = allData.find(u => u.id == id);
+            if (!item) return;
+
+            // 根据类型决定目标状态
+            const targetState = item.type === '失物' ? '寻找中' : '待认领';
+
+            window.Toast.confirm('审核通过', `确认将该${item.type}信息发布为“${targetState}”吗？`, () => {
+                $.post('/school/admin/updateLostFoundStatus', {
+                    lostFoundId: id,
+                    state: targetState  // 使用动态计算的状态
+                }, (res) => {
+                    if(res.status === 0) {
+                        window.Toast.success("已发布");
+                        loadData(currentLostPage);
+                    }
                 });
             });
         };
 
         window.rejectSingle = (id) => {
             window.Toast.prompt('审核驳回', '说明驳回理由', (reason) => {
-                $.post('/school/admin/updateLostStatus', { lostId: id, state: '已驳回', reason: reason }, (res) => {
+                $.post('/school/admin/updateLostFoundStatus', { lostFoundId: id, state: '已驳回', reason: reason }, (res) => {
                     if(res.status === 0) { window.Toast.success("已驳回"); loadData(currentLostPage); }
                 });
             });
         };
 
         window.showLostDetail = (id) => {
-            $.get('/school/admin/getLostById', { lostId: id, _t: new Date().getTime() }, function(res) {
+            $.get('/school/admin/getLostFoundById', { lostFoundId: id, _t: new Date().getTime() }, function(res) {
                 if(res.status === 0 && res.data) {
                     const item = res.data;
-                    const typeLabel = item.type === '招领' ? '【招领】' : '【失物】';
+                    const typeLabel = item.type === '招领' ? '招领' : '失物';
                     const content = `
                         <div class="mb-2"><strong>类型：</strong>${typeLabel}</div>
                         <div class="mb-2"><strong>标题：</strong>${item.title}</div>
@@ -309,15 +419,15 @@
             });
         };
 
-        window.deleteLostItem = (id) => {
+        window.deleteItem = (id) => {
             window.Toast.confirm("删除确认", "确定永久删除此信息吗？", () => {
-                $.post('/school/admin/deleteLost', { lostId: id }, (res) => {
+                $.post('/school/admin/deleteLostFoundById', { lostFoundId: id }, (res) => {
                     if(res.status === 0) { window.Toast.success("已删除"); loadData(currentLostPage); }
                 });
             });
         };
 
-        // --- 事件监听 ---
+        //事件监听
 
         $('#searchBtn').on('click', () => loadData(1));
         $('#searchInput').on('keypress', e => { if(e.which === 13) loadData(1); });
@@ -331,5 +441,62 @@
 
         // 首次加载
         loadData(1);
+
+        // 打开登记弹窗
+        window.openAddModal = () => {
+            $('#addForm')[0].reset();
+            new bootstrap.Modal('#addModal').show();
+        };
+
+// 提交登记信息
+        window.submitRegistration = () => {
+            const op = $('#addOp').val();
+            const file = $('#upload_file')[0].files[0];
+
+            if (!file) return window.Toast.error("请选择物品图片");
+
+            // 构造 JSON 数据
+            const itemData = {
+                title: $('#addForm [name="title"]').val(),
+                place: $('#addForm [name="place"]').val(),
+                phone: $('#addForm [name="phone"]').val(),
+                content: $('#addForm [name="content"]').val(),
+                state: '待审核' // 默认初始状态
+            };
+
+            const formData = new FormData();
+            formData.append('upload_file', file);
+            formData.append('op', op);
+
+            // 根据 op 字段将 JSON 放入不同的参数名中
+            if (op === '丢失') {
+                formData.append('lostJson', JSON.stringify(itemData));
+                formData.append('foundJson', ""); // 占位
+            } else {
+                formData.append('foundJson', JSON.stringify(itemData));
+                formData.append('lostJson', ""); // 占位
+            }
+
+            $.ajax({
+                url: '/school/admin/addLostFound',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(res) {
+                    if (res.status === 0) {
+                        window.Toast.success("发布成功！请等待审核");
+                        bootstrap.Modal.getInstance('#addModal').hide();
+                        loadData(1); // 刷新列表
+                    } else {
+                        window.Toast.error(res.msg || "发布失败");
+                    }
+                },
+                error: function() {
+                    window.Toast.error("服务器响应异常");
+                }
+            });
+        };
+
     })();
 </script>
