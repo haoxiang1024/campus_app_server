@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 @Service
 public interface UserService {
     //登录注册
-    ServerResponse loginRegister(String phone);
-    //密码登录
-    ServerResponse loginByPwd(String phone,String pwd);
+    ServerResponse register(String phone);
+    //登录
+    ServerResponse login(String phone,String pwd);
     //忘记密码
     ServerResponse resetPwd(String phone,String newPwd);
     //修改头像

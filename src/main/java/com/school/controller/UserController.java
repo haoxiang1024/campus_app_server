@@ -21,14 +21,14 @@ public class UserController {
     @Autowired
     private Util util;
     @ResponseBody
-    @RequestMapping("/login")
+    @RequestMapping("/register")
     public ServerResponse login(String phone) {
-        return userService.loginRegister(phone);
+        return userService.register(phone);
     }
     @ResponseBody
-    @RequestMapping("/loginByPwd")
-    public ServerResponse loginByPwd(String phone,String pwd){
-       return userService.loginByPwd(phone,pwd);
+    @RequestMapping("/login")
+    public ServerResponse login(String phone,String pwd){
+       return userService.login(phone,pwd);
     }
     @ResponseBody
     @RequestMapping("/resetPwd")

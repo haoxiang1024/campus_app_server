@@ -125,7 +125,7 @@ public class LostFoundController {
         return lostFoundService.showTopList(stick);
     }
 
-    // 用于处理安卓客户端传过来的文件
+
     /**
      * @param upload_file 上传的文件
      * @param lostJson    丢失物品json数据
@@ -134,11 +134,11 @@ public class LostFoundController {
      */
     @ResponseBody
     @PostMapping("/addLostFound")
-    public ServerResponse upload(MultipartFile upload_file, String lostJson, String foundJson, String op) {
+    public ServerResponse addLostFound(MultipartFile upload_file, String lostJson, String foundJson, String op) {
         String filename = util.getFileName(upload_file);
         //判断是丢失or招领
         if (op != null && !op.equals("")) {
-            if (op.equals("丢失")) {
+            if (op.equals("失物")) {
                 //失物
                 //添加物品信息,调用json-update设置图片名称
                 String newLostJson = Json.updateByKey(lostJson, "img", filename);

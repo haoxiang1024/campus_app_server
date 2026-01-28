@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public ServerResponse loginRegister(String phone) {
+    public ServerResponse register(String phone) {
         Integer userid = userMapper.findUserByPhone(phone);
         Date time = DateUtil.getTime();//获取时间
         Integer bigDecimal = 1000;
@@ -48,51 +48,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ServerResponse loginByPwd(String phone, String pwd) {
-        //判断是否为新账户登录
-        //1新账户，则自动注册 2已有账户，立即登录
+    public ServerResponse login(String phone, String pwd) {
         Integer userid = userMapper.findUserByPhone(phone);
-        Date time = DateUtil.getTime();//获取时间
-        Integer bigDecimal = 1000;
-        String nickname = Util.NickNameRandom();//随机获取昵称
-        String photo;
-        try {
-            photo = Util.ImageSearch("头像");//随机获取头像
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        User user = new User(nickname, phone, photo, "男", bigDecimal, 100, time);
         if (userid == null) {
-            //注册，第一次用户信息为系统默认，后续用户可以自行修改
-            //注册成功后返回user对象
-            String hashedPwd =  Util.encryptPwd(pwd);//加密存储密码
-            user.setPassword(hashedPwd);
-            userMapper.register(phone, user);
-            return ServerResponse.createServerResponseBySuccess(user, "注册成功,立即登录");
-        } else {
-            //已经有账户,立即登录,返回userInfo
-            String  hashedPwd = userMapper.login(phone);//取出密码
-            if (hashedPwd == null) {
-                //登录失败
-                return ServerResponse.createServerResponseBySuccess("登录失败,请检查手机号密码是否正确");
-            } else {
-                //验证密码是否正确
-                boolean isMatch = Util.verifyPwd(pwd, hashedPwd);
-                if (isMatch) {
-                    //密码正确 看有没有被禁用被禁用了无法登录
-                    User userInfo = userMapper.userInfo(userid);
-                    //设置头像
-                    String pic = Util.updatePic(userInfo.getPhoto());
-                    userInfo.setPhoto(pic);
-                    return ServerResponse.createServerResponseBySuccess(userInfo, "登录成功");
-                }else {
-                    //密码错误
-                    return ServerResponse.createServerResponseBySuccess( "登录失败，密码错误");
-                }
-
-            }
-
+            // 如果查询不到用户ID，说明该账号未注册
+            return ServerResponse.createServerResponseByFail("登录失败，该手机号尚未注册");
         }
+        //获取密码
+        String hashedPwd = userMapper.login(phone);
+        boolean isMatch = Util.verifyPwd(pwd, hashedPwd);
+        if (isMatch) {
+            //密码正确，获取详细用户信息
+            User userInfo = userMapper.userInfo(userid);
+            // 检查用户是否被禁用
+             if (userInfo.getstate() == 0) {
+                 return ServerResponse.createServerResponseByFail("该账号已被禁用");
+             }
+            String pic = Util.updatePic(userInfo.getPhoto());
+            userInfo.setPhoto(pic);
+            return ServerResponse.createServerResponseBySuccess(userInfo, "登录成功");
+        } else {
+            // 密码错误
+            return ServerResponse.createServerResponseByFail("登录失败，密码错误");
+        }
+
     }
 
     @Override

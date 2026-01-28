@@ -3,7 +3,18 @@
 <style>
     /* 核心变量与基础样式 */
     .text-custom-blue { color: #00aaff !important; }
+    /* 表格头像放大镜效果 */
+    .table-avatar-zoom {
+        transition: transform 0.2s ease; /* 让放大效果平滑一些 */
+    }
 
+    .table-avatar-zoom:hover {
+        cursor: zoom-in; /* 核心：鼠标变成放大镜形状 */
+        transform: scale(1.2); /* 悬停时图片轻微放大 20% */
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15); /* 增加一点阴影更有质感 */
+        z-index: 10; /* 确保放大时不会被旁边的单元格遮挡 */
+        position: relative;
+    }
     .content-wrapper {
         background: #ffffff !important;
         border-radius: 12px;
@@ -46,12 +57,12 @@
 <div class="content-wrapper">
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
         <div class="d-flex gap-2">
-            <button class="btn btn-outline-success btn-sm" id="btnBatchEnable">批量启用</button>
-            <button class="btn btn-outline-warning btn-sm" id="btnBatchDisable">批量禁用</button>
+            <button class="btn btn-outline-success btn-sm" id="btnBatchEnable">启用</button>
+            <button class="btn btn-outline-warning btn-sm" id="btnBatchDisable">禁用</button>
             <button class="btn btn-outline-danger btn-sm" id="btnBatchReset">重置密码</button>
         </div>
 
-        <div class="input-group input-group-sm" style="width: 280px;">
+        <div class="input-group input-group-sm" style="width: 220px;">
             <input type="text" id="userKeyword" class="form-control" placeholder="搜索昵称/手机号/Email...">
             <button class="btn btn-primary" type="button" id="btnSearchUser">
                 <i class="fa fa-search"></i>
@@ -187,8 +198,13 @@
                 html += `<tr>
                 <td><input type="checkbox" class="form-check-input user-checkbox" value="${u.id}"></td>
                 <td>${u.id}</td>
-                <td><img src="${getPhotoUrl(u.photo)}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;" onerror="this.src='./svgs/solid/circle-user.svg'"></td>
-                <td class="fw-bold">${u.nickname || '-'}</td>
+<td>
+    <img src="${getPhotoUrl(u.photo)}"
+         class="table-avatar-zoom"
+         style="width:35px;height:35px;border-radius:50%;object-fit:cover;cursor: zoom-in;"
+         onerror="this.src='./svgs/solid/circle-user.svg'"
+         onclick="window.open(this.src)">
+</td>                <td class="fw-bold">${u.nickname || '-'}</td>
                 <td class="text-center">${u.sex || '-'}</td>
                 <td><small class="text-muted">${formatDate(u.reg_date)}</small></td>
                 <td>${u.phone || '-'}</td>

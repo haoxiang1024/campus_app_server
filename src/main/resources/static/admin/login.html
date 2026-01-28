@@ -36,8 +36,8 @@
 
         // 获取表单数据
         const loginData = {
-            username: $('input[name="username"]').val(),
-            password: $('input[name="password"]').val()
+            phone: $('input[name="username"]').val(),
+            pwd: $('input[name="password"]').val()
         };
         const Toast = {
             success: (msg) => {
@@ -82,21 +82,18 @@
             }
         };
         $.ajax({
-            url: '/school/admin/login',
+            url: '/school/login',
             type: 'POST',
             data: loginData,
             success: function(res) {
                 console.log("服务器返回：", res);
                 if (res.status === 0) {
-                   // alert('登录成功！');
-                    //Toast.success("登录成功")
-                    // 将后端返回的完整的 AdminService 对象存入 Session
-                    sessionStorage.setItem("admin", JSON.stringify(res.data));
+                    sessionStorage.setItem("user", JSON.stringify(res.data));
                     window.location.href = 'index.html';
                 } else {
                     // 显示后端返回的具体错误信息
                     //alert('错误：' + (res.msg || '用户名或密码不正确'));
-                    Toast.error("用户名或密码不正确")
+                    Toast.error(res.msg || '用户名或密码不正确')
                 }
             },
             error: function() {

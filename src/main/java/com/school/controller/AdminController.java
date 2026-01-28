@@ -22,12 +22,6 @@ public class AdminController {
     private Util util;
     @Autowired
     private LostFoundService lostFoundService;
-    //管理员登录
-    @ResponseBody
-    @RequestMapping("/login")
-    public ServerResponse login(String username, String password){
-        return adminService.getUser(username,password);
-    }
     //获取用户数据 失物招领数量
     @ResponseBody
     @RequestMapping("/getAllUser")
@@ -131,5 +125,10 @@ public class AdminController {
                                @RequestParam(defaultValue = "10") int pageSize,
                                @RequestParam(required = false) String keyword) {
         return userService.getUserList(page, pageSize, keyword);
+    }
+    @ResponseBody
+    @PostMapping("/updateStickStatus")
+    public ServerResponse updateStickStatus(int id,int stick){
+        return adminService.updateStickStatus(id, stick);
     }
 }

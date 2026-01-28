@@ -22,16 +22,6 @@ import java.util.stream.Stream;
 public class AdminServiceImpl implements AdminService {
     @Autowired
     AdminMapper adminMapper;
-    @Override
-    public ServerResponse getUser(String username, String password) {
-        com.school.entity.Admin admin = adminMapper.getUser(username, password);
-        if (admin!= null) {
-            return ServerResponse.createServerResponseBySuccess(admin,"登录成功");
-        }else {
-            return ServerResponse.createServerResponseByFail(500);
-        }
-
-}
 
     @Override
     public ServerResponse getAllUser() {
@@ -105,5 +95,13 @@ public class AdminServiceImpl implements AdminService {
         result.put("total", total);
         result.put("totalPages", (int) Math.ceil((double) total / pageSize));
         return ServerResponse.createServerResponseBySuccess(result);
+    }
+
+    @Override
+    public ServerResponse updateStickStatus(int id,int stick) {
+        if(adminMapper.updateStickStatus(id, stick)){
+            return ServerResponse.createServerResponseBySuccess("置顶成功");
+        }
+        return ServerResponse.createServerResponseByFail("置顶失败");
     }
 }

@@ -1,19 +1,17 @@
 package com.school.mapper;
 
-import com.school.entity.Admin;
 import com.school.entity.LostFound;
 import com.school.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
 @Mapper
 public interface AdminMapper {
-    //登录
-    @Select("select * from admin where username=#{username} and password=#{password}")
-    Admin getUser(@Param("username") String username, @Param("password") String password);
+
     //获取所有用户数
     @Select("SELECT COUNT(*) FROM user")
     int getAllUserCount();
@@ -52,4 +50,7 @@ public interface AdminMapper {
             @Param("type") String type,
             @Param("state") String state
     );
+    //置顶信息
+    @Update("update lostFound set stick=#{stick} where id = #{id}")
+    boolean updateStickStatus(@Param("id")int id,@Param("stick")int stick);
 }

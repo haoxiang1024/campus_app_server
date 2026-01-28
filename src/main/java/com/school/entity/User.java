@@ -15,6 +15,15 @@ public class User {
     private Date reg_date;
     private String email;
     private int state;
+    private int role;
+
+    public int getRole() {
+        return role;
+    }
+
+    public void setRole(int role) {
+        this.role = role;
+    }
 
     public int getstate() {
         return state;
@@ -47,6 +56,7 @@ public class User {
         this.prestige = prestige;
         this.reg_date = reg_date;
     }
+
 
     public User() {
     }
