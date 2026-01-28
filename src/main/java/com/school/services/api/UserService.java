@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 @SuppressWarnings("rawtypes")
 @Service
 public interface UserService {
-    //登录注册
-    ServerResponse register(String phone);
+    //注册
+    ServerResponse register(String phone,String email,String password);
     //登录
     ServerResponse login(String phone,String pwd);
     //忘记密码

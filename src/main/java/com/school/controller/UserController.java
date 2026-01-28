@@ -22,8 +22,8 @@ public class UserController {
     private Util util;
     @ResponseBody
     @RequestMapping("/register")
-    public ServerResponse login(String phone) {
-        return userService.register(phone);
+    public ServerResponse register(String phone,String email,String password) {
+        return userService.register(phone,email,password);
     }
     @ResponseBody
     @RequestMapping("/login")

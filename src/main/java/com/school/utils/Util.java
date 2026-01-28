@@ -57,7 +57,13 @@ public class Util {
             return THREE_LETTERS[rand.nextInt(THREE_LETTERS.length)];
         }
     }
-
+    //随机性别
+    public static String SexRandom(){
+        final Random rand = new Random();
+        int type = rand.nextInt(2);
+        // 根据随机数返回对应的性别
+        return type == 0 ? "男" : "女";
+    }
     /**
      * @param oldPic 原图地址
      * @return 新图地址

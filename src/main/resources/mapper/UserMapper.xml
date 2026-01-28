@@ -4,9 +4,9 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.school.mapper.UserMapper">
     <insert id="register" useGeneratedKeys="true" keyProperty="user.id">
-        insert into user (nickname, phone, password, photo, sex, balance, prestige, reg_date)
-        VALUES (#{user.nickname}, #{phone}, #{user.password}, #{user.photo}, #{user.sex}, #{user.balance},
-                #{user.prestige}, #{user.reg_date})
+        insert into user (nickname, phone, password, photo, sex, balance, prestige, reg_date,state,role,email)
+        VALUES (#{user.nickname}, #{user.phone}, #{user.password}, #{user.photo}, #{user.sex}, #{user.balance},
+                #{user.prestige}, #{user.reg_date},#{user.state},#{user.role},#{user.email})
     </insert>
     <update id="resetPwd">
         update user

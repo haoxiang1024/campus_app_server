@@ -20,31 +20,28 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public ServerResponse register(String phone) {
-        Integer userid = userMapper.findUserByPhone(phone);
+    public ServerResponse register(String phone,String email,String password) {
         Date time = DateUtil.getTime();//获取时间
-        Integer bigDecimal = 1000;
+        Integer balance = 1000;
+        Integer prestige = 1000;
+        String sex=Util.SexRandom();
         String nickname = Util.NickNameRandom();//随机获取昵称
         String photo;
+        int state=1;//状态：1启用 0禁用
+        int role=0;//0：普通用户 1：管理员用户
+        //密码加密
+        String hashedPwd=Util.encryptPwd(password);
         try {
             photo = Util.ImageSearch("头像");//随机获取头像
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        User user = new User(nickname, phone, photo, "男", bigDecimal, 100, time);
-        if (userid == null) {
-            //注册，第一次用户信息为系统默认，后续用户可以自行修改
+        User user = new User(photo,phone,sex,balance,prestige,time,email,state,role,nickname,hashedPwd);
             //注册成功后返回user对象
-            userMapper.register(phone, user);
-        } else {
-            //已经有账户,返回userInfo
-            User userInfo = userMapper.userInfo(userid);
-            //设置头像
-            String pic = Util.updatePic(userInfo.getPhoto());
-            userInfo.setPhoto(pic);
-            return ServerResponse.createServerResponseBySuccess(userInfo, "已有账户，立即登录");
+        if(userMapper.register(user)) {
+            return ServerResponse.createServerResponseBySuccess(user, "注册成功");
         }
-        return ServerResponse.createServerResponseBySuccess(user, "注册成功");
+        return ServerResponse.createServerResponseByFail( "注册失败");
     }
 
     @Override

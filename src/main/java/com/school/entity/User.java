@@ -47,16 +47,19 @@ public class User {
         this.email = email;
     }
 
-    public User(String nickname, String phone, String photo, String sex, Integer balance, Integer prestige, Date reg_date) {
-        this.nickname = nickname;
-        this.phone = phone;
+    public User(String photo, String phone, String sex, Integer balance, Integer prestige, Date reg_date, String email, int state, int role, String nickname, String password) {
         this.photo = photo;
+        this.phone = phone;
         this.sex = sex;
         this.balance = balance;
         this.prestige = prestige;
         this.reg_date = reg_date;
+        this.email = email;
+        this.state = state;
+        this.role = role;
+        this.nickname = nickname;
+        this.password = password;
     }
-
 
     public User() {
     }

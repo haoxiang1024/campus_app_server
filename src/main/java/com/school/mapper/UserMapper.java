@@ -15,8 +15,8 @@ public interface UserMapper {
      */
     Integer findUserByPhone(@Param("phone") String phone);
 
-    //通过手机号注册用户
-    void register(@Param("phone") String phone, @Param("user") User user);
+    //注册用户
+    boolean register(@Param("user") User user);
 
     //根据id获取用户信息
     User userInfo(@Param("id") int id);
