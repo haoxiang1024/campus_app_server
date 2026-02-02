@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 public interface LostFoundService {
     //获取物品的详细信息
-    ServerResponse getLostFoundDetail(int lostfoundtypeId);
+    ServerResponse getLostFoundDetail(int lostfoundtypeId,String type);
 
     //获取用户名称
     ServerResponse getUserName(int id);
@@ -34,5 +34,5 @@ public interface LostFoundService {
     //分页查询
     ServerResponse getLostListByPage(int page, int size);
     //获取某分类下的信息
-    ServerResponse getDetailByTitle(String title);
+    ServerResponse getDetailByTitle(String title,String type);
 }

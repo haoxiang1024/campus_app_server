@@ -11,8 +11,8 @@ import java.util.List;
 
 @Mapper
 public interface LostFoundMapper {
-    //获取一个分类下的物品信息
-    List<LostFound> selectByTypeId(@Param("lostfoundtypeId") int lostfoundtypeId);
+    //获取一个分类下的物品信息 通过type区分失物招领
+    List<LostFound> selectByTypeId(@Param("lostfoundtypeId") int lostfoundtypeId,@Param("type") String type);
 
     //根据userid获取用户名称
     String searchUserNameId(@Param("id") int id);

@@ -17,8 +17,9 @@
     <select id="selectByTypeId" resultType="com.school.entity.LostFound">
         select *
         from lostFound
-        where lostfoundtype_id = #{lostfoundtypeId}
+        where lostfoundtype_id = #{lostfoundtypeId} and type=#{type}
           and state = '寻找中' or state='待认领'
+
         order by pub_date desc
     </select>
     <select id="searchUserNameId" resultType="java.lang.String">

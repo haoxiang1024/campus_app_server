@@ -42,8 +42,8 @@ public class LostFoundController {
     @ResponseBody
     //获取分类下的内容
     @RequestMapping("/DetailByTitle")
-    public ServerResponse getDetailByTitle( String title) {
-        return lostFoundService.getDetailByTitle(title);
+    public ServerResponse getDetailByTitle( String title,String type) {
+        return lostFoundService.getDetailByTitle(title,type);
     }
 
     @ResponseBody

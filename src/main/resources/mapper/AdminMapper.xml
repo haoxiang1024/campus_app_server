@@ -15,7 +15,7 @@
         SELECT * FROM lostfound
         <where>
             <if test="keyword != null and keyword != ''">
-                AND (title LIKE CONCAT('%', #{keyword}, '%') OR place LIKE CONCAT('%', #{keyword}, '%'))
+                AND (title LIKE CONCAT('%', #{keyword}, '%') OR place LIKE CONCAT('%', #{keyword}, '%') or phone LIKE CONCAT('%', #{keyword}, '%'))
             </if>
             <if test="type != null and type != ''">
                 AND type = #{type}

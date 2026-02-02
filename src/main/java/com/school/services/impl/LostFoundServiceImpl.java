@@ -33,8 +33,8 @@ public class LostFoundServiceImpl implements LostFoundService {
 
 
     @Override
-    public ServerResponse getLostFoundDetail(int lostfoundtypeId) {
-        List<LostFound> lostFoundList = lostFoundMapper.selectByTypeId(lostfoundtypeId);
+    public ServerResponse getLostFoundDetail(int lostfoundtypeId,String type) {
+        List<LostFound> lostFoundList = lostFoundMapper.selectByTypeId(lostfoundtypeId,type);
         if (lostFoundList == null) {
             return ServerResponse.createServerResponseByFail(ResponseCode.DATA_EMPTY.getCode(), ResponseCode.DATA_EMPTY.getMsg());
         }
@@ -180,9 +180,9 @@ public class LostFoundServiceImpl implements LostFoundService {
     }
 
     @Override
-    public ServerResponse getDetailByTitle(String title) {
+    public ServerResponse getDetailByTitle(String title,String type) {
         int id = (int) lostFoundTypeService.getIdByName(title).getData();
-        return ServerResponse.createServerResponseBySuccess(getLostFoundDetail(id).getData());
+        return ServerResponse.createServerResponseBySuccess(getLostFoundDetail(id,type).getData());
     }
 
 
