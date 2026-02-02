@@ -1,6 +1,7 @@
 package com.school.controller;
 
 
+import com.school.entity.LostFound;
 import com.school.entity.LostFoundType;
 import com.school.mapper.LostFoundTypeMapper;
 import com.school.services.api.LostFoundService;
@@ -41,48 +42,8 @@ public class LostFoundController {
     @ResponseBody
     //获取分类下的内容
     @RequestMapping("/DetailByTitle")
-    public ServerResponse getDetailByTitle(HttpSession session, String title) {
-        //获取标题id
-        int id = 0;
-        List<LostFoundType> lostFoundTypes = lostFoundTypeMapper.GetAll();
-        //中英文转换
-        String[] en = {"Digital Devices", "Certificates", "Daily Necessities", "Clothing and Apparel", "Other"};
-        String[] cn = {"数码设备", "证件", "日用品", "服饰", "其他"};
-        Map<String, String> map = new HashMap<>();//建立关系
-        for (int i = 0; i < en.length; i++) {
-            map.put(en[i], cn[i]);
-        }
-        for (LostFoundType lostfoundtype : lostFoundTypes) {
-            if (lostfoundtype.getName().equals(title)) {
-                //中文
-                id = lostfoundtype.getId();
-            } else {
-                //英文
-                String cnValue = map.get(title);
-                if (lostfoundtype.getName().equals(cnValue)) {
-                    id = lostfoundtype.getId();
-                }
-            }
-       }
-        ServerResponse lostDetailList = lostFoundService.getLostFoundDetail(id);
-        //更新图片地址
-        List<com.school.entity.LostFound> data = (List<com.school.entity.LostFound>) lostDetailList.getData();
-        String updatePic = "";
-        for (com.school.entity.LostFound lostFound : data) {
-            if (lostFound.getImg() == null) {
-                break;
-            } else {
-                updatePic = Util.updatePic(lostFound.getImg());
-                lostFound.setImg(updatePic);
-            }
-
-        }
-        //更新数据
-        lostDetailList.setData(data);
-        if (lostDetailList.isSuccess()) {
-            session.setAttribute("detailList", lostDetailList.getData());
-        }
-        return lostDetailList;
+    public ServerResponse getDetailByTitle( String title) {
+        return lostFoundService.getDetailByTitle(title);
     }
 
     @ResponseBody

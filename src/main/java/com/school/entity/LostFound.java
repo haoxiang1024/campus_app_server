@@ -28,18 +28,9 @@ public class LostFound implements Serializable {
     private Integer user_id;
     private String nickname;
     private  String type;
-    public LostFound() {
-    }
+    private LostFoundType lostfoundtype;
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public LostFound(Integer id, String title, String img, Date pub_date, String content, String place, String phone, String state, Integer stick, Integer lostfoundtype_id, LostFoundType lostfoundtype, Integer user_id, String nickname, String type) {
+    public LostFound(Integer id, String title, String img, Date pub_date, String content, String place, String phone, String state, Integer stick, Integer lostfoundtype_id, Integer user_id, String nickname, String type, LostFoundType lostfoundtype) {
         this.id = id;
         this.title = title;
         this.img = img;
@@ -53,8 +44,27 @@ public class LostFound implements Serializable {
         this.user_id = user_id;
         this.nickname = nickname;
         this.type = type;
+        this.lostfoundtype = lostfoundtype;
     }
 
+    public LostFoundType getLostfoundtype() {
+        return lostfoundtype;
+    }
+
+    public void setLostfoundtype(LostFoundType lostfoundtype) {
+        this.lostfoundtype = lostfoundtype;
+    }
+
+    public LostFound() {
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
 
     public String getNickname() {
@@ -175,6 +185,23 @@ public class LostFound implements Serializable {
         this.user_id = user_id;
     }
 
-
-
+    @Override
+    public String toString() {
+        return "LostFound{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", img='" + img + '\'' +
+                ", pub_date=" + pub_date +
+                ", content='" + content + '\'' +
+                ", place='" + place + '\'' +
+                ", phone='" + phone + '\'' +
+                ", state='" + state + '\'' +
+                ", stick=" + stick +
+                ", lostfoundtype_id=" + lostfoundtype_id +
+                ", user_id=" + user_id +
+                ", nickname='" + nickname + '\'' +
+                ", type='" + type + '\'' +
+                ", lostfoundtype=" + lostfoundtype +
+                '}';
+    }
 }

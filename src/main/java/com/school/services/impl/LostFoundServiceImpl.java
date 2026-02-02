@@ -8,11 +8,13 @@ import com.school.entity.LostFoundType;
 import com.school.mapper.LostFoundTypeMapper;
 import com.school.mapper.LostFoundMapper;
 import com.school.services.api.LostFoundService;
+import com.school.services.api.LostFoundTypeService;
 import com.school.utils.ResponseCode;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +27,9 @@ public class LostFoundServiceImpl implements LostFoundService {
 
     @Autowired
     private LostFoundTypeMapper lostFoundTypeMapper;
+    @Autowired
+    private LostFoundTypeService lostFoundTypeService;
+
 
 
     @Override
@@ -34,7 +39,7 @@ public class LostFoundServiceImpl implements LostFoundService {
             return ServerResponse.createServerResponseByFail(ResponseCode.DATA_EMPTY.getCode(), ResponseCode.DATA_EMPTY.getMsg());
         }
         //设置用户名
-        for (com.school.entity.LostFound lostFound : lostFoundList) {
+        for (LostFound lostFound : lostFoundList) {
             //获取用户id
             Integer userId = lostFound.getUserId();
             //根据用户id获取用户名
@@ -69,15 +74,14 @@ public class LostFoundServiceImpl implements LostFoundService {
     }
 
 
-
     @Override
     public ServerResponse getLostFoundByUserId(int user_id) {
-        List<com.school.entity.LostFound> allByIdLostFoundList = lostFoundMapper.getLostFoundListById(user_id);
+        List<LostFound> allByIdLostFoundList = lostFoundMapper.getLostFoundListById(user_id);
         if (allByIdLostFoundList.size() == 0) {
             return ServerResponse.createServerResponseBySuccess("还未发布任何信息");
         } else {
             //设置用户名
-            for (com.school.entity.LostFound lostFound : allByIdLostFoundList) {
+            for (LostFound lostFound : allByIdLostFoundList) {
                 //获取用户id
                 Integer userId = lostFound.getUserId();
                 //根据用户id获取用户名
@@ -95,7 +99,7 @@ public class LostFoundServiceImpl implements LostFoundService {
     @Override
     public ServerResponse updateState(int id, String state, int user_id) {
         if (lostFoundMapper.updateState(id, state)) {
-            List<com.school.entity.LostFound> allByIdLostFoundList = lostFoundMapper.getLostFoundListById(user_id);
+            List<LostFound> allByIdLostFoundList = lostFoundMapper.getLostFoundListById(user_id);
             return ServerResponse.createServerResponseBySuccess(allByIdLostFoundList, "状态已更改");
         }
         return ServerResponse.createServerResponseBySuccess("状态更改失败");
@@ -103,12 +107,12 @@ public class LostFoundServiceImpl implements LostFoundService {
 
     @Override
     public ServerResponse showTopList(int stick) {
-        List<com.school.entity.LostFound> lists = lostFoundMapper.showTopList(stick);
-        if (lists.size() == 0) {
+        List<LostFound> lists = lostFoundMapper.showTopList(stick);
+        if (lists.isEmpty()) {
             return ServerResponse.createServerResponseBySuccess("无置顶信息");
         }
         //设置用户名
-        for (com.school.entity.LostFound lostFound : lists) {
+        for (LostFound lostFound : lists) {
             //获取用户id
             Integer userId = lostFound.getUserId();
             //获取分类id
@@ -120,8 +124,8 @@ public class LostFoundServiceImpl implements LostFoundService {
             //设置分类
             List<LostFoundType> lostFoundTypes = lostFoundTypeMapper.GetAll();
             for (LostFoundType type : lostFoundTypes) {
-                if(Objects.equals(type.getId(), lostfoundtypeId)){
-                    //lostFound.setLostfoundtype(type);
+                if (Objects.equals(type.getId(), lostfoundtypeId)) {
+                    lostFound.setLostfoundtype(type);
                 }
             }
             //设置图片
@@ -142,17 +146,19 @@ public class LostFoundServiceImpl implements LostFoundService {
     public ServerResponse getLostFoundById(Integer id) {
         com.school.entity.LostFound lostFound = lostFoundMapper.selectByPrimaryKey(id);
         if (lostFound == null) return ServerResponse.createServerResponseByFail("信息不存在");
-        return ServerResponse.createServerResponseBySuccess(lostFound);    }
+        return ServerResponse.createServerResponseBySuccess(lostFound);
+    }
 
     @Override
     public ServerResponse deleteLostFoundById(Integer id) {
         int result = lostFoundMapper.deleteByPrimaryKey(id);
-        return result > 0 ? ServerResponse.createServerResponseBySuccess("删除成功") : ServerResponse.createServerResponseByFail("删除失败");    }
+        return result > 0 ? ServerResponse.createServerResponseBySuccess("删除成功") : ServerResponse.createServerResponseByFail("删除失败");
+    }
 
     @Override
     public ServerResponse updateLostFoundStatus(Integer id, String state) {
-        boolean isSuccess= lostFoundMapper.updateState(id, state);
-        if(isSuccess){
+        boolean isSuccess = lostFoundMapper.updateState(id, state);
+        if (isSuccess) {
             return ServerResponse.createServerResponseBySuccess("修改成功");
         }
         return ServerResponse.createServerResponseByFail("修改失败");
@@ -171,6 +177,12 @@ public class LostFoundServiceImpl implements LostFoundService {
         resultMap.put("list", pageInfo.getList());
         resultMap.put("total", pageInfo.getTotal());
         return ServerResponse.createServerResponseBySuccess(resultMap);
+    }
+
+    @Override
+    public ServerResponse getDetailByTitle(String title) {
+        int id = (int) lostFoundTypeService.getIdByName(title).getData();
+        return ServerResponse.createServerResponseBySuccess(getLostFoundDetail(id).getData());
     }
 
 

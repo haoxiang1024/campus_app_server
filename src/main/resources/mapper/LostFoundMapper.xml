@@ -18,7 +18,7 @@
         select *
         from lostFound
         where lostfoundtype_id = #{lostfoundtypeId}
-          and state = '未找到' or state='未认领'
+          and state = '寻找中' or state='待认领'
         order by pub_date desc
     </select>
     <select id="searchUserNameId" resultType="java.lang.String">
@@ -50,7 +50,7 @@
         select *
         from lostFound
         where stick = #{stick}
-          and state = '未找到' or state='未认领'
+          and state = '寻找中' or state='待认领'
     </select>
 
 </mapper>

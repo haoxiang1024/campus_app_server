@@ -33,4 +33,6 @@ public interface LostFoundService {
     ServerResponse updateLostFoundStatus(Integer id, String state);
     //分页查询
     ServerResponse getLostListByPage(int page, int size);
+    //获取某分类下的信息
+    ServerResponse getDetailByTitle(String title);
 }

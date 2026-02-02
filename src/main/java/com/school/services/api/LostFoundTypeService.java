@@ -8,8 +8,6 @@ public interface LostFoundTypeService {
     //获取所有分类
     ServerResponse getAllType();
 
-
-
     //获取分类id
     ServerResponse getIdByName(String name);
 
