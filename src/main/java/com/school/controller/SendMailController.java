@@ -1,7 +1,9 @@
 package com.school.controller;
 
 import com.school.entity.FormDataDTO;
+import com.school.utils.EmailVerificationUtils;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +19,12 @@ import java.util.Properties;
 //邮件发送
 @Controller
 public class SendMailController {
-
+    private static String SMTP_PASSWORD ; // QQ邮箱授权码
+    @Value("${mail.smtp.password}")
+    public void setSmtpPassword(String password) {
+        // 将注入的值赋给本类的静态变量
+        SendMailController.SMTP_PASSWORD = password;
+    }
     @SneakyThrows
     @ResponseBody
     @RequestMapping("/sendMail")
@@ -47,7 +54,6 @@ public class SendMailController {
         String host = "smtp.qq.com";
         int port = 587;
         String username = "3502777299@qq.com";
-        String password = "wcfcwypirtsjcjge"; // QQ邮箱授权码（需确保未过期）
         String to = "3502777299@qq.com";
         String subject = formData.getSubject();
         String text = formData.getMessage();
@@ -66,7 +72,7 @@ public class SendMailController {
         Authenticator authenticator = new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(username, password);
+                return new PasswordAuthentication(username, SMTP_PASSWORD);
             }
         };
 
