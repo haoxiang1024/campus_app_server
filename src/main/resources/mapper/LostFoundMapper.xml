@@ -15,12 +15,18 @@
 
 
     <select id="selectByTypeId" resultType="com.school.entity.LostFound">
-        select *
-        from lostFound
-        where lostfoundtype_id = #{lostfoundtypeId} and type=#{type}
-          and state = '寻找中' or state='待认领'
-
-        order by pub_date desc
+        SELECT *
+        FROM lostFound
+        <where>
+            <if test="lostfoundtypeId != null and lostfoundtypeId != 0">
+                AND lostfoundtype_id = #{lostfoundtypeId}
+            </if>
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+            AND (state = '寻找中' OR state = '待认领')
+        </where>
+        ORDER BY pub_date DESC
     </select>
     <select id="searchUserNameId" resultType="java.lang.String">
         select nickname

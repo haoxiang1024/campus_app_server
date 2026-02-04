@@ -8,7 +8,8 @@ import java.util.List;
 @Mapper
 public interface SearchMapper {
 
-    List<SearchInfo> searchInfoByValue(@Param("value")String value);
+    List<SearchInfo>
+    searchInfoByValue(@Param("value")String value);
 
 
 }

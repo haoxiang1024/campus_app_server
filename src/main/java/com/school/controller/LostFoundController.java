@@ -97,6 +97,7 @@ public class LostFoundController {
     @PostMapping("/addLostFound")
     public ServerResponse addLostFound(MultipartFile upload_file, String lostJson, String foundJson, String op) {
         String filename = util.getFileName(upload_file);
+        System.out.println(foundJson);
         //判断是丢失or招领
         if (op != null && !op.equals("")) {
             if (op.equals("失物")) {

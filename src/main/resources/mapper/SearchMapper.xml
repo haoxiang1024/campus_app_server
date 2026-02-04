@@ -5,12 +5,13 @@
 <mapper namespace="com.school.mapper.SearchMapper">
 
     <select id="searchInfoByValue" resultType="com.school.entity.SearchInfo">
-        SELECT * FROM (
-                          SELECT id, title, img, pub_date, content, place, phone, state, stick, lostfoundtype_id, user_id, 'lostFound' AS type
-                          FROM lostFound
-                          UNION ALL
-                          SELECT id, title, img, pub_date, content, place, phone, state, stick, lostfoundtype_id, user_id, 'found' AS type
-                          FROM found
-                      ) AS t WHERE t.title LIKE #{value} OR t.place LIKE #{value} OR t.state LIKE #{value}
+        SELECT
+            id, title, img, pub_date, content, place, phone, state, stick, lostfoundtype_id, user_id, type
+        FROM
+            lostfound
+        WHERE
+            title LIKE #{value}
+           OR place LIKE #{value}
+           OR state LIKE #{value}
     </select>
 </mapper>
