@@ -76,6 +76,11 @@ public class UserController {
 
         }
     }
+    @ResponseBody
+    @RequestMapping("/getIMUserToken")
+    public ServerResponse getIMUserToken(int uid, String nickname) {
+        return userService.getIMUserToken(uid,nickname);
+    }
 
 
 }

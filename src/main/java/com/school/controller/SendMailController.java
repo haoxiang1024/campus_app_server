@@ -1,7 +1,6 @@
 package com.school.controller;
 
 import com.school.entity.FormDataDTO;
-import com.school.utils.EmailVerificationUtils;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;

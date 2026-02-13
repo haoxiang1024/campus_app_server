@@ -1,14 +1,13 @@
 package com.school;
 
-import com.school.mapper.UserMapper;
-import com.school.services.impl.LostFoundTypeServiceImpl;
+import com.school.services.api.UserService;
 import com.school.services.impl.UserServiceImpl;
-import com.school.services.api.LostFoundService;
 import com.school.utils.EmailVerificationUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.io.ResourceLoader;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -20,21 +19,30 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 @SpringBootTest
+@EnableFeignClients
 class SchoolApplicationTests {
-    @Autowired
-    private ResourceLoader resourceLoader;
+    private static long appid;
+    @Value("${im.sdk.appid}")
+    public  void setAppid(long appid) {
+        SchoolApplicationTests.appid = appid;
+    }
 
-    @Autowired
-    LostFoundTypeServiceImpl lostFoundTypeServiceImpl;
-    @Autowired
-    UserMapper userMapper;
-    @Autowired
-    UserServiceImpl userServiceImpl;
-    @Autowired
-    private LostFoundService lostFoundService;
+    private static String key;
+    @Value("${im.key}")
+    public  void setKey(String key) {
+        SchoolApplicationTests.key = key;
+    }
+
+    private static String userid;
+    @Value("${im.userid}")
+   public  void setUserid(String userid) {
+        SchoolApplicationTests.userid = userid;
+    }
+@Autowired
+private UserServiceImpl userService;
+
     @Test
-    void contextLoads() {
-        //System.err.println(userService.resetPwd("18682675515", "p0000000"));
+    void im() {
 
 
     }

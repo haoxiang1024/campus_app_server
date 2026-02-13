@@ -2,9 +2,8 @@ package com.school.services.api;
 
 import com.school.utils.ServerResponse;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.stereotype.Service;
 
-@Service
+
 public interface LostFoundService {
     //获取物品的详细信息
     ServerResponse getLostFoundDetail(int lostfoundtypeId,String type);

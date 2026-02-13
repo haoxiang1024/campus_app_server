@@ -403,7 +403,21 @@
             if (!ids.length) return window.Toast.error('请选择用户');
             window.Toast.confirm('重置确认', `确认重置选中用户的密码吗？`, () => resetPassword(ids));
         });
+// 当用户选择了新图片文件时，实时更新预览图
+        $('#editPhoto').on('change', function() {
+            const file = this.files[0];
+            if (file) {
+                // 创建一个指向该本地文件的临时 URL
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // 将预览图的 src 替换为读取到的 Base64 数据
+                    $('#avatarPreview').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(file);
 
+
+            }
+        });
         // 首次加载
         loadUsers(1);
     })();

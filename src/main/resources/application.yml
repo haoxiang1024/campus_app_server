@@ -31,3 +31,10 @@ pagehelper:
   helper-dialect: mysql          # 指定数据库方言
   reasonable: true
   support-methods-arguments: true
+feign:
+  client:
+    config:
+      default: # default 表示全局配置，也可以换成具体的 client name
+        connectTimeout: 5000 # 连接超时 5s
+        readTimeout: 10000    # 读取超时 10s
+        loggerLevel: full     # 打印详细的请求日志（方便调试）

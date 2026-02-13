@@ -1,8 +1,7 @@
 package com.school.services.api;
 
 import com.school.utils.ServerResponse;
-import org.springframework.stereotype.Service;
-@Service
+
 public interface AdminService {
     //获取用户 失物招领信息数量
     ServerResponse getAllUser();

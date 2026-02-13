@@ -1,8 +1,6 @@
 package com.school.controller;
 
 
-import com.school.entity.LostFound;
-import com.school.entity.LostFoundType;
 import com.school.mapper.LostFoundTypeMapper;
 import com.school.services.api.LostFoundService;
 import com.school.services.api.LostFoundTypeService;
@@ -17,9 +15,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 
 @Controller

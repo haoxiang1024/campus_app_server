@@ -1,11 +1,16 @@
 package com.school.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.school.services.api.RongCloudApi;
 import org.jetbrains.annotations.NotNull;
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
@@ -22,10 +27,15 @@ import java.util.regex.Pattern;
 public class Util {
     @Value("${file.upload.path}")
     private  String uploadPath;
-    private static String imgUrl = "";//网络图片地址
-    private static Lock globalCountLock = new ReentrantLock();//线程锁保证线程安全
     // 工作因子（推荐 10-14）
     private static final int WORK_FACTOR = 12;
+    private static RongCloudApi staticRongCloudApi;
+    @Autowired
+    private  RongCloudApi rongCloudApi;
+    @PostConstruct
+    public void init(){
+        staticRongCloudApi = this.rongCloudApi;
+    }
     /**
      * @return 返回随机昵称
      */
@@ -164,5 +174,16 @@ public class Util {
         }
         // 自动从哈希值中提取盐，重新计算并对比
         return BCrypt.checkpw(plainPassword, hashedPassword);
+    }
+    //IM注册
+    /**
+     * 执行用户注册并获取 Token
+     */
+    public static String registerUserToProvider(String uid, String nickname, String avatarUrl) {
+        try {
+            return staticRongCloudApi.getToken(uid, nickname, avatarUrl);
+        } catch (Exception e) {
+            e.printStackTrace();        }
+        return null;
     }
 }

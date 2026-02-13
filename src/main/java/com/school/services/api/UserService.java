@@ -2,10 +2,8 @@ package com.school.services.api;
 
 import com.school.entity.User;
 import com.school.utils.ServerResponse;
-import org.springframework.stereotype.Service;
 
-@SuppressWarnings("rawtypes")
-@Service
+
 public interface UserService {
     //注册
     ServerResponse register(String phone,String email,String password);
@@ -31,4 +29,6 @@ public interface UserService {
     ServerResponse updateUserStatus(String ids, Integer status);
     //分页查询
     ServerResponse getUserList(int page, int pageSize, String keyword);
+    //获取IM用户的token
+    ServerResponse getIMUserToken(int uid, String nickname);
 }

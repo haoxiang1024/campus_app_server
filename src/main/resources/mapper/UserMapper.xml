@@ -43,6 +43,9 @@
             <if test="photo != null">
                 photo = #{photo},
             </if>
+            <if test="im_token != null">
+                im_token = #{im_token},
+            </if>
         </set>
         WHERE id = #{id}
     </update>
@@ -60,17 +63,7 @@
         where phone = #{phone}
     </select>
     <select id="userInfo" resultType="com.school.entity.User">
-        select id,
-               nickname,
-               phone,
-               password,
-               photo,
-               sex,
-               balance,
-               prestige,
-               reg_date,
-               email,
-               state
+        select *
         from user
         where id = #{id}
     </select>

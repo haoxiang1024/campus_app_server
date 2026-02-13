@@ -1,7 +1,10 @@
 package com.school.services.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.school.entity.User;
 import com.school.mapper.UserMapper;
+import com.school.services.api.RongCloudApi;
 import com.school.services.api.UserService;
 import com.school.utils.DateUtil;
 import com.school.utils.ServerResponse;
@@ -37,12 +40,26 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException(e);
         }
         User user = new User(photo,phone,sex,balance,prestige,time,email,state,role,nickname,hashedPwd);
-            //注册成功后返回user对象
+        //验证手机号是否已经注册过
+        List<User> userList = userMapper.getalll();
+        for(User u:userList){
+            if(u.getPhone().equals(phone)){
+                return ServerResponse.createServerResponseByFail( "该用户已注册！");
+            }
+        }
+        //注册成功后返回user对象
         if(userMapper.register(user)) {
-            return ServerResponse.createServerResponseBySuccess(user, "注册成功");
+            //IM注册
+            String response = Util.registerUserToProvider(user.getId().toString(), user.getNickname(), user.getPhoto());
+            JSONObject jsonObject = JSON.parseObject(response);
+            String token = jsonObject.getString("token");
+            if(token != null && !token.isEmpty()){
+                return ServerResponse.createServerResponseBySuccess(user, "注册成功");
+            }
         }
         return ServerResponse.createServerResponseByFail( "注册失败");
     }
+
 
     @Override
     public ServerResponse login(String phone, String pwd) {
@@ -176,6 +193,25 @@ public class UserServiceImpl implements UserService {
         result.put("listSize", listSize);
         result.put("total_if", total);//查询了之后的所有记录
         return ServerResponse.createServerResponseBySuccess(result);
+    }
+
+    @Override
+    public ServerResponse getIMUserToken(int uid, String nickname) {
+        User user = userMapper.userInfo(uid);
+        //判断是否是非首次连接（数据库已有 Token）
+        if (user.getIm_token() != null && !user.getIm_token().isEmpty()) {
+            return ServerResponse.createServerResponseBySuccess(user.getIm_token(),"token获取成功");
+        }
+        //首次连接
+        String response=Util.registerUserToProvider(String.valueOf(uid),nickname,user.getPhoto());
+        JSONObject jsonObject = JSON.parseObject(response);
+        String token = jsonObject.getString("token");
+        if (token != null && !token.isEmpty()){
+            user.setIm_token(token);
+            userMapper.updateUserInfo(user);
+            return ServerResponse.createServerResponseBySuccess(token,"token获取成功");
+        }
+        return ServerResponse.createServerResponseByFail("聊天服务连接失败，请稍后再试");
     }
 }
 
