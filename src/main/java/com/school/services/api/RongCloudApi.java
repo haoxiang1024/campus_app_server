@@ -22,4 +22,16 @@ public interface RongCloudApi {
             @RequestParam("portraitUri") String portraitUri
     );
 
+    /**
+     * 修改用户信息
+     *
+     */
+    @PostMapping(value = "/user/refresh.json",
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    String refresh(
+            @RequestParam("userId") String userId,
+            @RequestParam("name") String name,
+            @RequestParam("portraitUri") String portraitUri
+    );
+
 }

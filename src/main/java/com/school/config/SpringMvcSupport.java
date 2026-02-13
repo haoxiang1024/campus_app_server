@@ -1,32 +1,33 @@
 package com.school.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.CacheControl;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
-
+import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class SpringMvcSupport extends WebMvcConfigurationSupport {
 
-    // 配置upload路径：school根目录下的upload（与src同级）
-    @Value("${file.upload.path:./upload/}")
-    private String uploadPath;
-
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // 原有static目录映射（保留）
+        // 1. 保留静态资源映射
         registry.addResourceHandler("/**")
                 .addResourceLocations("classpath:/static/");
 
-        // 映射upload目录
-        // URL前缀：/upload/**（不要加/school，上下文路径会自动拼接）
+        // 2. 动态获取 upload 路径
+        String userDir = System.getProperty("user.dir");
+        File uploadDir = new File(userDir, "upload");
+
+        // 调试打印：这一行非常关键！
+        // 启动后看控制台，确认它打印的路径下是否真的有你的图片文件
+        System.out.println(">>> [DEBUG] 当前程序寻找文件的物理路径是: " + uploadDir.getAbsolutePath());
+
+        String location = "file:" + uploadDir.getAbsolutePath() + File.separator;
+
         registry.addResourceHandler("/upload/**")
-                // 关键：file: + 项目根目录下的upload（与src同级）
-                .addResourceLocations("file:" + uploadPath)
-                // 禁用缓存
+                .addResourceLocations(location)
                 .setCacheControl(CacheControl.maxAge(0, TimeUnit.SECONDS));
 
         super.addResourceHandlers(registry);

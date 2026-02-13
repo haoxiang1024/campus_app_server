@@ -6,7 +6,7 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/school_app?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://123.207.51.104:3306/school_app?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: 123456
   servlet:
@@ -19,6 +19,7 @@ spring:
       static-locations:
         - classpath:/static/
         - file:./src/main/resources/static/  # 映射项目内的src/static
+
   config:
     import: classpath:application-secret.properties
 

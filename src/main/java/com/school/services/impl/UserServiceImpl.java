@@ -20,7 +20,8 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     @Autowired
     UserMapper userMapper;
-
+    @Autowired
+    private RongCloudApi rongCloudApi;
 
     @Override
     public ServerResponse register(String phone,String email,String password) {
@@ -116,7 +117,15 @@ public class UserServiceImpl implements UserService {
             //设置头像
             String pic = Util.updatePic(userInfo.getPhoto());
             userInfo.setPhoto(pic);
-            return ServerResponse.createServerResponseBySuccess(userInfo, "修改头像成功!");
+            //IM用户资料同步修改
+            String res=rongCloudApi.refresh(String.valueOf(id),userInfo.getNickname(),pic);
+            JSONObject jsonObject = JSON.parseObject(res);
+            String code = jsonObject.getString("code");
+            if(code.equals("200")){
+                return ServerResponse.createServerResponseBySuccess(userInfo,"修改资料成功!");
+            }else {
+                return ServerResponse.createServerResponseBySuccess("IM错误，修改失败!");
+            }
         }
         return ServerResponse.createServerResponseBySuccess("修改失败!");
 
@@ -129,7 +138,15 @@ public class UserServiceImpl implements UserService {
             //设置头像
             String pic = Util.updatePic(userInfo.getPhoto());
             userInfo.setPhoto(pic);
-            return ServerResponse.createServerResponseBySuccess(userInfo,"修改资料成功!");
+            //IM用户资料同步修改
+            String res=rongCloudApi.refresh(String.valueOf(id),nickname,pic);
+            JSONObject jsonObject = JSON.parseObject(res);
+            String code = jsonObject.getString("code");
+            if(code.equals("200")){
+                return ServerResponse.createServerResponseBySuccess(userInfo,"修改资料成功!");
+            }else {
+                return ServerResponse.createServerResponseBySuccess("IM错误，修改失败!");
+            }
         }
         return ServerResponse.createServerResponseBySuccess("修改失败!");
     }
@@ -143,9 +160,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public ServerResponse updateUserInfo(User user) {
         int resultCount = userMapper.updateUserInfo(user);
-
         if (resultCount > 0) {
-            return ServerResponse.createServerResponseBySuccess("用户信息更新成功");
+            //IM用户资料同步修改
+            String res=rongCloudApi.refresh(String.valueOf(user.getId()),user.getNickname(),user.getPhoto());
+            JSONObject jsonObject = JSON.parseObject(res);
+            String code = jsonObject.getString("code");
+            if(code.equals("200")){
+                return ServerResponse.createServerResponseBySuccess("用户信息更新成功");
+            }else {
+                return ServerResponse.createServerResponseBySuccess("IM错误，修改失败!");
+            }
         } else {
             return ServerResponse.createServerResponseByFail(500,"用户信息更新失败");
         }
