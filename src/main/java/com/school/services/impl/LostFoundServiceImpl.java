@@ -24,7 +24,8 @@ import java.util.Objects;
 public class LostFoundServiceImpl implements LostFoundService {
     @Autowired
     private LostFoundMapper lostFoundMapper;
-
+    @Autowired
+    private Util util;
     @Autowired
     private LostFoundTypeMapper lostFoundTypeMapper;
     @Autowired
@@ -89,7 +90,7 @@ public class LostFoundServiceImpl implements LostFoundService {
                 //设置用户名
                 lostFound.setNickname(userNameId);
                 //设置图片
-                String updatePic = Util.updatePic(lostFound.getImg());
+                String updatePic = util.updatePic(lostFound.getImg());
                 lostFound.setImg(updatePic);
             }
         }
@@ -130,7 +131,7 @@ public class LostFoundServiceImpl implements LostFoundService {
             }
             //设置图片
             String img = lostFound.getImg();
-            String updatePic = Util.updatePic(img);
+            String updatePic = util.updatePic(img);
             lostFound.setImg(updatePic);
         }
         return ServerResponse.createServerResponseBySuccess(lists, "置顶信息");

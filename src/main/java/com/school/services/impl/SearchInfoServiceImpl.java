@@ -22,7 +22,8 @@ public class SearchInfoServiceImpl implements SearchInfoService {
     private UserMapper userMapper;
     @Autowired
     private LostFoundTypeMapper lostFoundTypeMapper;
-
+    @Autowired
+    private Util util;
     @Override
     public ServerResponse searchInfo(String value) {
         List<SearchInfo> searchInfos = searchMapper.searchInfoByValue(value);
@@ -38,7 +39,7 @@ public class SearchInfoServiceImpl implements SearchInfoService {
                 //设置用户名
                 searchInfo.setNickname(userNameId);
                 //设置图片
-                String updatePic = Util.updatePic(searchInfo.getImg());
+                String updatePic = util.updatePic(searchInfo.getImg());
                 searchInfo.setImg(updatePic);
                 //设置分类
                 List<LostFoundType> lostFoundTypes = lostFoundTypeMapper.GetAll();

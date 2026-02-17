@@ -1,5 +1,7 @@
 package com.school.config;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.system.ApplicationHome;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.CacheControl;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -9,23 +11,21 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class SpringMvcSupport extends WebMvcConfigurationSupport {
-
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // 1. 保留静态资源映射
-        registry.addResourceHandler("/**")
-                .addResourceLocations("classpath:/static/");
-
-        // 2. 动态获取 upload 路径
-        String userDir = System.getProperty("user.dir");
-        File uploadDir = new File(userDir, "upload");
-
-        // 调试打印：这一行非常关键！
-        // 启动后看控制台，确认它打印的路径下是否真的有你的图片文件
-        System.out.println(">>> [DEBUG] 当前程序寻找文件的物理路径是: " + uploadDir.getAbsolutePath());
-
+        registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
+        ApplicationHome home = new ApplicationHome(getClass());
+        File baseDir = home.getDir();
+        if (baseDir.getAbsolutePath().endsWith("classes") || baseDir.getAbsolutePath().endsWith("target")) {
+            while (baseDir.getName().equals("classes") || baseDir.getName().equals("target")) {
+                baseDir = baseDir.getParentFile();
+            }
+        }
+        File uploadDir = new File(baseDir, "upload");
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
         String location = "file:" + uploadDir.getAbsolutePath() + File.separator;
-
         registry.addResourceHandler("/upload/**")
                 .addResourceLocations(location)
                 .setCacheControl(CacheControl.maxAge(0, TimeUnit.SECONDS));

@@ -6,7 +6,7 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://123.207.51.104:3306/school_app?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://localhost:3306/school_app?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: 123456
   servlet:
@@ -27,7 +27,7 @@ spring:
 file:
   upload:
     # 路径改为相对路径（./开头），指向项目根目录下的src
-    path: ./school/upload/
+    path: upload/
 pagehelper:
   helper-dialect: mysql          # 指定数据库方言
   reasonable: true

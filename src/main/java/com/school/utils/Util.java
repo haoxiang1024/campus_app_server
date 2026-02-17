@@ -78,14 +78,12 @@ public class Util {
      * @param oldPic 原图地址
      * @return 新图地址
      */
-    public static String updatePic(String oldPic) {
+    public String updatePic(String oldPic) {
         Pattern pattern = Pattern.compile(".*http.*"); // 此处使用的正则表达式是".*world.*"，匹配包含"http"的任何字符串。
         Matcher matcher = pattern.matcher(oldPic); // 将正则表达式应用到输入字符串上
-        String newPic = "";
+        String savePath = "http://"+Ip.getIp()+":8081/school/upload/";
         if (!matcher.matches()) {
-            newPic = "http://" + Ip.getIp() + ":8081/school/upload/" + oldPic;
-            //newPic = "http://111.67.197.142:8081/school/images/" + oldPic;
-            return newPic;
+            return savePath+oldPic;
         }
         return oldPic;
     }
@@ -123,34 +121,17 @@ public class Util {
     }
 
     @NotNull
-    public String getFileName(MultipartFile upload_file) {
-        //获取文件名
-        String fileName;
-        String filePath;
+    public String getFileName(MultipartFile file) {
+        String savePath = PathUtils.getUploadPath();
+        String fileName = UUID.randomUUID() + ".jpg";
         try {
-            File dir = new File(uploadPath);
-            if (!dir.exists()) {
-                dir.mkdirs(); // 不存在则创建，存在则无影响
-            }
-            // 生成唯一文件名，避免覆盖
-            String originalName = upload_file.getOriginalFilename();
-            String suffix = originalName.substring(originalName.lastIndexOf("."));
-            fileName = UUID.randomUUID() + suffix;
-            // 拼接最终文件路径
-            filePath = uploadPath + fileName;
-            //写入文件
-            try (InputStream in = upload_file.getInputStream();
-                 FileOutputStream out = new FileOutputStream(filePath)) {
-                byte[] buffer = new byte[1024];
-                int len;
-                while ((len = in.read(buffer)) != -1) {
-                    out.write(buffer, 0, len);
-                }
-            }
+            File dest = new File(savePath + fileName);
+            file.transferTo(dest); // 执行保存
+            return fileName; // 返回给前端的相对 URL
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            return "上传失败：" + e.getMessage();
         }
-        return fileName;
     }
     /**
      * 加密明文密码

@@ -22,7 +22,8 @@ public class UserServiceImpl implements UserService {
     UserMapper userMapper;
     @Autowired
     private RongCloudApi rongCloudApi;
-
+    @Autowired
+    private Util util;
     @Override
     public ServerResponse register(String phone,String email,String password) {
         Date time = DateUtil.getTime();//获取时间
@@ -79,7 +80,7 @@ public class UserServiceImpl implements UserService {
              if (userInfo.getstate() == 0) {
                  return ServerResponse.createServerResponseByFail("该账号已被禁用");
              }
-            String pic = Util.updatePic(userInfo.getPhoto());
+            String pic = util.updatePic(userInfo.getPhoto());
             userInfo.setPhoto(pic);
             return ServerResponse.createServerResponseBySuccess(userInfo, "登录成功");
         } else {
@@ -115,7 +116,7 @@ public class UserServiceImpl implements UserService {
         if (userMapper.updatePhoto(photo, id)) {
             User userInfo = userMapper.userInfo(id);//获取用户信息
             //设置头像
-            String pic = Util.updatePic(userInfo.getPhoto());
+            String pic = util.updatePic(userInfo.getPhoto());
             userInfo.setPhoto(pic);
             //IM用户资料同步修改
             String res=rongCloudApi.refresh(String.valueOf(id),userInfo.getNickname(),pic);
@@ -136,7 +137,7 @@ public class UserServiceImpl implements UserService {
         if (userMapper.updateAc(nickname,sex,id)) {
             User userInfo = userMapper.userInfo(id);
             //设置头像
-            String pic = Util.updatePic(userInfo.getPhoto());
+            String pic = util.updatePic(userInfo.getPhoto());
             userInfo.setPhoto(pic);
             //IM用户资料同步修改
             String res=rongCloudApi.refresh(String.valueOf(id),nickname,pic);
