@@ -6,30 +6,29 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.CacheControl;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
-public class SpringMvcSupport extends WebMvcConfigurationSupport {
+public class SpringMvcSupport implements WebMvcConfigurer {
+    @Value("${file.upload.path}")
+    private String uploadPath;
     @Override
-    protected void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
-        ApplicationHome home = new ApplicationHome(getClass());
-        File baseDir = home.getDir();
-        if (baseDir.getAbsolutePath().endsWith("classes") || baseDir.getAbsolutePath().endsWith("target")) {
-            while (baseDir.getName().equals("classes") || baseDir.getName().equals("target")) {
-                baseDir = baseDir.getParentFile();
-            }
-        }
-        File uploadDir = new File(baseDir, "upload");
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        File uploadDir = new File(uploadPath);
         if (!uploadDir.exists()) {
             uploadDir.mkdirs();
         }
-        String location = "file:" + uploadDir.getAbsolutePath() + File.separator;
+        String path = uploadDir.getAbsolutePath();
+        if (!path.endsWith(File.separator)) {
+            path += File.separator;
+        }
+        String locations = "file:" + path.replace("\\", "/");
         registry.addResourceHandler("/upload/**")
-                .addResourceLocations(location)
-                .setCacheControl(CacheControl.maxAge(0, TimeUnit.SECONDS));
+                .addResourceLocations(locations);
 
-        super.addResourceHandlers(registry);
+        System.out.println("文件上传映射路径: " + locations);
     }
 }

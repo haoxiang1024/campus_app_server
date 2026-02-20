@@ -47,6 +47,9 @@ public class LostFoundServiceImpl implements LostFoundService {
             String userNameId = lostFoundMapper.searchUserNameId(userId);
             //设置用户名
             lostFound.setNickname(userNameId);
+            //设置图片
+            String updatePic = util.updatePic(lostFound.getImg());
+            lostFound.setImg(updatePic);
 
         }
 

@@ -23,11 +23,10 @@ spring:
   config:
     import: classpath:application-secret.properties
 
-# 关键：file和spring同级（缩进和spring一致），解决配置无法识别问题
+
 file:
   upload:
-    # 路径改为相对路径（./开头），指向项目根目录下的src
-    path: upload/
+    path: ./school/upload/
 pagehelper:
   helper-dialect: mysql          # 指定数据库方言
   reasonable: true
