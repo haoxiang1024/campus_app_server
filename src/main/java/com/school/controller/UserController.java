@@ -1,5 +1,6 @@
 package com.school.controller;
 
+import com.school.entity.User;
 import com.school.services.api.UserService;
 import com.school.utils.EmailVerificationUtils;
 import com.school.utils.ServerResponse;
@@ -81,6 +82,10 @@ public class UserController {
     public ServerResponse getIMUserToken(int uid, String nickname) {
         return userService.getIMUserToken(uid,nickname);
     }
-
+    @ResponseBody
+    @RequestMapping("/getUserById")
+    public User getUserById(int id) {
+        return userService.getUserById(id);
+    }
 
 }
