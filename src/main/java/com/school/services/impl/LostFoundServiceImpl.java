@@ -103,10 +103,10 @@ public class LostFoundServiceImpl implements LostFoundService {
     @Override
     public ServerResponse updateState(int id, String state, int user_id) {
         if (lostFoundMapper.updateState(id, state)) {
-            List<LostFound> allByIdLostFoundList = lostFoundMapper.getLostFoundListById(user_id);
-            return ServerResponse.createServerResponseBySuccess(allByIdLostFoundList, "状态已更改");
+           // List<LostFound> allByIdLostFoundList = lostFoundMapper.getLostFoundListById(user_id);
+            return ServerResponse.createServerResponseBySuccess( "状态已更改");
         }
-        return ServerResponse.createServerResponseBySuccess("状态更改失败");
+        return ServerResponse.createServerResponseByFail("状态更改失败");
     }
 
     @Override

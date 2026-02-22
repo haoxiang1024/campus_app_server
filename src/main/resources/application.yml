@@ -22,8 +22,9 @@ spring:
 
   config:
     import: classpath:application-secret.properties
-
-
+logging:
+  level:
+    com.school.mapper: debug
 file:
   upload:
     path: ./school/upload/
