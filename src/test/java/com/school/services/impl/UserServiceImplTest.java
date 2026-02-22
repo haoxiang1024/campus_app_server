@@ -19,16 +19,16 @@ class UserServiceImplTest {
     private RongCloudApi rongCloudApi;
     @Autowired
     private UserMapper userMapper;
-    @Test
-        void registerUserToProvider() {
-        try {
-            List<User> userList = userMapper.getalll();
-            for (User user : userList) {
-                String response = rongCloudApi.getToken(String.valueOf(user.getId()), user.getNickname(), user.getPhoto());
-                System.out.println("服务商返回原始数据: " + response);
-            }
-        } catch (Exception e) {
-            System.err.println("调用接口失败: " + e.getMessage());
-        }
-    }
+    //@Test
+//        void registerUserToProvider() {
+//        try {
+//            List<User> userList = userMapper.getalll();
+//            for (User user : userList) {
+//                String response = rongCloudApi.getToken(String.valueOf(user.getId()), user.getNickname(), user.getPhoto());
+//                System.out.println("服务商返回原始数据: " + response);
+//            }
+//        } catch (Exception e) {
+//            System.err.println("调用接口失败: " + e.getMessage());
+//        }
+//    }
 }

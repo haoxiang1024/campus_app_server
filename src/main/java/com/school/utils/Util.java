@@ -82,6 +82,7 @@ public class Util {
         Pattern pattern = Pattern.compile(".*http.*"); // 此处使用的正则表达式是".*world.*"，匹配包含"http"的任何字符串。
         Matcher matcher = pattern.matcher(oldPic); // 将正则表达式应用到输入字符串上
         String savePath = "http://"+Ip.getIp()+":8081/school/upload/";
+        //String savePath = "http://123.207.51.104:8081/school/upload/";
         if (!matcher.matches()) {
             return savePath+oldPic;
         }
