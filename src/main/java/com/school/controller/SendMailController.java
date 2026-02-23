@@ -1,6 +1,6 @@
 package com.school.controller;
 
-import com.school.entity.FormDataDTO;
+import com.school.entity.EmailFormData;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -27,7 +27,7 @@ public class SendMailController {
     @SneakyThrows
     @ResponseBody
     @RequestMapping("/sendMail")
-    public void sendMail(@ModelAttribute FormDataDTO formData, HttpServletResponse response) {
+    public void sendMail(@ModelAttribute EmailFormData formData, HttpServletResponse response) {
         send(formData); // 发送邮件
 
         // 优化：设置响应头，避免乱码，且保证流关闭
@@ -48,7 +48,7 @@ public class SendMailController {
     }
 
     @SneakyThrows
-    private void send(FormDataDTO formData) {
+    private void send(EmailFormData formData) {
         // 邮件配置（QQ邮箱SMTP）
         String host = "smtp.qq.com";
         int port = 587;

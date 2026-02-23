@@ -1,6 +1,6 @@
 package com.school.entity;
 
-public class FormDataDTO {
+public class EmailFormData {
     //发送邮件表单传输实体类
     private String name;//自己的邮箱
     private String password;//邮箱授权码
@@ -8,10 +8,10 @@ public class FormDataDTO {
     private String subject;//主题
     private String message;//消息
 
-    public FormDataDTO() {
+    public EmailFormData() {
     }
 
-    public FormDataDTO(String name, String password, String email, String subject, String message) {
+    public EmailFormData(String name, String password, String email, String subject, String message) {
         this.name = name;
         this.password = password;
         this.email = email;
