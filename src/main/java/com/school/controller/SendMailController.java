@@ -15,31 +15,45 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 import java.util.Properties;
 
-//邮件发送
+/**
+ * 邮件发送控制器类
+ * 处理邮件发送相关的请求，通过QQ邮箱SMTP服务发送邮件
+ */
 @Controller
 public class SendMailController {
-    private static String SMTP_PASSWORD ; // QQ邮箱授权码
+    private static String SMTP_PASSWORD; // QQ邮箱授权码
+    
+    /**
+     * 设置SMTP密码
+     * @param password 从配置文件注入的QQ邮箱授权码
+     */
     @Value("${mail.smtp.password}")
     public void setSmtpPassword(String password) {
         // 将注入的值赋给本类的静态变量
         SendMailController.SMTP_PASSWORD = password;
     }
+    
+    /**
+     * 发送邮件接口
+     * @param formData 邮件表单数据，包含主题和消息内容
+     * @param response HTTP响应对象，用于返回HTML页面
+     */
     @SneakyThrows
     @ResponseBody
     @RequestMapping("/sendMail")
     public void sendMail(@ModelAttribute EmailFormData formData, HttpServletResponse response) {
         send(formData); // 发送邮件
 
-        // 优化：设置响应头，避免乱码，且保证流关闭
+        // 设置响应头，避免乱码，且保证流关闭
         response.setContentType("text/html;charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
-        try (PrintWriter out = response.getWriter()) { //
+        try (PrintWriter out = response.getWriter()) {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head><meta charset='UTF-8'><title>提示</title></head>");
             out.println("<body>");
             out.println("<script type='text/javascript'>");
-            out.println("alert('发送成功!');window.history.back();"); // 增加返回上一页体验
+            out.println("alert('发送成功!');window.history.back();");
             out.println("</script>");
             out.println("</body>");
             out.println("</html>");
@@ -47,6 +61,10 @@ public class SendMailController {
         }
     }
 
+    /**
+     * 执行邮件发送逻辑
+     * @param formData 邮件表单数据，包含邮件主题和内容
+     */
     @SneakyThrows
     private void send(EmailFormData formData) {
         // 邮件配置（QQ邮箱SMTP）
@@ -75,7 +93,7 @@ public class SendMailController {
             }
         };
 
-        // 获取Session
+        // 获取邮件会话
         Session session = Session.getInstance(props, authenticator);
 
         // 构建邮件消息

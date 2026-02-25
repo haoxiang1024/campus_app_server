@@ -3,5 +3,28 @@
 <mapper namespace="com.school.mapper.CommentMapper">
 
 
+    <select id="getReceivedComments" resultType="com.school.entity.Comment">
+        SELECT
+            c.id,
+            c.lostfound_id,
+            c.user_id,
+            c.content,
+            c.state,
+            c.parentId AS parentId,
+            c.replyUserId AS replyUserId,
+            c.create_time,
+            u.nickname,
+            u.photo
+        FROM comment c
+                 LEFT JOIN user u ON c.user_id = u.id
+        WHERE c.state = 1 -- 排除掉正在审核中的违规评论
+          AND (
+            -- 情况1：直接回复了该用户
+            c.replyUserId = #{userId}
 
-</mapper>
+                -- 情况2：评论了该用户发布的帖子 (如果你的表名不是 lostfound，请修改下方子查询)
+                OR (c.parentId = 0 AND c.lostfound_id IN (SELECT id FROM lostfound WHERE user_id = #{userId}))
+            )
+          AND c.user_id != #{userId}
+        ORDER BY c.create_time DESC
+    </select></mapper>
