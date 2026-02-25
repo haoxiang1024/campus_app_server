@@ -12,6 +12,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 失物招领分类服务实现类
+ * 实现失物招领分类管理相关功能
+ */
 @Service
 public class LostFoundTypeServiceImpl implements LostFoundTypeService {
     String key = "typeList";//key值用于redsi存储
@@ -19,6 +23,10 @@ public class LostFoundTypeServiceImpl implements LostFoundTypeService {
     private LostFoundTypeMapper lostFoundTypeMapper;
 
 
+    /**
+     * 获取所有失物招领分类
+     * @return ServerResponse 包含分类名称列表的响应对象
+     */
     @Override
     public ServerResponse getAllType() {
 
@@ -34,6 +42,12 @@ public class LostFoundTypeServiceImpl implements LostFoundTypeService {
     }
 
 
+    /**
+     * 根据分类名称获取分类ID
+     * 支持中英文分类名称的双向查找
+     * @param name 分类名称（支持中英文）
+     * @return ServerResponse 包含分类ID的响应对象
+     */
     @Override
     public ServerResponse getIdByName(String name) {
         //中英文转换
