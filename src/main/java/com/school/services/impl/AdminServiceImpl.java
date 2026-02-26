@@ -2,6 +2,8 @@ package com.school.services.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.school.entity.Comment;
+import com.school.entity.CommentVO;
 import com.school.entity.LostFound;
 import com.school.entity.User;
 import com.school.mapper.AdminMapper;
@@ -167,5 +169,62 @@ public class AdminServiceImpl implements AdminService {
             return ServerResponse.createServerResponseBySuccess("置顶成功");
         }
         return ServerResponse.createServerResponseByFail("置顶失败");
+    }
+
+    /**
+     * 分页查询评论信息
+     */
+    @Override
+    public ServerResponse getCommentsByPage(int page, int pageSize, String keyword, String state) {
+        // 使用 PageHelper 开启分页
+        PageHelper.startPage(page, pageSize);
+
+        // 执行联表多条件查询
+        List<CommentVO> list = adminMapper.getCommentsByCondition(keyword, state);
+
+        // 封装分页结果
+        PageInfo<CommentVO> pageInfo = new PageInfo<>(list);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("list", pageInfo.getList());
+        result.put("total", pageInfo.getTotal());
+        result.put("totalPages", pageInfo.getPages());
+
+        return ServerResponse.createServerResponseBySuccess(result);
+    }
+
+    /**
+     * 更新评论状态
+     */
+    @Override
+    public ServerResponse updateCommentStatus(Integer commentId, int state, String reason) {
+        Comment comment = new Comment();
+        comment.setId(commentId);
+        comment.setState(state);
+
+        // 记录或清空驳回原因
+        if ("已驳回".equals(state)) {
+            comment.setRejectReason(reason);
+        } else if ("已通过".equals(state)) {
+            comment.setRejectReason("");
+        }
+
+        int rows = adminMapper.updateCommentSelective(comment);
+        if (rows > 0) {
+            return ServerResponse.createServerResponseBySuccess("操作成功");
+        }
+        return ServerResponse.createServerResponseByFail(500, "操作失败，可能数据不存在");
+    }
+
+    /**
+     * 删除评论
+     */
+    @Override
+    public ServerResponse deleteCommentById(Integer commentId) {
+        int rows = adminMapper.deleteCommentById(commentId);
+        if (rows > 0) {
+            return ServerResponse.createServerResponseBySuccess("删除成功");
+        }
+        return ServerResponse.createServerResponseByFail(500, "删除失败，可能数据不存在");
     }
 }

@@ -229,4 +229,46 @@ public class AdminController {
     public ServerResponse updateStickStatus(int id,int stick){
         return adminService.updateStickStatus(id, stick);
     }
+
+    /**
+     * 分页获取评论列表
+     * @param page 页码
+     * @param pageSize 每页大小
+     * @param keyword 搜索关键字（可选）
+     * @param state 评论状态（可选）
+     */
+    @ResponseBody
+    @GetMapping("/getCommentsByPage")
+    public ServerResponse getCommentsByPage(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String state) {
+        return adminService.getCommentsByPage(page, pageSize, keyword, state);
+    }
+
+    /**
+     * 更新评论状态 (通过/驳回)
+     * @param commentId 评论ID
+     * @param state 新的状态值
+     * @param reason 驳回原因（可选）
+     */
+    @ResponseBody
+    @PostMapping("/updateCommentStatus")
+    public ServerResponse updateCommentStatus(
+            @RequestParam("commentId") Integer commentId,
+            @RequestParam("state") int state,
+            @RequestParam(value = "reason", required = false) String reason) {
+        return adminService.updateCommentStatus(commentId, state, reason);
+    }
+
+    /**
+     * 根据ID删除评论信息
+     * @param commentId 评论ID
+     */
+    @ResponseBody
+    @PostMapping("/deleteCommentById")
+    public ServerResponse deleteCommentById(@RequestParam("commentId") Integer commentId) {
+        return adminService.deleteCommentById(commentId);
+    }
 }

@@ -60,5 +60,20 @@ public interface AdminService {
      * @return ServerResponse 操作结果响应对象
      */
     ServerResponse updateStickStatus(int id,int stick);
+
+    /**
+     * 分页获取评论列表
+     */
+    ServerResponse getCommentsByPage(int page, int pageSize, String keyword, String state);
+
+    /**
+     * 更新评论状态
+     */
+    ServerResponse updateCommentStatus(Integer commentId, int state, String reason);
+
+    /**
+     * 删除评论
+     */
+    ServerResponse deleteCommentById(Integer commentId);
 }
 

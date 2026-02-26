@@ -56,13 +56,21 @@ public class Comment {
     public int getParentId() {
         return parentId;
     }
-
+    private String rejectReason;  // 驳回原因
     /**
      * 设置父评论ID
      * @param parentId 父评论ID
      */
     public void setParentId(int parentId) {
         this.parentId = parentId;
+    }
+
+    public String getRejectReason() {
+        return rejectReason;
+    }
+
+    public void setRejectReason(String rejectReason) {
+        this.rejectReason = rejectReason;
     }
 
     /**
@@ -127,6 +135,7 @@ public class Comment {
                 ", replyUserId=" + replyUserId +
                 ", replyNickname='" + replyNickname + '\'' +
                 ", replies=" + replies +
+                ", rejectReason='" + rejectReason + '\'' +
                 ", create_time=" + create_time +
                 '}';
     }

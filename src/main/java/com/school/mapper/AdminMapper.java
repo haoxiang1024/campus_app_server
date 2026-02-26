@@ -1,11 +1,10 @@
 package com.school.mapper;
 
+import com.school.entity.Comment;
+import com.school.entity.CommentVO;
 import com.school.entity.LostFound;
 import com.school.entity.User;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -94,4 +93,20 @@ public interface AdminMapper {
      */
     @Update("update lostFound set stick=#{stick} where id = #{id}")
     boolean updateStickStatus(@Param("id")int id,@Param("stick")int stick);
+
+    /**
+     * 简单查询：删除评论
+     */
+    @Delete("DELETE FROM comment WHERE id = #{commentId}")
+    int deleteCommentById(@Param("commentId") Integer commentId);
+
+    /**
+     * 复杂查询：多条件联表查询评论
+     */
+    List<CommentVO> getCommentsByCondition(@Param("keyword") String keyword, @Param("state") String state);
+
+    /**
+     * 复杂查询：动态更新评论状态和原因
+     */
+    int updateCommentSelective(Comment comment);
 }

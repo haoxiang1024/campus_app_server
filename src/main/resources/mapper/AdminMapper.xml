@@ -60,4 +60,44 @@
         SELECT COUNT(*) FROM lostfound
         <include refid="lostFoundQueryFilter" />
     </select>
+
+    <select id="getCommentsByCondition" resultType="com.school.entity.CommentVO">
+        SELECT
+        c.id,
+        c.content,
+        c.create_time AS createTime,
+        c.state,
+        c.rejectReason AS rejectReason,
+        u.nickname AS authorName,
+        l.title AS postTitle
+        FROM comment c
+        LEFT JOIN user u ON c.user_id = u.id
+        LEFT JOIN lostfound l ON c.lostfound_id = l.id
+        <where>
+            <if test="state != null and state != ''">
+                AND c.state = #{state}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                c.content LIKE CONCAT('%', #{keyword}, '%')
+                OR u.nickname LIKE CONCAT('%', #{keyword}, '%')
+                OR l.title LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+        </where>
+        ORDER BY c.create_time DESC
+    </select>
+
+    <update id="updateCommentSelective" parameterType="com.school.entity.Comment">
+        UPDATE comment
+        <set>
+            <if test="state != null and state != ''">
+                state = #{state},
+            </if>
+            <if test="rejectReason != null">
+                reject_reason = #{rejectReason},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
 </mapper>

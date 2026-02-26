@@ -30,7 +30,7 @@ public class LostFoundTypeServiceImpl implements LostFoundTypeService {
     @Override
     public ServerResponse getAllType() {
 
-        List<String> lostfoundtypeList = lostFoundTypeMapper.getAllType();
+        List<LostFoundType> lostfoundtypeList = lostFoundTypeMapper.GetAll();
         if (lostfoundtypeList == null) {
             //数据为空
             return ServerResponse.createServerResponseByFail(ResponseCode.DATA_EMPTY.getCode(), ResponseCode.DATA_EMPTY.getMsg());
