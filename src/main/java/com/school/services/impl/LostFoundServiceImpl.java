@@ -107,9 +107,9 @@ public class LostFoundServiceImpl implements LostFoundService {
         
         // 调用数据访问层保存失物招领信息
         if (lostFoundMapper.addLostFound(lostFound)) {
-            return ServerResponse.createServerResponseBySuccess(ResponseCode.ADD_LOST_SUCCESS.getMsg());
+            return ServerResponse.createServerResponseBySuccess("信息发布成功");
         } else {
-            return ServerResponse.createServerResponseByFail(ResponseCode.ADD_LOST_FAIL.getCode(), ResponseCode.ADD_LOST_FAIL.getMsg());
+            return ServerResponse.createServerResponseByFail("信息发布失败");
         }
     }
 

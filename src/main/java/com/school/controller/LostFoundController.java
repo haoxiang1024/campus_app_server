@@ -128,21 +128,23 @@ public class LostFoundController {
     @PostMapping("/addLostFound")
     public ServerResponse addLostFound(MultipartFile upload_file, String lostJson, String foundJson, String op) {
         String filename = util.getFileName(upload_file);
-        System.out.println(foundJson);
-        
         // 判断是发布丢失物品还是招领物品
         if (op != null && !op.equals("")) {
+            ServerResponse serviceResponse = null;
             if (op.equals("失物")) {
                 // 处理丢失物品发布
                 String newLostJson = Json.updateByKey(lostJson, "img", filename);
-                lostFoundService.addLostFound(newLostJson);
-            } else {
+                serviceResponse = lostFoundService.addLostFound(newLostJson);            }
+            else {
                 // 处理招领物品发布
                 String newFoundJson = Json.updateByKey(foundJson, "img", filename);
-                lostFoundService.addLostFound(newFoundJson);
+                serviceResponse = lostFoundService.addLostFound(newFoundJson);
+            }
+            if (serviceResponse != null && !serviceResponse.isSuccess()) {
+                return serviceResponse;
             }
         } else {
-            return ServerResponse.createServerResponseBySuccess("未选择失物or招领");
+            return ServerResponse.createServerResponseBySuccess("未选择失物或者招领");
         }
         return ServerResponse.createServerResponseBySuccess("发布成功!");
     }
