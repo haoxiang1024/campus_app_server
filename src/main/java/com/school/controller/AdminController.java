@@ -254,7 +254,7 @@ public class AdminController {
      * @param reason 驳回原因（可选）
      */
     @ResponseBody
-    @PostMapping("/updateCommentStatus")
+    @RequestMapping ("/updateCommentStatus")
     public ServerResponse updateCommentStatus(
             @RequestParam("commentId") Integer commentId,
             @RequestParam("state") int state,

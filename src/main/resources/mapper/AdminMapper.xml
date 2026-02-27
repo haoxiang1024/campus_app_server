@@ -65,11 +65,9 @@
         SELECT
         c.id,
         c.content,
-        c.create_time AS createTime,
-        c.state,
-        c.rejectReason AS rejectReason,
-        u.nickname AS authorName,
-        l.title AS postTitle
+        c.create_time AS create_time,  c.state,
+        c.rejectReason AS rejectReason, u.nickname AS nickname,
+        l.title AS title
         FROM comment c
         LEFT JOIN user u ON c.user_id = u.id
         LEFT JOIN lostfound l ON c.lostfound_id = l.id
@@ -95,7 +93,7 @@
                 state = #{state},
             </if>
             <if test="rejectReason != null">
-                reject_reason = #{rejectReason},
+                rejectReason = #{rejectReason},
             </if>
         </set>
         WHERE id = #{id}

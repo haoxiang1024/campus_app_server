@@ -49,8 +49,8 @@ public interface CommentMapper {
             "u2.nickname AS replyNickname " + // 从 u2 表取回被回复人的昵称
             "FROM comment c " +
             "LEFT JOIN user u1 ON c.user_id = u1.id " +
-            "LEFT JOIN user u2 ON c.replyUserId = u2.id " + // 这里的字段必须和数据库一模一样
-            "WHERE c.lostfound_id = #{lostfound_id} " +
+            "LEFT JOIN user u2 ON c.replyUserId = u2.id " +
+            "WHERE c.lostfound_id = #{lostfound_id}  and c.state = 1 " +
             "ORDER BY c.create_time ASC")
     List<Comment> getCommentsByLostFoundId(int lostfound_id);
 

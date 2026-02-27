@@ -10,6 +10,7 @@ import com.school.mapper.LostFoundTypeMapper;
 import com.school.services.api.LostFoundService;
 import com.school.services.api.LostFoundTypeService;
 import com.school.utils.ResponseCode;
+import com.school.utils.SensitiveWordUtil;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,8 @@ public class LostFoundServiceImpl implements LostFoundService {
     private LostFoundTypeMapper lostFoundTypeMapper;
     @Autowired
     private LostFoundTypeService lostFoundTypeService;
-
+    @Autowired
+    private SensitiveWordUtil sensitiveWordUtil;
 
     /**
      * 获取物品的详细信息
@@ -95,7 +97,13 @@ public class LostFoundServiceImpl implements LostFoundService {
     @Override
     public ServerResponse addLostFound(String lostfoundJson) {
         // 将JSON字符串解析为LostFound实体对象
-        com.school.entity.LostFound lostFound = JSON.parseObject(lostfoundJson, com.school.entity.LostFound.class);
+        LostFound lostFound = JSON.parseObject(lostfoundJson, LostFound.class);
+        //敏感词检测
+        if(sensitiveWordUtil.contains(lostFound.getContent())||sensitiveWordUtil.contains(lostFound.getTitle())||sensitiveWordUtil.contains(lostFound.getPlace())){
+            lostFound.setState("已驳回");
+            lostFoundMapper.addLostFound(lostFound);
+            return ServerResponse.createServerResponseByFail("内容包含敏感词，请修改后重试");
+        }
         
         // 调用数据访问层保存失物招领信息
         if (lostFoundMapper.addLostFound(lostFound)) {

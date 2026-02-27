@@ -203,9 +203,9 @@ public class AdminServiceImpl implements AdminService {
         comment.setState(state);
 
         // 记录或清空驳回原因
-        if ("已驳回".equals(state)) {
+        if (state == 2) {
             comment.setRejectReason(reason);
-        } else if ("已通过".equals(state)) {
+        } else if (state == 1) {
             comment.setRejectReason("");
         }
 

@@ -44,9 +44,11 @@ public class CommentServiceImpl implements CommentService {
         
         // 敏感词检测逻辑
         if (sensitiveWordUtil.contains(content)) {
-            // 命中敏感词：脱敏处理并设为待审核 (status = 0)
-            finalContent = sensitiveWordUtil.replaceSensitiveWord(content, "*");
-            status = 0; // 待审核状态
+            // 命中敏感词：直接驳回
+            //finalContent = sensitiveWordUtil.replaceSensitiveWord(content, "*");
+            status = 2; // 驳回状态
+            commentMapper.addComment(lostfound_id, user_id, finalContent, status,parent_id,reply_user_id);
+            return ServerResponse.createServerResponseByFail("内容包含敏感词，请修改后重试");
         } else {
             // 正常内容：直接发布 (status = 1)
             status = 1; // 已发布状态

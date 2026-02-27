@@ -1,10 +1,13 @@
 package com.school.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 public class CommentVO {
     private Integer id;
     private String content;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
     private Date create_time;
     private String state;
     private String rejectReason;
