@@ -33,4 +33,6 @@ public interface CommentService {
      */
     ServerResponse getReceivedComments(int userId);
 
+    ServerResponse getComments(int userId);
+
 }

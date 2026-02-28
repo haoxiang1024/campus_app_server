@@ -267,7 +267,7 @@ public class AdminController {
      * @param commentId 评论ID
      */
     @ResponseBody
-    @PostMapping("/deleteCommentById")
+    @RequestMapping("/deleteCommentById")
     public ServerResponse deleteCommentById(@RequestParam("commentId") Integer commentId) {
         return adminService.deleteCommentById(commentId);
     }

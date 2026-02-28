@@ -220,7 +220,7 @@ public class LostFoundServiceImpl implements LostFoundService {
      */
     @Override
     public ServerResponse getLostFoundById(Integer id) {
-        com.school.entity.LostFound lostFound = lostFoundMapper.selectByPrimaryKey(id);
+        LostFound lostFound = lostFoundMapper.selectByPrimaryKey(id);
         if (lostFound == null) return ServerResponse.createServerResponseByFail("信息不存在");
         return ServerResponse.createServerResponseBySuccess(lostFound);
     }

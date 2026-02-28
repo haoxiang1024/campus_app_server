@@ -61,4 +61,15 @@ public interface CommentMapper {
      */
     List<Comment> getReceivedComments(@Param("userId") int userId);
 
+    /**
+     * 根据用户ID查询该用户发表的所有评论
+     * 
+     * @param userId 用户ID
+     * @return 该用户发表的评论列表
+     */
+    @Select("SELECT c.id, c.lostfound_id, c.user_id, c.content, c.state, c.parentId AS parentId, c.replyUserId AS replyUserId, c.create_time, u.nickname, u.photo " +
+            "FROM comment c LEFT JOIN user u ON c.user_id = u.id WHERE c.state = 1  " +
+            "ORDER BY c.create_time DESC; ")
+    List<Comment> getComments(@Param("user_id") int userId);
+
 }

@@ -64,4 +64,16 @@ public class CommentController {
         return commentService.getReceivedComments(user_id);
     }
 
+    /**
+     * 获取用户发表的所有评论
+     * 
+     * @param user_id 用户ID
+     * @return ServerResponse 包含用户发表评论的响应结果
+     */
+    @ResponseBody
+    @RequestMapping("/getComments")
+    public ServerResponse getComments(@RequestParam("user_id") int user_id) {
+        return commentService.getComments(user_id);
+    }
+
 }

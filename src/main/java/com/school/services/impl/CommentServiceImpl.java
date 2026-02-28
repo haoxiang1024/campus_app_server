@@ -142,4 +142,23 @@ public class CommentServiceImpl implements CommentService {
         // 直接返回平铺的列表给前端 RecyclerView 渲染即可。
         return ServerResponse.createServerResponseBySuccess(receivedComments);
     }
+
+    /**
+     * 获取用户发表的所有评论，并更新图片路径
+     * 
+     * @param userId 用户ID
+     * @return ServerResponse 包含用户评论列表的响应结果
+     */
+    @Override
+    public ServerResponse getComments(int userId) {
+        List<Comment> comments = commentMapper.getComments(userId);
+        // 处理评论图片路径并返回结果
+        if (comments != null && !comments.isEmpty()) {
+            for (Comment comment : comments) {
+                comment.setPhoto(util.updatePic(comment.getPhoto()));
+            }
+            return ServerResponse.createServerResponseBySuccess(comments);
+        }
+        return ServerResponse.createServerResponseBySuccess(new ArrayList<>());
+    }
 }

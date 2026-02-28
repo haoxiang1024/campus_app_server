@@ -28,8 +28,6 @@ public class LostFoundController {
     @Autowired
     private LostFoundService lostFoundService;
     @Autowired
-    private LostFoundTypeMapper lostFoundTypeMapper;
-    @Autowired
     private Util util;
 
     /**
