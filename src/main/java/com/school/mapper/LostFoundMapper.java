@@ -97,4 +97,6 @@ public interface LostFoundMapper {
      */
     @Select("SELECT * FROM lostfound ORDER BY pub_date DESC")
     List<LostFound> selectByPage();
+
+    List<LostFound>smartMatch(@Param("type")String type,@Param("lostfoundtype_id")int lostfoundtype_id,@Param("keyword")String keyword);
 }

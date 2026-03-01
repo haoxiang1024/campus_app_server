@@ -59,5 +59,18 @@
         where stick = #{stick}
           and state = '寻找中' or state='待认领'
     </select>
-
+    <select id="smartMatch" resultType="com.school.entity.LostFound">
+        SELECT * FROM lost_found
+        WHERE type = #{targetType} -- 目标类型（如果发布失物，这里传'招领'）
+          AND type_id = #{categoryId} -- 分类ID必须相同（比如都是'数码产品'）
+          AND state != '已找到'
+         AND state != '已认领'
+        -- 已经完成的就不匹配了
+      AND (
+          title LIKE CONCAT('%', #{keyword}, '%')
+           OR content LIKE CONCAT('%', #{keyword}, '%')
+            )
+        ORDER BY create_time DESC
+            LIMIT 3 -- 最多推荐1个最相关的
+    </select>
 </mapper>

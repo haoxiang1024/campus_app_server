@@ -107,6 +107,14 @@ public class LostFoundServiceImpl implements LostFoundService {
         
         // 调用数据访问层保存失物招领信息
         if (lostFoundMapper.addLostFound(lostFound)) {
+            String targetType = lostFound.getType().equals("失物") ? "招领" : "失物";
+            // 提取标题作为关键字
+            String keyword = lostFound.getTitle();
+            List<LostFound> matchedList = lostFoundMapper.smartMatch(targetType, lostFound.getLostfoundtypeId(), keyword);
+            if (matchedList != null && !matchedList.isEmpty()) {
+                // 如果匹配到了，把列表放进 data 字段返回给前端
+                return ServerResponse.createServerResponseBySuccess( matchedList,"发布成功，发现疑似匹配物品！");
+            }
             return ServerResponse.createServerResponseBySuccess("信息发布成功");
         } else {
             return ServerResponse.createServerResponseByFail("信息发布失败");
