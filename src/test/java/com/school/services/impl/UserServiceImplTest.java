@@ -1,17 +1,9 @@
 package com.school.services.impl;
 
-import com.school.entity.User;
 import com.school.mapper.UserMapper;
 import com.school.services.api.RongCloudApi;
-import com.school.services.api.UserService;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 
 class UserServiceImplTest {

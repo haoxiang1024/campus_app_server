@@ -1,8 +1,11 @@
 package com.school.utils;
 //敏感词工具类
+
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 @Service
 public class SensitiveWordUtil {
     // 敏感词库树

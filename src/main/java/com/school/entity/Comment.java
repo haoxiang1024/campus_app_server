@@ -1,7 +1,6 @@
 package com.school.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.google.gson.annotations.SerializedName;
 
 import java.util.Date;
 import java.util.List;

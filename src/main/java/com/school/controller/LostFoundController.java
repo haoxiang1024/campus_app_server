@@ -1,7 +1,6 @@
 package com.school.controller;
 
 
-import com.school.mapper.LostFoundTypeMapper;
 import com.school.services.api.LostFoundService;
 import com.school.services.api.LostFoundTypeService;
 import com.school.utils.Json;
@@ -138,13 +137,11 @@ public class LostFoundController {
                 String newFoundJson = Json.updateByKey(foundJson, "img", filename);
                 serviceResponse = lostFoundService.addLostFound(newFoundJson);
             }
-            if (serviceResponse != null && !serviceResponse.isSuccess()) {
                 return serviceResponse;
-            }
+
         } else {
             return ServerResponse.createServerResponseBySuccess("未选择失物或者招领");
         }
-        return ServerResponse.createServerResponseBySuccess("发布成功!");
     }
 
 }

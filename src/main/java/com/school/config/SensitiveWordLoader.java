@@ -1,7 +1,6 @@
 package com.school.config;
 
 import com.school.mapper.SensitiveWordMapper;
-import com.school.services.api.RongCloudApi;
 import com.school.utils.SensitiveWordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

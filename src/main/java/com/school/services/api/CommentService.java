@@ -1,6 +1,5 @@
 package com.school.services.api;
 
-import com.school.entity.Comment;
 import com.school.utils.ServerResponse;
 
 /**

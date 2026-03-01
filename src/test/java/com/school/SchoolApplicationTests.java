@@ -1,23 +1,7 @@
 package com.school;
 
-import com.school.services.api.UserService;
-import com.school.services.impl.UserServiceImpl;
-import com.school.utils.EmailVerificationUtils;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.openfeign.EnableFeignClients;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 @SpringBootTest
 @EnableFeignClients
 class SchoolApplicationTests {

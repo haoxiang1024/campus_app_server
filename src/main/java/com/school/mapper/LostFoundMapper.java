@@ -98,5 +98,13 @@ public interface LostFoundMapper {
     @Select("SELECT * FROM lostfound ORDER BY pub_date DESC")
     List<LostFound> selectByPage();
 
+    /**
+     * 智能匹配失物招领信息
+     * 根据类型、分类ID和关键字进行智能筛选匹配
+     * @param type 类型标识（lost/found）
+     * @param lostfoundtype_id 失物招领分类ID
+     * @param keyword 搜索关键字
+     * @return 匹配的失物招领信息列表
+     */
     List<LostFound>smartMatch(@Param("type")String type,@Param("lostfoundtype_id")int lostfoundtype_id,@Param("keyword")String keyword);
 }

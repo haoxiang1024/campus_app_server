@@ -113,7 +113,10 @@ public class LostFoundServiceImpl implements LostFoundService {
             List<LostFound> matchedList = lostFoundMapper.smartMatch(targetType, lostFound.getLostfoundtypeId(), keyword);
             if (matchedList != null && !matchedList.isEmpty()) {
                 // 如果匹配到了，把列表放进 data 字段返回给前端
-                return ServerResponse.createServerResponseBySuccess( matchedList,"发布成功，发现疑似匹配物品！");
+                for (LostFound lostFoundData : matchedList) {
+                    lostFoundData.setImg(util.updatePic(lostFoundData.getImg()));
+                }
+                return ServerResponse.createServerResponseBySuccess(matchedList,"发布成功，发现疑似匹配物品！");
             }
             return ServerResponse.createServerResponseBySuccess("信息发布成功");
         } else {
