@@ -203,7 +203,8 @@ public class UserServiceImpl implements UserService {
             JSONObject jsonObject = JSON.parseObject(res);
             String code = jsonObject.getString("code");
             if(code.equals("200")){
-                return ServerResponse.createServerResponseBySuccess(userInfo,"修改资料成功!");
+                return ServerResponse.createServerResponseBySuccess(userInfo,"状态更新成功");
+
             }else {
                 return ServerResponse.createServerResponseBySuccess("IM错误，修改失败!");
             }
@@ -278,7 +279,7 @@ public class UserServiceImpl implements UserService {
             int result = userMapper.updateUserStatus(idList, status);
 
             if (result > 0) {
-                return ServerResponse.createServerResponseBySuccess("状态更新成功");
+                return ServerResponse.createServerResponseBySuccess(401,"状态更新成功");
             } else {
                 return ServerResponse.createServerResponseByFail(500,"更新失败，未找到指定用户");
             }

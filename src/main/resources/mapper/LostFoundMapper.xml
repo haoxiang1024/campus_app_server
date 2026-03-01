@@ -61,15 +61,17 @@
     </select>
     <select id="smartMatch" resultType="com.school.entity.LostFound">
         SELECT * FROM lostFound
-        WHERE type = #{type} -- 目标类型（如果发布失物，这里传'招领'）
-          AND lostfoundtype_id = #{lostfoundtype_id} -- 分类ID必须相同（比如都是'数码产品'）
-          AND state != '已找到' or  state != '已认领'
-        -- 已经完成的就不匹配了
-      AND (
-          title LIKE CONCAT('%', #{keyword}, '%')
+        WHERE type = #{type}
+          AND lostfoundtype_id = #{lostfoundtype_id}
+      -- 使用 AND 连接，确保排除掉所有已完成的状态
+          AND state != '已找到'
+  AND state != '已认领'
+  -- 关键词搜索务必用括号包裹，否则会破坏 type 的过滤
+  AND (
+    title LIKE CONCAT('%', #{keyword}, '%')
            OR content LIKE CONCAT('%', #{keyword}, '%')
             )
         ORDER BY pub_date DESC
-            LIMIT 3 -- 最多推荐1个最相关的
+            LIMIT 3
     </select>
 </mapper>

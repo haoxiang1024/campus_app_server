@@ -2,6 +2,7 @@ package com.school.utils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.school.entity.User;
 import lombok.Data;
 
 /**
@@ -57,7 +58,12 @@ public class ServerResponse<T> {
     public static <T> ServerResponse createServerResponseBySuccess(T data, String msg) {
         return new ServerResponse(0, data, msg);
     }
-
+    public static <T> ServerResponse createServerResponseBySuccess(int status,T data, String msg) {
+        return new ServerResponse(status, data, msg);
+    }
+    public static ServerResponse createServerResponseBySuccess(int status, String msg) {
+        return new ServerResponse(status, null, msg);
+    }
     public static ServerResponse createServerResponseByFail(int status) {
         return new ServerResponse(status);
     }
@@ -68,6 +74,8 @@ public class ServerResponse<T> {
     public static ServerResponse createServerResponseByFail( String msg) {
         return new ServerResponse( 500, msg);
     }
+
+
 
     @JsonIgnore
     public boolean isSuccess() {

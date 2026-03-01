@@ -7,12 +7,12 @@
     <select id="searchInfoByValue" resultType="com.school.entity.SearchInfo">
         <bind name="pattern" value="'%' + value + '%'" />
         SELECT
-            id, title, img, pub_date, content, place, phone, state, stick, lostfoundtype_id, user_id, type
+        id, title, img, pub_date, content, place, phone, state, stick, lostfoundtype_id, user_id, type
         FROM
-            lostfound
+        lostfound
         WHERE
-            title LIKE #{pattern}
-           OR place LIKE #{pattern}
-           OR state LIKE #{pattern}
+        (title LIKE #{pattern} OR place LIKE #{pattern} OR state LIKE #{pattern})
+        AND state != '待审核'
+        AND state != '已驳回'
     </select>
 </mapper>

@@ -296,7 +296,7 @@
         function updateUserStatus(ids, state) {
             $.post('/school/admin/updateUserStatus', { ids: ids.join(','), state: state }, function(res) {
                 if (res.status === 0) window.Toast.success('状态更新成功');
-                else window.Toast.error(res.msg);
+                else window.Toast.success(res.msg);
                 loadUsers(currentPage);
             });
         }
