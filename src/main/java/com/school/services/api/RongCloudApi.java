@@ -45,4 +45,12 @@ public interface RongCloudApi {
             @RequestParam("portraitUri") String portraitUri
     );
 
+
+    @PostMapping(value = "/user/block.json",
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    String block(
+            @RequestParam("userId") String userId,
+            @RequestParam("minute") Number minute
+    );
+
 }

@@ -2,17 +2,18 @@ package com.school.services.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.school.entity.LoginResponseDTO;
 import com.school.entity.User;
 import com.school.mapper.UserMapper;
 import com.school.services.api.RongCloudApi;
 import com.school.services.api.UserService;
 import com.school.utils.DateUtil;
 import com.school.utils.ServerResponse;
+import com.school.utils.TokenUtils;
 import com.school.utils.Util;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,8 @@ public class UserServiceImpl implements UserService {
     private RongCloudApi rongCloudApi;
     @Autowired
     private Util util;
+    @Autowired
+    private TokenUtils serverTokenUtils;
     /**
      * 用户注册
      * 创建新用户账户，包含随机昵称、头像生成和IM系统集成
@@ -118,8 +121,12 @@ public class UserServiceImpl implements UserService {
             // 更新头像路径为完整URL
             String pic = util.updatePic(userInfo.getPhoto());
             userInfo.setPhoto(pic);
+            //token
+            String bearerToken = serverTokenUtils.generateToken(userInfo.getId());
+            //设置用户信息
+            LoginResponseDTO loginResponseDTO=new LoginResponseDTO(userInfo,bearerToken);
             
-            return ServerResponse.createServerResponseBySuccess(userInfo, "登录成功");
+            return ServerResponse.createServerResponseBySuccess(loginResponseDTO, "登录成功");
         } else {
             // 密码错误
             return ServerResponse.createServerResponseByFail("登录失败，密码错误");
@@ -279,7 +286,7 @@ public class UserServiceImpl implements UserService {
             int result = userMapper.updateUserStatus(idList, status);
 
             if (result > 0) {
-                return ServerResponse.createServerResponseBySuccess(401,"状态更新成功");
+                return ServerResponse.createServerResponseBySuccess("状态更新成功");
             } else {
                 return ServerResponse.createServerResponseByFail(500,"更新失败，未找到指定用户");
             }

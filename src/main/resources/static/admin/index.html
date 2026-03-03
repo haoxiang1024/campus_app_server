@@ -25,7 +25,8 @@
 <script>
     // 权限与用户名检查
     (function() {
-        const data = sessionStorage.getItem("user");
+        const data = sessionStorage.getItem("adminUser");
+        console.log( data)
         if (!data) { window.location.href = 'login.html'; return; }
         const user = JSON.parse(data);
         const check = setInterval(function() {

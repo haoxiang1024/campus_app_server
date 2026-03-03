@@ -10,6 +10,8 @@
     <style>
         body { background-color: #f8f9fa; display: flex; align-items: center; height: 100vh; }
         .login-card { width: 100%; max-width: 400px; margin: auto; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); background: #fff; border-radius: 10px; }
+        .password-toggle { position: relative; }
+        .password-toggle .toggle-icon { position: absolute; right: 10px; top: 70%; transform: translateY(-50%); cursor: pointer; color: #6c757d; }
     </style>
 </head>
 <body>
@@ -21,83 +23,149 @@
             <label class="form-label">用户名</label>
             <input type="text" name="username" class="form-control" required placeholder="请输入管理员账号">
         </div>
-        <div class="mb-3">
+        <div class="mb-3 password-toggle">
             <label class="form-label">密码</label>
             <input type="password" name="password" class="form-control" required placeholder="请输入密码">
+            <span class="toggle-icon" onclick="togglePassword()">👁️</span>
         </div>
-        <button type="submit" class="btn btn-primary w-100">登录</button>
+        <button type="submit" class="btn btn-primary w-100" id="loginBtn">登录</button>
     </form>
 </div>
+
 <script src="./js/sweetalert2@11.js"></script>
 <script src="./js/jquery.min.js"></script>
 <script>
+    // 密码显示/隐藏切换
+    function togglePassword() {
+        const pwdInput = $('input[name="password"]');
+        const type = pwdInput.attr('type') === 'password' ? 'text' : 'password';
+        pwdInput.attr('type', type);
+    }
+
+    // 防抖标识（防止重复提交）
+    let isSubmitting = false;
+
+    // 统一提示工具类（提前定义，避免作用域问题）
+    const Toast = {
+        success: (msg) => {
+            Swal.fire({
+                icon: 'success',
+                title: msg,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2000,
+                width: '220px',
+                padding: '0.5rem',
+            });
+        },
+        error: (msg) => {
+            Swal.fire({
+                icon: 'error',
+                title: '操作失败',
+                text: msg,
+                confirmButtonColor: '#00aaff',
+                width: '320px',
+                padding: '1.25rem',
+                customClass: { title: 'fs-6', htmlContainer: 'small' }
+            });
+        },
+        confirm: (title, text, callback) => {
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#00aaff',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                width: '350px',
+                padding: '1.25rem',
+                customClass: { title: 'fs-6', htmlContainer: 'small' }
+            }).then((result) => {
+                if (result.isConfirmed) callback();
+            });
+        }
+    };
+
     $('#loginForm').on('submit', function(e) {
         e.preventDefault();
 
-        // 获取表单数据
+
+        const username = $.trim($('input[name="username"]').val());
+        const password = $.trim($('input[name="password"]').val());
+
+        if (!username) {
+            Toast.error('请输入管理员账号');
+            return;
+        }
+        if (!password) {
+            Toast.error('请输入密码');
+            return;
+        }
+
+        if (password.length < 6) {
+            Toast.error('密码长度不能少于6位');
+            return;
+        }
+
+
+        if (isSubmitting) return;
+        isSubmitting = true;
+        $('#loginBtn').text('登录中...').prop('disabled', true);
+
+
         const loginData = {
-            phone: $('input[name="username"]').val(),
-            pwd: $('input[name="password"]').val()
+            phone: username,
+            pwd: password
         };
-        const Toast = {
-            success: (msg) => {
-                Swal.fire({
-                    icon: 'success',
-                    title: msg,
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 2000,
-                    width: '220px',
-                    padding: '0.5rem',
-                });
-            },
-            error: (msg) => {
-                Swal.fire({
-                    icon: 'error',
-                    title: '操作失败',
-                    text: msg,
-                    confirmButtonColor: '#00aaff',
-                    width: '320px',
-                    padding: '1.25rem',
-                    customClass: { title: 'fs-6', htmlContainer: 'small' }
-                });
-            },
-            confirm: (title, text, callback) => {
-                Swal.fire({
-                    title: title,
-                    text: text,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#00aaff',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    width: '350px',
-                    padding: '1.25rem',
-                    customClass: { title: 'fs-6', htmlContainer: 'small' }
-                }).then((result) => {
-                    if (result.isConfirmed) callback();
-                });
-            }
-        };
+
+
         $.ajax({
             url: '/school/login',
             type: 'POST',
             data: loginData,
+            timeout: 10000, // 超时时间10秒
+            dataType: 'json', // 期望返回JSON
             success: function(res) {
                 console.log("服务器返回：", res);
+                // 适配服务端状态码
                 if (res.status === 0) {
-                    sessionStorage.setItem("user", JSON.stringify(res.data));
-                    window.location.href = 'index.html';
+                    // 存储用户信息
+                    const loginData = res.data;
+                    const userInfo = loginData.userInfo; // 用户信息
+                    const token = loginData.token;       // Token
+                    // 存储用户信息（供权限检查函数使用）
+                    sessionStorage.setItem("adminUser", JSON.stringify(userInfo));
+                    // 可选：存储Token（如果后续请求需要）
+                    sessionStorage.setItem("token", token);
+                    Toast.success('登录成功');
+                    // 延迟跳转，保证提示能显示
+                    setTimeout(() => {
+                         window.location.href = 'index.html';
+                    }, 1000);
                 } else {
-                    // 显示后端返回的具体错误信息
-                    //alert('错误：' + (res.msg || '用户名或密码不正确'));
-                    Toast.error(res.msg || '用户名或密码不正确')
+                    Toast.error(res.msg || '用户名或密码不正确');
                 }
             },
-            error: function() {
-                Toast.error("服务器内部错误")
+            error: function(xhr, status, error) {
+                // 处理非200状态码（如401/500）
+                let errorMsg = "服务器内部错误";
+                if (xhr.responseJSON) {
+                    // 解析服务端返回的错误信息
+                    errorMsg = xhr.responseJSON.msg || errorMsg;
+                } else if (status === 'timeout') {
+                    errorMsg = '请求超时，请检查网络';
+                }
+                Toast.error(errorMsg);
+            },
+            complete: function() {
+                // 无论成功/失败，恢复按钮状态
+                isSubmitting = false;
+                $('#loginBtn').text('登录').prop('disabled', false);
+                // 清空密码框（安全）
+                $('input[name="password"]').val('');
             }
         });
     });
