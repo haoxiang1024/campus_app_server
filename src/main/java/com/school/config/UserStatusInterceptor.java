@@ -68,7 +68,7 @@ public class UserStatusInterceptor implements HandlerInterceptor {
         // 根据用户 ID 查询用户信息并校验用户状态
         User user = userMapper.getUserById(userId);
         if (user != null) {
-            System.out.println("用户状态：" + user.getstate());
+           // System.out.println("用户状态：" + user.getstate());
             // 检查用户是否被禁用（state=0 表示禁用）
             if (user.getstate() == 0) {
                 // 用户被禁用，返回 401 错误和提示信息

@@ -72,6 +72,6 @@ public class LostFoundTypeServiceImpl implements LostFoundTypeService {
                 }
             }
         }
-        return ServerResponse.createServerResponseBySuccess(id, ResponseCode.GET_DATA_SUCCESS.getMsg());
+        return ServerResponse.createServerResponseBySuccess(0,id, ResponseCode.GET_DATA_SUCCESS.getMsg());
     }
 }
