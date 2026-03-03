@@ -33,8 +33,12 @@ public class SpringMvcSupport implements WebMvcConfigurer {
     }
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        //System.out.println("【拦截器配置】开始注册UserStatusInterceptor");
         registry.addInterceptor(userStatusInterceptor)
                 .addPathPatterns("/**")          // 所有接口
-                .excludePathPatterns("/login");  // 排除登录接口
+                .excludePathPatterns("/login/**","/register/**","/resetPwd/**",
+                        "/verify_code/**","/send_code/**");  // 排除登录接口
+        //System.out.println("【拦截器配置】UserStatusInterceptor注册完成，拦截所有路径，排除上述公开接口");
+
     }
 }

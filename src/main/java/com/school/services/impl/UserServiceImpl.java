@@ -77,11 +77,16 @@ public class UserServiceImpl implements UserService {
             // IM系统注册 - 同步创建IM账户
             String response = Util.registerUserToProvider(user.getId().toString(), user.getNickname(), user.getPhoto());
             JSONObject jsonObject = JSON.parseObject(response);
+            //imtoken
             String token = jsonObject.getString("token");
             
             // 验证IM注册是否成功
             if(token != null && !token.isEmpty()){
-                return ServerResponse.createServerResponseBySuccess(user, "注册成功");
+                //token
+                String bearerToken = serverTokenUtils.generateToken(user.getId());
+                //设置用户信息
+                LoginResponseDTO loginResponseDTO=new LoginResponseDTO(user,bearerToken);
+                return ServerResponse.createServerResponseBySuccess(loginResponseDTO, "注册成功");
             }
         }
         return ServerResponse.createServerResponseByFail( "注册失败");

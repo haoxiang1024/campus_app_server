@@ -2,13 +2,13 @@ package com.school.utils;
 
 import com.school.config.JwtConfig;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class TokenUtils {
@@ -17,20 +17,20 @@ public class TokenUtils {
     private JwtConfig jwtConfig;
 
     /**
-     * 生成安卓端需要的Bearer Token
+     * 生成标准JWT Token（仅返回Token本身，不拼接Bearer）
      * @param userId 用户ID
-     * @return 格式："Bearer eyJhbGciOiJIUzI1NiJ9.xxxx"
+     * @return 纯JWT Token："eyJhbGciOiJIUzI1NiJ9.xxxx.xxxx"
      */
     public String generateToken(Integer userId) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", userId);
-        claims.put("exp", new Date(System.currentTimeMillis() + jwtConfig.getExpire())); // 过期时间
+        SecretKey secretKey = Keys.hmacShaKeyFor(jwtConfig.getSecret().getBytes(StandardCharsets.UTF_8));
 
+        // 生成标准JWT Token
         String jwt = Jwts.builder()
-                .setClaims(claims)
-                .signWith(SignatureAlgorithm.HS256, jwtConfig.getSecret())
+                .claim("userId", userId) // 自定义字段：用户ID
+                .setExpiration(new Date(System.currentTimeMillis() + jwtConfig.getExpire())) // 核心修复2：标准过期时间设置
+                .signWith(secretKey)
                 .compact();
 
-        return "Bearer " + jwt;
+        return jwt;
     }
 }
