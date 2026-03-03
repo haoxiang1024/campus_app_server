@@ -74,4 +74,7 @@
         ORDER BY pub_date DESC
             LIMIT 3
     </select>
+    <select id="countByTypeId" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM lostfound WHERE lostfoundtype_id = #{typeId}
+    </select>
 </mapper>

@@ -75,5 +75,43 @@ public interface AdminService {
      * 删除评论
      */
     ServerResponse deleteCommentById(Integer commentId);
+
+    /**
+     * 分页获取类型列表
+     * @param page 页码
+     * @param pageSize 每页大小
+     * @param keyword 搜索关键字
+     * @return ServerResponse 包含类型列表和分页信息的响应对象
+     */
+    ServerResponse getTypeByPage(int page, int pageSize, String keyword);
+    
+    /**
+     * 添加新类型
+     * @param name 类型名称
+     * @return ServerResponse 操作结果响应对象
+     */
+    ServerResponse addType(String name);
+    
+    /**
+     * 更新类型信息
+     * @param id 类型 ID
+     * @param name 新的类型名称
+     * @return ServerResponse 操作结果响应对象
+     */
+    ServerResponse updateType(Integer id, String name);
+    
+    /**
+     * 根据 ID 删除类型
+     * @param typeId 类型 ID
+     * @return ServerResponse 操作结果响应对象
+     */
+    ServerResponse deleteTypeById(Integer typeId);
+    
+    /**
+     * 批量删除类型
+     * @param ids 类型 ID 字符串，多个 ID 用逗号分隔
+     * @return ServerResponse 操作结果响应对象
+     */
+    ServerResponse deleteTypeBatch(String ids);
 }
 

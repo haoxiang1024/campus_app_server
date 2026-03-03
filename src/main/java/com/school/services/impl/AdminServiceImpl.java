@@ -2,11 +2,10 @@ package com.school.services.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.school.entity.Comment;
-import com.school.entity.CommentVO;
-import com.school.entity.LostFound;
-import com.school.entity.User;
+import com.school.entity.*;
 import com.school.mapper.AdminMapper;
+import com.school.mapper.LostFoundMapper;
+import com.school.mapper.LostFoundTypeMapper;
 import com.school.services.api.AdminService;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
@@ -14,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +28,10 @@ import java.util.stream.Stream;
 public class AdminServiceImpl implements AdminService {
     @Autowired
     AdminMapper adminMapper;
-
+    @Autowired
+    private LostFoundTypeMapper lostFoundTypeMapper;
+    @Autowired
+    private LostFoundMapper lostFoundMapper;
     /**
      * 获取所有用户数量
      * @return ServerResponse 包含用户总数的响应对象
@@ -226,5 +229,127 @@ public class AdminServiceImpl implements AdminService {
             return ServerResponse.createServerResponseBySuccess("删除成功");
         }
         return ServerResponse.createServerResponseByFail(500, "删除失败，可能数据不存在");
+    }
+
+
+    /**
+     * 分页获取类型列表
+     * @param page 页码
+     * @param pageSize 每页大小
+     * @param keyword 搜索关键字
+     * @return ServerResponse 包含类型列表和分页信息的响应对象
+     */
+    @Override
+    public ServerResponse getTypeByPage(int page, int pageSize, String keyword) {
+        // 设置分页参数
+        PageHelper.startPage(page, pageSize);
+        // 根据关键字查询类型列表
+        List<LostFoundType> list = lostFoundTypeMapper.selectTypeByPage(keyword);
+        // 构建分页信息对象
+        PageInfo<LostFoundType> pageInfo = new PageInfo<>(list);
+    
+        // 封装返回结果
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("list", pageInfo.getList());
+        resultMap.put("total", pageInfo.getTotal());
+        resultMap.put("totalPages", pageInfo.getPages());
+    
+        return ServerResponse.createServerResponseBySuccess(resultMap);
+    }
+    
+    /**
+     * 添加新类型
+     * @param name 类型名称
+     * @return ServerResponse 操作结果响应对象
+     */
+    @Override
+    public ServerResponse addType(String name) {
+        // 参数校验：检查名称是否为空
+        if (name == null || name.trim().isEmpty()) {
+            return ServerResponse.createServerResponseByFail("分类名称不能为空");
+        }
+        // 创建类型对象并设置名称
+        LostFoundType type = new LostFoundType();
+        type.setName(name);
+        // 执行插入操作
+        int result = lostFoundTypeMapper.insertType(type);
+        return result > 0 ? ServerResponse.createServerResponseBySuccess("新增成功") : ServerResponse.createServerResponseByFail("新增失败");
+    }
+    
+    /**
+     * 更新类型信息
+     * @param id 类型 ID
+     * @param name 新的类型名称
+     * @return ServerResponse 操作结果响应对象
+     */
+    @Override
+    public ServerResponse updateType(Integer id, String name) {
+        // 参数校验：检查 ID 和名称是否为空
+        if (id == null || name == null || name.trim().isEmpty()) {
+            return ServerResponse.createServerResponseByFail("参数错误");
+        }
+        // 创建类型对象并设置 ID 和名称
+        LostFoundType type = new LostFoundType();
+        type.setId(id);
+        type.setName(name);
+        // 执行更新操作
+        int result = lostFoundTypeMapper.updateType(type);
+        return result > 0 ? ServerResponse.createServerResponseBySuccess("更新成功") : ServerResponse.createServerResponseByFail("更新失败");
+    }
+    
+    /**
+     * 根据 ID 删除类型
+     * @param typeId 类型 ID
+     * @return ServerResponse 操作结果响应对象
+     */
+    @Override
+    public ServerResponse deleteTypeById(Integer typeId) {
+        if (typeId == null) {
+            return ServerResponse.createServerResponseByFail("分类ID不能为空");
+        }
+
+        // 检查是否还有失物招领信息正在使用该分类
+        int count = lostFoundMapper.countByTypeId(typeId);
+        if (count > 0) {
+            return ServerResponse.createServerResponseByFail("删除被拦截：当前有 " + count + " 条物品信息属于该分类，请先转移或删除相关物品！");
+        }
+
+        int result = lostFoundTypeMapper.deleteTypeById(typeId);
+        return result > 0 ? ServerResponse.createServerResponseBySuccess("删除成功") : ServerResponse.createServerResponseByFail("删除失败");
+    }
+
+    /**
+     * 批量删除类型
+     * @param ids 类型 ID 字符串，多个 ID 用逗号分隔
+     * @return ServerResponse 操作结果响应对象
+     */
+    @Override
+    public ServerResponse deleteTypeBatch(String ids) {
+        // 参数校验：检查 ID 字符串是否为空
+        if (ids == null || ids.isEmpty()) {
+            return ServerResponse.createServerResponseByFail("参数不能为空");
+        }
+    
+        // 解析 ID 字符串，转换为整数列表
+        String[] idArray = ids.split(",");
+        List<Integer> idList = new ArrayList<>();
+    
+        // 遍历检查每一个准备删除的分类
+        for (String idStr : idArray) {
+            Integer typeId = Integer.parseInt(idStr);
+            // 统计该分类下的物品数量
+            int count = lostFoundMapper.countByTypeId(typeId);
+    
+            // 如果分类仍在使用中，则拦截删除操作
+            if (count > 0) {
+                // 只要发现其中有一个分类还在被使用，就直接熔断整个批量删除操作
+                return ServerResponse.createServerResponseByFail("批量删除被拦截：分类 ID [" + typeId + "] 下仍有 " + count + " 条关联的物品信息，请先处理！");
+            }
+            idList.add(typeId);
+        }
+    
+        // 执行批量删除操作
+        int result = lostFoundTypeMapper.deleteTypeBatch(idList);
+        return result > 0 ? ServerResponse.createServerResponseBySuccess("批量删除成功") : ServerResponse.createServerResponseByFail("批量删除失败");
     }
 }

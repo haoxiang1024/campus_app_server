@@ -107,4 +107,10 @@ public interface LostFoundMapper {
      * @return 匹配的失物招领信息列表
      */
     List<LostFound>smartMatch(@Param("type")String type,@Param("lostfoundtype_id")int lostfoundtype_id,@Param("keyword")String keyword);
+
+    /**
+     * 根据分类ID统计关联的失物招领信息数量
+     * 用于删除分类前的安全检查
+     */
+    int countByTypeId(@Param("typeId") Integer typeId);
 }

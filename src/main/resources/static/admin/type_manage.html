@@ -1,0 +1,279 @@
+<link href="./css/sweetalert2.min.css" rel="stylesheet">
+<style>
+    .content-wrapper {
+        background: #ffffff !important;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        padding: 25px;
+        margin: 15px;
+        color: #333 !important;
+    }
+    .text-custom-blue { color: #00aaff !important; }
+    .table-light th { background-color: #f8f9fa !important; color: #666 !important; font-weight: 600; }
+    .btn-outline-custom { color: #00aaff !important; border-color: #dee2e6 !important; }
+    .btn-outline-custom:hover:not(:disabled) { background-color: #00aaff !important; color: white !important; }
+    .btn-outline-custom:disabled { cursor: not-allowed; opacity: 0.5; }
+    .btn-link { text-decoration: none !important; }
+</style>
+
+<div class="content-wrapper">
+    <div class="d-flex justify-content-between align-items-center mb-4 gap-3 flex-wrap">
+        <div class="d-flex gap-2">
+            <button class="btn btn-warning btn-sm text-white px-3" onclick="openTypeModal()">+ 新增分类</button>
+            <button class="btn btn-outline-danger btn-sm" id="batchDeleteBtn">批量删除</button>
+        </div>
+        <div class="d-flex gap-2">
+            <div class="input-group input-group-sm" style="width: 250px;">
+                <input type="text" id="searchInput" class="form-control" placeholder="搜索分类名称...">
+                <button class="btn btn-primary" type="button" id="searchBtn">
+                    <i class="fa fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+            <tr>
+                <th style="width: 45px;"><input type="checkbox" id="selectAll" class="form-check-input"></th>
+                <th style="width: 80px;">ID</th>
+                <th>分类名称</th>
+                <th class="text-center" style="width: 150px;">操作</th>
+            </tr>
+            </thead>
+            <tbody id="typeTableBody">
+            <tr><td colspan="4" class="text-center text-muted">正在检索数据...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex flex-column align-items-center mt-4" id="paginationWrapper">
+        <div class="d-flex align-items-center gap-3">
+            <div class="btn-group">
+                <button class="btn btn-sm btn-outline-custom px-3" id="btnFirstPage">首页</button>
+                <button class="btn btn-sm btn-outline-custom px-3" id="btnPrevPage">上一页</button>
+            </div>
+            <span id="pageInfo" class="text-custom-blue fw-bold">第 1 页 / 共 1 页</span>
+            <div class="btn-group">
+                <button class="btn btn-sm btn-outline-custom px-3" id="btnNextPage">下一页</button>
+                <button class="btn btn-sm btn-outline-custom px-3" id="btnLastPage">末页</button>
+            </div>
+        </div>
+        <div class="mt-2 text-muted small">共 <span id="totalCount">0</span> 条记录</div>
+    </div>
+</div>
+
+<div class="modal fade" id="typeModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold text-custom-blue" id="modalTitle">新增分类</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="typeForm">
+                    <input type="hidden" id="typeId" name="id">
+                    <div class="mb-3">
+                        <label class="form-label">分类名称 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="typeName" name="name" required placeholder="例如：电子产品、证件、书籍等">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="submitType()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="./js/jquery.min.js"></script>
+<script src="./js/bootstrap.bundle.min.js"></script>
+<script src="./js/sweetalert2@11.js"></script>
+
+<script>
+    // 统一定制 Toast 提示 (完全复用你的模板逻辑)
+    window.Toast = window.Toast || {
+        success: (msg) => {
+            Swal.fire({ icon: 'success', title: msg, toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, width: '220px', padding: '0.5rem' });
+        },
+        error: (msg) => {
+            Swal.fire({ icon: 'error', title: '操作失败', text: msg || '未知错误', confirmButtonColor: '#00aaff', width: '320px' });
+        },
+        confirm: (title, text, callback) => {
+            Swal.fire({
+                title: title, text: text, icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#6c757d', confirmButtonText: '确定', cancelButtonText: '取消'
+            }).then((result) => {
+                if (result.isConfirmed && typeof callback === 'function') callback();
+            });
+        }
+    };
+
+    (function() {
+        let currentPage = 1;
+        let totalPages = 1;
+        const pageSize = 10;
+        let allData = [];
+
+        // 加载分类数据
+        function loadData(page) {
+            currentPage = page || 1;
+            const keyword = $('#searchInput').val().trim();
+
+            $('#typeTableBody').html('<tr><td colspan="4" class="text-center text-muted">正在检索最新数据...</td></tr>');
+
+            // 注意：需要后端配合提供对应的接口 (假设路径如下)
+            $.get('/school/admin/getTypeByPage', {
+                page: currentPage,
+                pageSize: pageSize,
+                keyword: keyword
+            }, function(res) {
+                if(res && res.status === 0 && res.data) {
+                    // 如果后端未做分页，直接返回的是数组，做一下兼容处理
+                    let list = res.data.list || res.data;
+                    allData = list;
+                    const totalItems = res.data.total || list.length;
+                    totalPages = res.data.totalPages || Math.ceil(totalItems / pageSize) || 1;
+
+                    renderTable(allData);
+
+                    $('#pageInfo').text(`第 ${currentPage} 页 / 共 ${totalPages} 页`);
+                    $('#totalCount').text(totalItems);
+                    $('#btnFirstPage, #btnPrevPage').prop('disabled', currentPage <= 1);
+                    $('#btnNextPage, #btnLastPage').prop('disabled', currentPage >= totalPages);
+                    $('#selectAll').prop('checked', false);
+                } else {
+                    $('#typeTableBody').html('<tr><td colspan="4" class="text-center text-danger">数据加载失败：' + (res?.msg || '接口返回异常') + '</td></tr>');
+                }
+            }).fail(function() {
+                $('#typeTableBody').html('<tr><td colspan="4" class="text-center text-danger">数据加载失败：网络异常</td></tr>');
+            });
+        }
+
+        // 渲染表格
+        function renderTable(data) {
+            let html = '';
+            if (!data || !data.length) {
+                html = '<tr><td colspan="4" class="text-center text-muted">未找到分类记录</td></tr>';
+            } else {
+                data.forEach(item => {
+                    item = item || {};
+                    html += `<tr>
+                        <td><input type="checkbox" class="item-checkbox form-check-input" value="${item.id}"></td>
+                        <td class="text-muted">#${item.id}</td>
+                        <td class="fw-bold text-custom-blue">${item.name || '未命名'}</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-link text-primary p-0 me-3" onclick="openTypeModal(${item.id})">编辑</button>
+                            <button class="btn btn-sm btn-link text-danger p-0" onclick="deleteItem(${item.id})">删除</button>
+                        </td>
+                    </tr>`;
+                });
+            }
+            $('#typeTableBody').html(html);
+        }
+
+        // 批量删除
+        $('#batchDeleteBtn').on('click', function() {
+            const selectedIds = $('.item-checkbox:checked').map(function() {
+                return $(this).val();
+            }).get().filter(id => id);
+
+            if (!selectedIds.length) return window.Toast.error('请勾选要删除的分类');
+
+            window.Toast.confirm("批量删除", `确定永久删除选中的 ${selectedIds.length} 个分类吗？该操作可能导致已关联此分类的物品信息显示异常！`, () => {
+                // 注意：需要后端配合提供对应的批量删除接口 (例如用逗号拼接ID)
+                $.post('/school/admin/deleteTypeBatch', { ids: selectedIds.join(',') }, (res) => {
+                    if(res && res.status === 0) {
+                        window.Toast.success("批量删除完成");
+                        loadData(1);
+                    } else {
+                        window.Toast.error(res?.msg || '操作失败');
+                    }
+                }).fail(() => {
+                    window.Toast.error("网络异常");
+                });
+            });
+        });
+
+        // 删除单个
+        window.deleteItem = (id) => {
+            if (!id) return window.Toast.error('无效的记录ID');
+
+            window.Toast.confirm("删除确认", "确定永久删除此分类吗？", () => {
+                $.post('/school/admin/deleteTypeById', { typeId: id }, (res) => {
+                    if(res && res.status === 0) {
+                        window.Toast.success("分类已删除");
+                        loadData(currentPage);
+                    } else {
+                        window.Toast.error(res?.msg || '删除失败');
+                    }
+                }).fail(() => {
+                    window.Toast.error('网络异常，删除失败');
+                });
+            });
+        };
+
+        // 打开新增/编辑模态框 (复用同一个模态框)
+        window.openTypeModal = (id) => {
+            const form = $('#typeForm')[0];
+            form.reset();
+
+            if (id) {
+                // 编辑模式
+                const item = allData.find(u => u.id == id);
+                if(item) {
+                    $('#modalTitle').text('编辑分类');
+                    $('#typeId').val(item.id);
+                    $('#typeName').val(item.name);
+                }
+            } else {
+                // 新增模式
+                $('#modalTitle').text('新增分类');
+                $('#typeId').val('');
+            }
+            new bootstrap.Modal('#typeModal').show();
+        };
+
+        // 提交表单 (新增或编辑)
+        window.submitType = () => {
+            const form = $('#typeForm')[0];
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const id = $('#typeId').val();
+            const name = $('#typeName').val().trim();
+
+            // 判断是走新增接口还是编辑接口
+            const url = id ? '/school/admin/updateType' : '/school/admin/addType';
+            const data = id ? { id: id, name: name } : { name: name };
+
+            $.post(url, data, function(res) {
+                if (res && res.status === 0) {
+                    window.Toast.success(id ? "修改成功" : "新增成功");
+                    bootstrap.Modal.getInstance('#typeModal').hide();
+                    loadData(id ? currentPage : 1); // 修改留在当前页，新增跳到第一页
+                } else {
+                    window.Toast.error(res?.msg || "操作失败");
+                }
+            }).fail(function() {
+                window.Toast.error("服务器响应异常");
+            });
+        };
+
+        // 事件绑定
+        $('#searchBtn').on('click', () => loadData(1));
+        $('#searchInput').on('keypress', e => { if(e.which === 13) loadData(1); });
+        $('#selectAll').on('change', function() { $('.item-checkbox').prop('checked', this.checked); });
+
+        $('#btnFirstPage').on('click', () => loadData(1));
+        $('#btnLastPage').on('click', () => loadData(totalPages));
+        $('#btnPrevPage').on('click', () => { if(currentPage > 1) loadData(currentPage - 1); });
+        $('#btnNextPage').on('click', () => { if(currentPage < totalPages) loadData(currentPage + 1); });
+
+        // 首次加载
+        loadData(1);
+    })();
+</script>

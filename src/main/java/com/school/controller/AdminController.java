@@ -271,4 +271,52 @@ public class AdminController {
     public ServerResponse deleteCommentById(@RequestParam("commentId") Integer commentId) {
         return adminService.deleteCommentById(commentId);
     }
+
+    /**
+     * 分页获取失物招领分类列表
+     */
+    @ResponseBody
+    @GetMapping("/getTypeByPage")
+    public ServerResponse getTypeByPage(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String keyword) {
+        return adminService.getTypeByPage(page, pageSize, keyword);
+    }
+
+    /**
+     * 新增分类
+     */
+    @ResponseBody
+    @PostMapping("/addType")
+    public ServerResponse addType(@RequestParam("name") String name) {
+        return adminService.addType(name);
+    }
+
+    /**
+     * 修改分类
+     */
+    @ResponseBody
+    @PostMapping("/updateType")
+    public ServerResponse updateType(@RequestParam("id") Integer id, @RequestParam("name") String name) {
+        return adminService.updateType(id, name);
+    }
+
+    /**
+     * 删除单条分类
+     */
+    @ResponseBody
+    @PostMapping("/deleteTypeById")
+    public ServerResponse deleteTypeById(@RequestParam("typeId") Integer typeId) {
+        return adminService.deleteTypeById(typeId);
+    }
+
+    /**
+     * 批量删除分类
+     */
+    @ResponseBody
+    @PostMapping("/deleteTypeBatch")
+    public ServerResponse deleteTypeBatch(@RequestParam("ids") String ids) {
+        return adminService.deleteTypeBatch(ids);
+    }
 }

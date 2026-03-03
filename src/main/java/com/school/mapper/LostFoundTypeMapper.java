@@ -35,7 +35,30 @@ public interface LostFoundTypeMapper {
      */
     int typeIdByName(@Param("name") String name);
 
+    /**
+     * 分页及关键字搜索分类
+     */
+    List<LostFoundType> selectTypeByPage(@Param("keyword") String keyword);
 
+    /**
+     * 新增分类
+     */
+    int insertType(LostFoundType type);
+
+    /**
+     * 更新分类
+     */
+    int updateType(LostFoundType type);
+
+    /**
+     * 根据ID删除分类
+     */
+    int deleteTypeById(@Param("id") Integer id);
+
+    /**
+     * 批量删除分类
+     */
+    int deleteTypeBatch(@Param("ids") List<Integer> ids);
 
 
 }
