@@ -149,4 +149,30 @@ public class UserController {
         return userService.getUserById(id);
     }
 
+    /**
+     * 验证已有邮箱并更新手机号
+     * @param id 用户ID
+     * @param newPhone 新手机号
+     * @param code 发送到已有邮箱的验证码
+     * @return 返回ServerResponse对象
+     */
+    @ResponseBody
+    @RequestMapping("/updatePhone")
+    public ServerResponse updatePhone(int id, String newPhone, String code) {
+        return userService.updatePhone(id, newPhone, code);
+    }
+
+    /**
+     * 验证已有邮箱并更新邮箱
+     * @param id 用户ID
+     * @param newEmail 新邮箱
+     * @param code 发送到已有邮箱的验证码
+     * @return 返回ServerResponse对象
+     */
+    @ResponseBody
+    @RequestMapping("/updateEmail")
+    public ServerResponse updateEmail(int id, String newEmail, String code) {
+        return userService.updateEmail(id, newEmail, code);
+    }
+
 }

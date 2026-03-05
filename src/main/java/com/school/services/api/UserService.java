@@ -96,4 +96,22 @@ public interface UserService {
      * @return ServerResponse 包含IM Token的响应对象
      */
     ServerResponse getIMUserToken(int uid, String nickname);
+
+    /**
+     * 验证已有邮箱并修改手机号
+     * @param id 用户ID
+     * @param newPhone 新手机号
+     * @param code 邮箱验证码
+     * @return ServerResponse 操作结果
+     */
+    ServerResponse updatePhone(int id, String newPhone, String code);
+
+    /**
+     * 验证已有邮箱并修改邮箱
+     * @param id 用户ID
+     * @param newEmail 新邮箱
+     * @param code 邮箱验证码
+     * @return ServerResponse 操作结果
+     */
+    ServerResponse updateEmail(int id, String newEmail, String code);
 }

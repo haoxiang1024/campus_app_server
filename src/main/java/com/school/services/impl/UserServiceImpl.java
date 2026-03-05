@@ -7,10 +7,7 @@ import com.school.entity.User;
 import com.school.mapper.UserMapper;
 import com.school.services.api.RongCloudApi;
 import com.school.services.api.UserService;
-import com.school.utils.DateUtil;
-import com.school.utils.ServerResponse;
-import com.school.utils.TokenUtils;
-import com.school.utils.Util;
+import com.school.utils.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -347,6 +344,84 @@ public class UserServiceImpl implements UserService {
             return ServerResponse.createServerResponseBySuccess(token,"token获取成功");
         }
         return ServerResponse.createServerResponseByFail("聊天服务连接失败，请稍后再试");
+    }
+
+    /**
+     * 验证已有邮箱并修改手机号
+     */
+    @Override
+    public ServerResponse updatePhone(int id, String newPhone, String code) {
+        //  获取当前用户信息，拿到绑定的旧邮箱
+        User user = userMapper.userInfo(id);
+        if (user == null) {
+            return ServerResponse.createServerResponseByFail("用户不存在");
+        }
+        String oldEmail = user.getEmail();
+        if (StringUtils.isEmpty(oldEmail)) {
+            return ServerResponse.createServerResponseByFail("原账号未绑定邮箱，无法进行安全验证");
+        }
+
+        //  校验发送到旧邮箱的验证码
+        boolean isValid = EmailVerificationUtils.verifyCode(oldEmail, code);
+        if (!isValid) {
+            return ServerResponse.createServerResponseByFail("验证码错误或已过期");
+        }
+
+        //  检查新手机号是否已被其他账号占用
+        Integer existId = userMapper.findUserByPhone(newPhone);
+        if (existId != null && !existId.equals(id)) {
+            return ServerResponse.createServerResponseByFail("该手机号已被其他账号绑定");
+        }
+
+        //  更新手机号
+        User updateParam = new User();
+        updateParam.setId(id);
+        updateParam.setPhone(newPhone);
+
+        int result = userMapper.updateUserInfo(updateParam);
+        if (result > 0) {
+            // 返回最新用户信息并处理头像路径
+            User updatedUser = userMapper.userInfo(id);
+            updatedUser.setPhoto(util.updatePic(updatedUser.getPhoto()));
+            return ServerResponse.createServerResponseBySuccess(updatedUser, "手机号修改成功");
+        }
+        return ServerResponse.createServerResponseByFail("修改失败，请稍后重试");
+    }
+
+    /**
+     * 验证已有邮箱并修改邮箱
+     */
+    @Override
+    public ServerResponse updateEmail(int id, String newEmail, String code) {
+        //  获取当前用户信息，拿到绑定的旧邮箱
+        User user = userMapper.userInfo(id);
+        if (user == null) {
+            return ServerResponse.createServerResponseByFail("用户不存在");
+        }
+        String oldEmail = user.getEmail();
+        if (StringUtils.isEmpty(oldEmail)) {
+            return ServerResponse.createServerResponseByFail("原账号未绑定邮箱，无法进行安全验证");
+        }
+
+        //  校验发送到旧邮箱的验证码
+        boolean isValid = EmailVerificationUtils.verifyCode(oldEmail, code);
+        if (!isValid) {
+            return ServerResponse.createServerResponseByFail("验证码错误或已过期");
+        }
+
+        //  更新为新邮箱
+        User updateParam = new User();
+        updateParam.setId(id);
+        updateParam.setEmail(newEmail);
+
+        int result = userMapper.updateUserInfo(updateParam);
+        if (result > 0) {
+            // 返回最新用户信息并处理头像路径
+            User updatedUser = userMapper.userInfo(id);
+            updatedUser.setPhoto(util.updatePic(updatedUser.getPhoto()));
+            return ServerResponse.createServerResponseBySuccess(updatedUser, "邮箱修改成功");
+        }
+        return ServerResponse.createServerResponseByFail("修改失败，请稍后重试");
     }
 }
 

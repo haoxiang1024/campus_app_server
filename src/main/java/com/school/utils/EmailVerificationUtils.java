@@ -73,16 +73,16 @@ public class EmailVerificationUtils {
      * @throws MessagingException 邮件发送异常
      */
     public static String sendVerificationCodeEmail(String toEmail) throws MessagingException {
-        // 1. 生成验证码
+        //  生成验证码
         String verificationCode = generateVerificationCode();
 
-        // 2. 计算过期时间（当前时间 + 5分钟）
+        //  计算过期时间（当前时间 + 5分钟）
         long expireTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(CODE_EXPIRE_MINUTES);
 
-        // 3. 存储验证码
+        // 存储验证码
         CODE_STORE.put(toEmail, new VerificationCode(verificationCode, expireTime));
 
-        // 4. 初始化邮件配置
+        //  初始化邮件配置
         Properties props = new Properties();
         props.put("mail.smtp.host", SMTP_HOST);
         props.put("mail.smtp.port", SMTP_PORT);
@@ -92,7 +92,7 @@ public class EmailVerificationUtils {
         props.put("mail.smtp.ssl.trust", SMTP_HOST);
         props.put("mail.debug", "false");
 
-        // 5. 创建认证器
+        //  创建认证器
         Authenticator authenticator = new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
@@ -100,10 +100,10 @@ public class EmailVerificationUtils {
             }
         };
 
-        // 6. 获取Session
+        //  获取Session
         Session session = Session.getInstance(props, authenticator);
 
-        // 7. 构建邮件消息
+        //  构建邮件消息
         MimeMessage message = new MimeMessage(session);
         message.setFrom(new InternetAddress(SMTP_USERNAME)); // 发件人
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail)); // 收件人
@@ -123,7 +123,7 @@ public class EmailVerificationUtils {
         );
         message.setContent(emailContent, "text/html; charset=UTF-8");
 
-        // 8. 发送邮件
+        //  发送邮件
         Transport.send(message);
 
         return verificationCode;
@@ -136,23 +136,23 @@ public class EmailVerificationUtils {
      * @return 验证结果：true=有效，false=无效（过期/错误）
      */
     public static boolean verifyCode(String email, String inputCode) {
-        // 1. 检查邮箱是否存在
+        // 检查邮箱是否存在
         if (!CODE_STORE.containsKey(email)) {
             return false;
         }
 
         VerificationCode storedCode = CODE_STORE.get(email);
 
-        // 2. 检查是否过期
+        //  检查是否过期
         if (storedCode.isExpired()) {
             CODE_STORE.remove(email); // 移除过期验证码
             return false;
         }
 
-        // 3. 校验验证码是否匹配
+        // 校验验证码是否匹配
         boolean isMatch = storedCode.getCode().equals(inputCode);
 
-        // 4. 验证成功后移除验证码（防止重复使用）
+        // 验证成功后移除验证码（防止重复使用）
         if (isMatch) {
             CODE_STORE.remove(email);
         }

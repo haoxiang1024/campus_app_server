@@ -27,7 +27,7 @@ public class TokenUtils {
         // 生成标准JWT Token
         String jwt = Jwts.builder()
                 .claim("userId", userId) // 自定义字段：用户ID
-                .setExpiration(new Date(System.currentTimeMillis() + jwtConfig.getExpire())) // 核心修复2：标准过期时间设置
+                .setExpiration(new Date(System.currentTimeMillis() + jwtConfig.getExpire()))
                 .signWith(secretKey)
                 .compact();
 
