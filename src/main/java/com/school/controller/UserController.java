@@ -175,4 +175,15 @@ public class UserController {
         return userService.updateEmail(id, newEmail, code);
     }
 
+    /**
+     * 注销账号接口
+     * @param id 用户ID
+     * @return 返回ServerResponse对象
+     */
+    @ResponseBody
+    @RequestMapping("/deleteAccount")
+    public ServerResponse deleteAccount(int id) {
+        return userService.deleteAccount(id);
+    }
+
 }

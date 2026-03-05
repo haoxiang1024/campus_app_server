@@ -114,4 +114,11 @@ public interface UserService {
      * @return ServerResponse 操作结果
      */
     ServerResponse updateEmail(int id, String newEmail, String code);
+
+    /**
+     * 注销用户账号
+     * @param id 用户ID
+     * @return ServerResponse 操作结果
+     */
+    ServerResponse deleteAccount(int id);
 }

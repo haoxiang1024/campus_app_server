@@ -423,6 +423,19 @@ public class UserServiceImpl implements UserService {
         }
         return ServerResponse.createServerResponseByFail("修改失败，请稍后重试");
     }
+
+    /**
+     * 注销用户账号
+     */
+    @Override
+    public ServerResponse deleteAccount(int id) {
+        // 执行数据库删除操作
+        int result = userMapper.deleteUserById(id);
+        if (result > 0) {
+            return ServerResponse.createServerResponseBySuccess("账号已注销");
+        }
+        return ServerResponse.createServerResponseByFail("账号注销失败，请稍后重试");
+    }
 }
 
 

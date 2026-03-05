@@ -110,4 +110,11 @@ public interface UserMapper {
      * @return 用户总数
      */
     int getUserCount(@Param("keyword") String keyword);
+
+    /**
+     * 注销/删除用户账号
+     * @param id 用户ID
+     * @return 影响行数
+     */
+    int deleteUserById(@Param("id") int id);
 }
