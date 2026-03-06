@@ -261,10 +261,15 @@
 
         // 格式化日期 - 增加时间戳有效性校验
         function formatDate(ts) {
-            if (!ts || isNaN(ts)) return '未设置';
-            const d = new Date(Number(ts));
-            // 校验日期是否有效
-            if (d.toString() === 'Invalid Date') return '未设置';
+            if (!ts) return '未设置';
+
+            // 如果传入的是纯数字字符串（如时间戳），先转成 Number；如果是 ISO 字符串，原样保留
+            const parseValue = isNaN(Number(ts)) ? ts : Number(ts);
+            const d = new Date(parseValue);
+
+            // 校验日期是否有效 (如果无效，d.getTime() 会返回 NaN)
+            if (isNaN(d.getTime())) return '未设置';
+
             return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
         }
 
@@ -345,7 +350,7 @@
                         </td>
                         <td class="fw-bold">${item.title || '未命名'}</td>
                         <td>${item.place || '-'}</td>
-                        <td><small class="text-muted">${formatDate(item.pubDate)}</small></td>
+                        <td><small class="text-muted">${formatDate(item.pubDate || item.pub_date)}</small></td>
                         <td>${item.phone || '-'}</td>
                         <td><span class="badge ${badgeClass} text-white">${item.state || '未知'}</span></td>
                         <td class="text-center">${btns}</td>

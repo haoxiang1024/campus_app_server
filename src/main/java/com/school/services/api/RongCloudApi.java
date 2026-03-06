@@ -52,5 +52,9 @@ public interface RongCloudApi {
             @RequestParam("userId") String userId,
             @RequestParam("minute") Number minute
     );
+    @PostMapping(value = "/user/unblock.json",
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    String unblock(
+            @RequestParam("userId") String userId);
 
 }

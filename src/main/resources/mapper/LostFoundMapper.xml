@@ -2,9 +2,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.school.mapper.LostFoundMapper">
     <insert id="addLostFound" useGeneratedKeys="true" keyProperty="id">
-        insert into lostFound (title, img, pub_date, content, place, phone, state, stick, lostfoundtype_id, user_id,type)
-        VALUES (#{lostFound.title}, #{lostFound.img}, #{lostFound.pub_date}, #{lostFound.content}, #{lostFound.place}, #{lostFound.phone},
-                #{lostFound.state}, #{lostFound.stick}, #{lostFound.lostfoundtypeId}, #{lostFound.user_id},#{lostFound.type})
+        insert into lostFound (
+            title, img, pub_date, content, place, phone,
+            state, stick, lostfoundtype_id, user_id, type,
+            longitude, latitude  -- 添加这两个字段
+        )
+        VALUES (
+                   #{lostFound.title}, #{lostFound.img}, #{lostFound.pub_date},
+                   #{lostFound.content}, #{lostFound.place}, #{lostFound.phone},
+                   #{lostFound.state}, #{lostFound.stick}, #{lostFound.lostfoundtypeId},
+                   #{lostFound.user_id}, #{lostFound.type},
+                   #{lostFound.longitude}, #{lostFound.latitude} -- 对应实体类中的属性
+               )
 
     </insert>
     <update id="updateState">

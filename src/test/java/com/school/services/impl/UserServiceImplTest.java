@@ -21,6 +21,7 @@ class UserServiceImplTest {
     @Test
         void registerUserToProvider() {
         try {
+            rongCloudApi.unblock("2");
             List<User> userList = userMapper.getalll();
             for (User user : userList) {
 //                String response = rongCloudApi.getToken(String.valueOf(user.getId()), user.getNickname(), user.getPhoto());
