@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.school.mapper.MessageMapper">
+
+    <insert id="insertMessage" useGeneratedKeys="true" keyProperty="msg.id">
+        INSERT INTO message (user_id, content, create_time, state)
+        VALUES (#{msg.userId}, #{msg.content}, #{msg.createTime}, #{msg.state})
+    </insert>
+
+    <select id="getMessageList" resultType="com.school.entity.MessageVO">
+        SELECT
+            m.id,
+            m.user_id as userId,
+            m.content,
+            m.create_time as createTime,
+            u.nickname,
+            u.photo
+        FROM message m
+                 LEFT JOIN user u ON m.user_id = u.id
+        WHERE m.state = 1
+        ORDER BY m.create_time ASC
+    </select>
+
+</mapper>

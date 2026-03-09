@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>校园留言板</title>
+    <style>
+        :root {
+            --primary-color: #259ee2;
+            --light-blue: #e9f5fc;
+            --bg-color: #f7f9fb;
+            --text-main: #2c3e50;
+            --text-sub: #95a5a6;
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: var(--white);
+            text-align: center;
+            padding: 18px 0;
+            font-size: 17px;
+            font-weight: bold;
+            box-shadow: 0 2px 10px rgba(37, 158, 226, 0.2);
+            z-index: 10;
+        }
+
+        .message-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            scroll-behavior: smooth;
+        }
+
+        .msg-card {
+            background-color: var(--white);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .msg-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--primary-color), #5ec3f7);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 12px;
+        }
+
+        .username {
+            font-size: 14px;
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .time {
+            font-size: 11px;
+            color: var(--text-sub);
+        }
+
+        .msg-content {
+            font-size: 14.5px;
+            color: #444;
+            line-height: 1.6;
+            word-wrap: break-word;
+        }
+
+        .emoji-picker {
+            position: absolute;
+            bottom: calc(env(safe-area-inset-bottom, 12px) + 65px);
+            right: 16px;
+            left: 16px;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+            padding: 12px;
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 8px;
+            max-height: 180px;
+            overflow-y: auto;
+            z-index: 100;
+            border: 1px solid #eee;
+            animation: fadeInOut 0.2s ease-out;
+        }
+
+        @keyframes fadeInOut {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .emoji-item {
+            font-size: 24px;
+            text-align: center;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .emoji-item:active {
+            background-color: var(--light-blue);
+        }
+
+        /* 底部输入区域 */
+        .input-area {
+            background-color: var(--white);
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            border-top: 1px solid #eee;
+            padding-bottom: env(safe-area-inset-bottom, 10px);
+        }
+
+        .input-box {
+            flex: 1;
+            background-color: #f1f3f5;
+            border: 1.5px solid transparent;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .input-box:focus {
+            background-color: var(--white);
+            border-color: var(--primary-color);
+        }
+
+        /* 表情按钮和发送按钮的组合 */
+        .action-group {
+            display: flex;
+            align-items: center;
+            margin-left: 8px;
+        }
+
+        .emoji-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            outline: none;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        .emoji-btn img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+        }
+
+        .emoji-btn:active {
+            transform: scale(0.85);
+        }
+
+        .send-btn {
+            margin-left: 5px;
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            height: 38px;
+            padding: 0 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(37, 158, 226, 0.2);
+            white-space: nowrap;
+        }
+
+        .send-btn:active {
+            transform: scale(0.96);
+            background-color: #1d88c5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="emoji-picker" id="emojiPicker"></div>
+
+<div class="message-container" id="msgList">
+    <div class="msg-card">
+        <div class="msg-header">
+            <div class="avatar">博</div>
+            <div class="user-info">
+                <div class="username">系统助手</div>
+                <div class="time">刚刚</div>
+            </div>
+        </div>
+        <div class="msg-content">你好！</div>
+    </div>
+</div>
+
+<div class="input-area">
+    <input type="text" id="userInput" class="input-box" placeholder="留个言吧..." maxlength="200">
+    <div class="action-group">
+        <button class="emoji-btn" id="emojiToggleBtn">
+            <img src="./img/emoji.png" alt="表情">
+        </button>
+        <button class="send-btn" id="sendAction">发送</button>
+    </div>
+</div>
+
+<script>
+    // 解析 URL 中的参数
+    function getQueryVariable(variable) {
+        var reg = new RegExp("([?&])" + variable + "=([^&]*)(&|$)");
+        var r = window.location.href.match(reg);
+        if (r != null) {
+            return decodeURIComponent(r[2]);
+        }
+        return false;
+    }
+    /**
+     * 移植自 Java 的智能时间格式化
+     * @param {string} timeStr 后端返回的时间字符串
+     */
+    function formatCommentTime(timeStr) {
+        if (!timeStr) return "";
+
+        // 解析后端时间（兼容 standard format 或 ISO format）
+        const date = new Date(timeStr);
+        const time = date.getTime();
+        const now = Date.now();
+        const diff = now - time;
+
+        const minute = 60 * 1000;
+        const hour = 60 * minute;
+        const day = 24 * hour;
+
+        if (diff < minute) {
+            return "刚刚";
+        } else if (diff < hour) {
+            return Math.floor(diff / minute) + "分钟前";
+        } else if (diff < day) {
+            return Math.floor(diff / hour) + "小时前";
+        } else {
+            const commentDate = new Date(time);
+            const today = new Date();
+
+            // 判断是否是昨天
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+
+            if (commentDate.toDateString() === yesterday.toDateString()) {
+                const h = String(commentDate.getHours()).padStart(2, '0');
+                const m = String(commentDate.getMinutes()).padStart(2, '0');
+                return `昨天 ${h}:${m}`;
+            }
+
+            const diffDays = Math.floor(diff / day);
+            if (diffDays < 3) {
+                return diffDays + "天前";
+            } else {
+                // 超过3天，显示 M-d
+                return (commentDate.getMonth() + 1) + "-" + commentDate.getDate();
+            }
+        }
+    }
+    // 获取从 Android 传过来的 userId
+    const userIdFromUrl = getQueryVariable("userId");
+
+
+    // 优先使用 URL 传来的 userId，如果没有则找 localStorage
+    let currentUserId = userIdFromUrl || localStorage.getItem('userId');
+
+    if (userIdFromUrl) {
+        localStorage.setItem('userId', userIdFromUrl);
+    }
+
+
+    const msgList = document.getElementById('msgList');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendAction');
+    const emojiPicker = document.getElementById('emojiPicker');
+    const emojiToggleBtn = document.getElementById('emojiToggleBtn');
+
+    const emojis = [
+        '😀','😂','😊','😍','😘','😜','😎','🤩','😏','😔',
+        '😭','😡','🤔','🙄','😬','👍','🙌','👏','🙏','💪',
+        '❤️','✨','🎉','🔥','💯','📚','🎓','🚲','🏫','🌟'
+    ];
+
+    function initEmojis() {
+        emojis.forEach(emoji => {
+            const span = document.createElement('span');
+            span.className = 'emoji-item';
+            span.innerText = emoji;
+            span.onclick = (e) => {
+                e.stopPropagation();
+                userInput.value += emoji;
+                userInput.focus();
+            };
+            emojiPicker.appendChild(span);
+        });
+    }
+
+    initEmojis();
+
+    emojiToggleBtn.onclick = (e) => {
+        e.stopPropagation();
+        emojiPicker.style.display = (emojiPicker.style.display === 'grid') ? 'none' : 'grid';
+    };
+
+    document.body.onclick = (e) => {
+        if (!emojiPicker.contains(e.target) && !emojiToggleBtn.contains(e.target)) {
+            emojiPicker.style.display = 'none';
+        }
+    };
+
+
+    const BASE_URL = '/school/message';
+
+    /**
+     * 加载留言列表
+     */
+    async function fetchMessageList() {
+        try {
+            const response = await fetch(`${BASE_URL}/list`);
+            const res = await response.json();
+            if (res.status === 0 || res.code === 200 || res.data) {
+                renderMessages(res.data);
+            } else {
+                console.error("获取留言失败:", res.msg);
+            }
+        } catch (error) {
+            console.error("网络请求错误:", error);
+        }
+    }
+
+    /**
+     * 渲染留言列表到页面
+     */
+    function renderMessages(messages) {
+        msgList.innerHTML = ''; // 清空现有占位内容
+
+        if (!messages || messages.length === 0) {
+            msgList.innerHTML = '<div style="text-align:center; color:#95a5a6; margin-top: 30px;">暂无留言，快来抢沙发吧~</div>';
+            return;
+        }
+
+        messages.forEach(msg => {
+            const card = document.createElement('div');
+            card.className = 'msg-card';
+
+            // 处理头像展示：如果有头像链接则显示 img，否则显示昵称首字母
+            let avatarContent = '';
+            if (msg.photo && msg.photo.trim() !== '') {
+                avatarContent = `<img src="${msg.photo}" alt="头像" style="width: 100%; height: 100%; border-radius: 8px; object-fit: cover;">`;
+            } else {
+                let initial = msg.nickname ? msg.nickname.charAt(0) : '匿';
+                avatarContent = initial;
+            }
+
+            // 处理时间格式化
+            const timeStr = formatCommentTime(msg.createTime);
+            card.innerHTML = `
+                <div class="msg-header">
+                    <div class="avatar">${avatarContent}</div>
+                    <div class="user-info">
+                        <div class="username">${msg.nickname || '匿名用户'}</div>
+                        <div class="time">${timeStr}</div>
+                    </div>
+                </div>
+                <div class="msg-content">${msg.content}</div>
+            `;
+            msgList.appendChild(card);
+        });
+
+        // 滚动到最底部
+        msgList.scrollTop = msgList.scrollHeight;
+    }
+
+    /**
+     * 发送留言
+     */
+    sendBtn.onclick = async () => {
+        const val = userInput.value.trim();
+        if(!val) {
+            alert("留言内容不能为空哦");
+            return;
+        }
+
+        // 禁用按钮防止重复点击
+        sendBtn.disabled = true;
+        sendBtn.innerText = '发送中...';
+
+        try {
+            const response = await fetch(`${BASE_URL}/add`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: parseInt(currentUserId), // 拿到正确的 userId 并转为整型
+                    content: val
+                })
+            });
+
+            const res = await response.json();
+
+            if (res.status === 0 || res.code === 200 || res.msg === "留言发布成功") {
+                // 发送成功：清空输入框，收起表情包，重新拉取最新留言列表
+                userInput.value = '';
+                emojiPicker.style.display = 'none';
+                fetchMessageList();
+            } else {
+                alert(res.msg || "发布失败");
+            }
+        } catch (error) {
+            console.error("发送留言异常:", error);
+            alert("网络异常，请稍后重试");
+        } finally {
+            // 恢复按钮状态
+            sendBtn.disabled = false;
+            sendBtn.innerText = '发送';
+        }
+    };
+
+    // 支持回车键发送
+    userInput.onkeyup = (e) => {
+        if(e.key === 'Enter') {
+            sendBtn.click();
+        }
+    };
+
+    // 页面加载完成后立即获取一次留言列表
+    window.onload = () => {
+        fetchMessageList();
+    };
+
+</script>
+</body>
+</html>
