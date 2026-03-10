@@ -5,8 +5,8 @@
 <mapper namespace="com.school.mapper.MessageMapper">
 
     <insert id="insertMessage" useGeneratedKeys="true" keyProperty="msg.id">
-        INSERT INTO message (user_id, content, create_time, state)
-        VALUES (#{msg.userId}, #{msg.content}, #{msg.createTime}, #{msg.state})
+        INSERT INTO message (user_id, content, create_time, state,parent_id)
+        VALUES (#{msg.userId}, #{msg.content}, #{msg.createTime}, #{msg.state},#{msg.parentId})
     </insert>
 
     <select id="getMessageList" resultType="com.school.entity.MessageVO">
@@ -15,12 +15,12 @@
             m.user_id as userId,
             m.content,
             m.create_time as createTime,
-            u.nickname,
+            m.parent_id as parentId,  u.nickname,
             u.photo
         FROM message m
                  LEFT JOIN user u ON m.user_id = u.id
         WHERE m.state = 1
-        ORDER BY m.create_time ASC
+        ORDER BY m.create_time DESC
     </select>
 
 </mapper>

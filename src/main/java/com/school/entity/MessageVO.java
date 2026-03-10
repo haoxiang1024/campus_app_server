@@ -1,6 +1,7 @@
 package com.school.entity;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 留言展示视图对象 (包含用户头像和昵称)
@@ -12,6 +13,8 @@ public class MessageVO {
     private Date createTime;
     private String nickname;
     private String photo;
+    private Integer parentId; // 标识是否是子评论
+    private List<MessageVO> replies; // 用于存放该留言下的所有二级评论
 
     @Override
     public String toString() {
@@ -22,7 +25,25 @@ public class MessageVO {
                 ", createTime=" + createTime +
                 ", nickname='" + nickname + '\'' +
                 ", photo='" + photo + '\'' +
+                ", parentId=" + parentId +
+                ", replies=" + replies +
                 '}';
+    }
+
+    public List<MessageVO> getReplies() {
+        return replies;
+    }
+
+    public void setReplies(List<MessageVO> replies) {
+        this.replies = replies;
+    }
+
+    public Integer getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Integer parentId) {
+        this.parentId = parentId;
     }
 
     public Integer getId() {

@@ -11,14 +11,25 @@ public class Message {
     private String content;
     private Date createTime;
     private Integer state;
-
+    private Integer parentId; // 新增：父级ID
     public Message() {}
 
-    public Message(Integer userId, String content, Date createTime, Integer state) {
+
+
+    public Message(Integer userId, String content, Date now, int i, Integer pId) {
         this.userId = userId;
         this.content = content;
-        this.createTime = createTime;
-        this.state = state;
+        this.createTime = now;
+        this.state = i;
+        this.parentId = pId;
+    }
+
+    public Integer getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Integer parentId) {
+        this.parentId = parentId;
     }
 
     @Override
@@ -29,6 +40,7 @@ public class Message {
                 ", content='" + content + '\'' +
                 ", createTime=" + createTime +
                 ", state=" + state +
+                ", parentId=" + parentId +
                 '}';
     }
 

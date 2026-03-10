@@ -10,8 +10,11 @@ import com.school.utils.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class MessageServiceImpl implements MessageService {
@@ -22,15 +25,15 @@ public class MessageServiceImpl implements MessageService {
     @Autowired
     private Util util;
 
-    @Override
-    public ServerResponse addMessage(Integer userId, String content) {
+    public ServerResponse addMessage(Integer userId, String content, Integer parentId) {
         if (content == null || content.trim().isEmpty()) {
             return ServerResponse.createServerResponseByFail("留言内容不能为空");
         }
 
-        // 创建留言对象，默认状态 1 (正常)
         Date now = DateUtil.getTime();
-        Message msg = new Message(userId, content, now, 1);
+        // 如果 parentId 为空，设为 0 作为主楼标识
+        Integer pId = (parentId == null) ? 0 : parentId;
+        Message msg = new Message(userId, content, now, 1, pId);
 
         int result = messageMapper.insertMessage(msg);
         if (result > 0) {
@@ -41,16 +44,34 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public ServerResponse getMessageList() {
-        List<MessageVO> list = messageMapper.getMessageList();
-        if (list != null && !list.isEmpty()) {
-            for (MessageVO vo : list) {
-                if (vo.getPhoto() != null && !vo.getPhoto().isEmpty()) {
-                    String fullPhotoUrl = util.updatePic(vo.getPhoto());
-                    vo.setPhoto(fullPhotoUrl);
-                }
+        List<MessageVO> allList = messageMapper.getMessageList();
+        if (allList == null || allList.isEmpty()) {
+            return ServerResponse.createServerResponseBySuccess(new ArrayList<>(), "获取留言成功");
+        }
+
+        List<MessageVO> rootMessages = new ArrayList<>();
+        List<MessageVO> replyMessages = new ArrayList<>();
+
+        for (MessageVO vo : allList) {
+            if (vo.getPhoto() != null && !vo.getPhoto().isEmpty()) {
+                vo.setPhoto(util.updatePic(vo.getPhoto()));
+            }
+
+            if (vo.getParentId() == null || vo.getParentId() == 0) {
+                rootMessages.add(vo); // 收集主楼
+            } else {
+                replyMessages.add(vo); // 收集评论
             }
         }
 
-        return ServerResponse.createServerResponseBySuccess(list, "获取留言成功");
+        Map<Integer, List<MessageVO>> replyMap = replyMessages.stream()
+                .collect(Collectors.groupingBy(MessageVO::getParentId));
+
+        for (MessageVO root : rootMessages) {
+            List<MessageVO> replies = replyMap.getOrDefault(root.getId(), new ArrayList<>());
+            root.setReplies(replies);
+        }
+
+        return ServerResponse.createServerResponseBySuccess(rootMessages, "获取留言成功");
     }
 }

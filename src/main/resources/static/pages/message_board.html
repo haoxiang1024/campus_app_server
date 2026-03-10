@@ -21,14 +21,22 @@
             font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
-
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
         body {
             background-color: var(--bg-color);
             display: flex;
             flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-            position: relative;
+            overflow: hidden; /* 防止整个 body 滚动 */
+
         }
 
         .header {
@@ -43,10 +51,14 @@
         }
 
         .message-container {
+            height: calc(100vh - 120px);
             flex: 1;
-            overflow-y: auto;
-            padding: 15px;
-            scroll-behavior: smooth;
+            overflow-y: scroll !important;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: none;
+            min-height: 0;
+            padding: 15px 15px 30px 15px;
+            overscroll-behavior-y: contain;
         }
 
         .msg-card {
@@ -82,6 +94,10 @@
             margin-right: 12px;
         }
 
+        .user-info {
+            flex: 1;
+        }
+
         .username {
             font-size: 14px;
             color: var(--text-main);
@@ -99,6 +115,68 @@
             line-height: 1.6;
             word-wrap: break-word;
         }
+
+        /* --- 新增：盖楼评论区样式 --- */
+        .replies-container {
+            margin-top: 12px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+
+        .reply-item {
+            font-size: 13.5px;
+            line-height: 1.5;
+            margin-bottom: 8px;
+            word-wrap: break-word;
+        }
+
+        .reply-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .reply-user {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-right: 4px;
+            cursor: pointer;
+        }
+
+        .reply-content {
+            color: #333;
+        }
+
+        .reply-time {
+            font-size: 11px;
+            color: var(--text-sub);
+            margin-left: 6px;
+        }
+
+        /* 底部交互栏（回复按钮等） */
+        .msg-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--text-sub);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .action-btn:active {
+            background-color: #f1f3f5;
+            color: var(--primary-color);
+        }
+        /* -------------------------- */
 
         .emoji-picker {
             position: absolute;
@@ -138,13 +216,31 @@
         }
 
         /* 底部输入区域 */
-        .input-area {
+        .input-wrapper {
             background-color: var(--white);
+            border-top: 1px solid #eee;
+            padding-bottom: env(safe-area-inset-bottom, 0);
+        }
+
+        /* 回复提示条 */
+        .reply-hint-bar {
+            display: none;
+            padding: 8px 12px 0 12px;
+            font-size: 12px;
+            color: var(--primary-color);
+            align-items: center;
+            justify-content: space-between;
+        }
+        .reply-hint-bar .cancel-reply {
+            color: var(--text-sub);
+            cursor: pointer;
+            padding: 2px 5px;
+        }
+
+        .input-area {
             padding: 10px 12px;
             display: flex;
             align-items: center;
-            border-top: 1px solid #eee;
-            padding-bottom: env(safe-area-inset-bottom, 10px);
         }
 
         .input-box {
@@ -163,7 +259,6 @@
             border-color: var(--primary-color);
         }
 
-        /* 表情按钮和发送按钮的组合 */
         .action-group {
             display: flex;
             align-items: center;
@@ -218,29 +313,29 @@
 <div class="emoji-picker" id="emojiPicker"></div>
 
 <div class="message-container" id="msgList">
-    <div class="msg-card">
-        <div class="msg-header">
-            <div class="avatar">博</div>
-            <div class="user-info">
-                <div class="username">系统助手</div>
-                <div class="time">刚刚</div>
-            </div>
-        </div>
-        <div class="msg-content">你好！</div>
-    </div>
 </div>
 
-<div class="input-area">
-    <input type="text" id="userInput" class="input-box" placeholder="留个言吧..." maxlength="200">
-    <div class="action-group">
-        <button class="emoji-btn" id="emojiToggleBtn">
-            <img src="./img/emoji.png" alt="表情">
-        </button>
-        <button class="send-btn" id="sendAction">发送</button>
+<div class="input-wrapper">
+    <div class="reply-hint-bar" id="replyHintBar">
+        <span id="replyHintText">正在回复 @某人</span>
+        <span class="cancel-reply" onclick="cancelReply()">取消回复</span>
+    </div>
+
+    <div class="input-area">
+        <input type="text" id="userInput" class="input-box" placeholder="留个言吧..." maxlength="200">
+        <div class="action-group">
+            <button class="emoji-btn" id="emojiToggleBtn">
+                <img src="./img/emoji.png" alt="表情">
+            </button>
+            <button class="send-btn" id="sendAction">发送</button>
+        </div>
     </div>
 </div>
 
 <script>
+    // targetParentId 为空时代表发一级留言；有值时代表发二级评论。
+    let targetParentId = null;
+
     // 解析 URL 中的参数
     function getQueryVariable(variable) {
         var reg = new RegExp("([?&])" + variable + "=([^&]*)(&|$)");
@@ -250,15 +345,16 @@
         }
         return false;
     }
+
     /**
-     * 移植自 Java 的智能时间格式化
-     * @param {string} timeStr 后端返回的时间字符串
+     * 智能时间格式化 (主楼和评论通用)
      */
     function formatCommentTime(timeStr) {
         if (!timeStr) return "";
-
-        // 解析后端时间（兼容 standard format 或 ISO format）
         const date = new Date(timeStr);
+        // 如果后端返回时间格式异常导致解析为 NaN，原样返回
+        if (isNaN(date.getTime())) return timeStr;
+
         const time = date.getTime();
         const now = Date.now();
         const diff = now - time;
@@ -277,7 +373,6 @@
             const commentDate = new Date(time);
             const today = new Date();
 
-            // 判断是否是昨天
             const yesterday = new Date(today);
             yesterday.setDate(today.getDate() - 1);
 
@@ -291,35 +386,33 @@
             if (diffDays < 3) {
                 return diffDays + "天前";
             } else {
-                // 超过3天，显示 M-d
                 return (commentDate.getMonth() + 1) + "-" + commentDate.getDate();
             }
         }
     }
-    // 获取从 Android 传过来的 userId
+
+    // 获取 userId
     const userIdFromUrl = getQueryVariable("userId");
-
-
-    // 优先使用 URL 传来的 userId，如果没有则找 localStorage
     let currentUserId = userIdFromUrl || localStorage.getItem('userId');
-
     if (userIdFromUrl) {
         localStorage.setItem('userId', userIdFromUrl);
     }
 
-
+    // DOM 元素
     const msgList = document.getElementById('msgList');
     const userInput = document.getElementById('userInput');
     const sendBtn = document.getElementById('sendAction');
     const emojiPicker = document.getElementById('emojiPicker');
     const emojiToggleBtn = document.getElementById('emojiToggleBtn');
+    const replyHintBar = document.getElementById('replyHintBar');
+    const replyHintText = document.getElementById('replyHintText');
 
+    // 表情包初始化
     const emojis = [
         '😀','😂','😊','😍','😘','😜','😎','🤩','😏','😔',
         '😭','😡','🤔','🙄','😬','👍','🙌','👏','🙏','💪',
         '❤️','✨','🎉','🔥','💯','📚','🎓','🚲','🏫','🌟'
     ];
-
     function initEmojis() {
         emojis.forEach(emoji => {
             const span = document.createElement('span');
@@ -333,7 +426,6 @@
             emojiPicker.appendChild(span);
         });
     }
-
     initEmojis();
 
     emojiToggleBtn.onclick = (e) => {
@@ -347,8 +439,39 @@
         }
     };
 
-
     const BASE_URL = '/school/message';
+
+    /**
+     * 触发回复动作
+     * @param {number|string} parentId 主楼留言的 ID (保证只有两级)
+     * @param {string} nickname 被回复者的昵称
+     * @param {boolean} isSubReply 是否是在回复一个二级评论
+     */
+    function handleReply(parentId, nickname, isSubReply) {
+        targetParentId = parentId;
+        replyHintBar.style.display = 'flex';
+        replyHintText.innerText = `正在回复 @${nickname}`;
+
+        if (isSubReply) {
+            userInput.value = `回复 @${nickname}: `;
+        } else {
+            userInput.value = '';
+        }
+
+        userInput.focus();
+        emojiPicker.style.display = 'none';
+    }
+
+    /**
+     * 取消回复状态，切回发布一级留言模式
+     */
+    function cancelReply() {
+        targetParentId = null;
+        replyHintBar.style.display = 'none';
+        userInput.value = '';
+        userInput.placeholder = '留个言吧...';
+    }
+
 
     /**
      * 加载留言列表
@@ -368,10 +491,10 @@
     }
 
     /**
-     * 渲染留言列表到页面
+     * 渲染留言列表到页面 (支持二级树)
      */
     function renderMessages(messages) {
-        msgList.innerHTML = ''; // 清空现有占位内容
+        msgList.innerHTML = '';
 
         if (!messages || messages.length === 0) {
             msgList.innerHTML = '<div style="text-align:center; color:#95a5a6; margin-top: 30px;">暂无留言，快来抢沙发吧~</div>';
@@ -382,7 +505,7 @@
             const card = document.createElement('div');
             card.className = 'msg-card';
 
-            // 处理头像展示：如果有头像链接则显示 img，否则显示昵称首字母
+            // 头像
             let avatarContent = '';
             if (msg.photo && msg.photo.trim() !== '') {
                 avatarContent = `<img src="${msg.photo}" alt="头像" style="width: 100%; height: 100%; border-radius: 8px; object-fit: cover;">`;
@@ -391,79 +514,109 @@
                 avatarContent = initial;
             }
 
-            // 处理时间格式化
             const timeStr = formatCommentTime(msg.createTime);
+            const authorName = msg.nickname || '匿名用户';
+
+            let repliesHtml = '';
+            if (msg.replies && msg.replies.length > 0) {
+                repliesHtml += `<div class="replies-container">`;
+                msg.replies.forEach(reply => {
+                    const replyTimeStr = formatCommentTime(reply.createTime);
+                    const replyAuthor = reply.nickname || '匿名用户';
+
+                    repliesHtml += `
+                        <div class="reply-item">
+                            <span class="reply-user" onclick="handleReply(${msg.id}, '${replyAuthor}', true)">${replyAuthor}:</span>
+                            <span class="reply-content">${reply.content}</span>
+                            <span class="reply-time">${replyTimeStr}</span>
+                        </div>
+                    `;
+                });
+                repliesHtml += `</div>`;
+            }
+
             card.innerHTML = `
                 <div class="msg-header">
                     <div class="avatar">${avatarContent}</div>
                     <div class="user-info">
-                        <div class="username">${msg.nickname || '匿名用户'}</div>
+                        <div class="username">${authorName}</div>
                         <div class="time">${timeStr}</div>
                     </div>
                 </div>
                 <div class="msg-content">${msg.content}</div>
+
+                ${repliesHtml} <div class="msg-actions">
+                    <button class="action-btn" onclick="handleReply(${msg.id}, '${authorName}', false)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                        回复
+                    </button>
+                </div>
             `;
             msgList.appendChild(card);
         });
 
-        // 滚动到最底部
-        msgList.scrollTop = msgList.scrollHeight;
+        setTimeout(() => {
+            msgList.scrollTop = msgList.scrollHeight;
+        }, 100);
     }
 
     /**
-     * 发送留言
+     * 发送留言/评论
      */
     sendBtn.onclick = async () => {
         const val = userInput.value.trim();
         if(!val) {
-            alert("留言内容不能为空哦");
+            alert("内容不能为空哦");
             return;
         }
 
-        // 禁用按钮防止重复点击
         sendBtn.disabled = true;
         sendBtn.innerText = '发送中...';
+
+        // 构建请求体
+        const requestBody = {
+            userId: parseInt(currentUserId),
+            content: val
+        };
+
+        // 如果 targetParentId 不为 null，说明是一条二级评论
+        // 请将 `parentId` 替换为你后端实际接收的参数名，如 `messageId` 等
+        if (targetParentId) {
+            requestBody.parentId = targetParentId;
+        }
 
         try {
             const response = await fetch(`${BASE_URL}/add`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    userId: parseInt(currentUserId), // 拿到正确的 userId 并转为整型
-                    content: val
-                })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestBody)
             });
 
             const res = await response.json();
 
             if (res.status === 0 || res.code === 200 || res.msg === "留言发布成功") {
-                // 发送成功：清空输入框，收起表情包，重新拉取最新留言列表
-                userInput.value = '';
+                // 发送成功后重置状态
+                cancelReply();
                 emojiPicker.style.display = 'none';
-                fetchMessageList();
+                fetchMessageList(); // 重新拉取列表
             } else {
                 alert(res.msg || "发布失败");
             }
         } catch (error) {
-            console.error("发送留言异常:", error);
+            console.error("发送异常:", error);
             alert("网络异常，请稍后重试");
         } finally {
-            // 恢复按钮状态
             sendBtn.disabled = false;
             sendBtn.innerText = '发送';
         }
     };
 
-    // 支持回车键发送
     userInput.onkeyup = (e) => {
         if(e.key === 'Enter') {
             sendBtn.click();
         }
     };
 
-    // 页面加载完成后立即获取一次留言列表
     window.onload = () => {
         fetchMessageList();
     };

@@ -20,8 +20,9 @@ public class MessageController {
     public ServerResponse addMessage(@RequestBody java.util.Map<String, Object> params) {
         Integer userId = (Integer) params.get("userId");
         String content = (String) params.get("content");
-        // 注意：实际项目中 userId 最好从 token 中解析获取，防止伪造
-        return messageService.addMessage(userId, content);
+        Integer parentId = (Integer) params.get("parentId");
+
+        return messageService.addMessage(userId, content, parentId);
     }
 
     /**

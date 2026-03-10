@@ -9,7 +9,7 @@ public interface MessageService {
      * @param content 留言内容
      * @return 操作结果
      */
-    ServerResponse addMessage(Integer userId, String content);
+    ServerResponse addMessage(Integer userId, String content, Integer parentId);
 
     /**
      * 获取留言板列表
