@@ -22,21 +22,15 @@
             -webkit-tap-highlight-color: transparent;
         }
         html, body {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            position: fixed;
-            top: 0;
-            left: 0;
-        }
-        body {
+            height: auto;
+            min-height: 100%;
             background-color: var(--bg-color);
+        }
+
+        body {
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* 防止整个 body 滚动 */
-
+            padding-bottom: 80px;
         }
 
         .header {
@@ -51,14 +45,8 @@
         }
 
         .message-container {
-            height: calc(100vh - 120px);
-            flex: 1;
-            overflow-y: scroll !important;
-            -webkit-overflow-scrolling: touch;
-            overscroll-behavior: none;
-            min-height: 0;
-            padding: 15px 15px 30px 15px;
-            overscroll-behavior-y: contain;
+            width: 100%;
+            padding: 15px;
         }
 
         .msg-card {
@@ -116,7 +104,6 @@
             word-wrap: break-word;
         }
 
-        /* --- 新增：盖楼评论区样式 --- */
         .replies-container {
             margin-top: 12px;
             background-color: #f8f9fa;
@@ -138,7 +125,6 @@
         .reply-user {
             color: var(--primary-color);
             font-weight: 600;
-            margin-right: 4px;
             cursor: pointer;
         }
 
@@ -152,7 +138,6 @@
             margin-left: 6px;
         }
 
-        /* 底部交互栏（回复按钮等） */
         .msg-actions {
             display: flex;
             justify-content: flex-end;
@@ -176,11 +161,10 @@
             background-color: #f1f3f5;
             color: var(--primary-color);
         }
-        /* -------------------------- */
 
         .emoji-picker {
-            position: absolute;
-            bottom: calc(env(safe-area-inset-bottom, 12px) + 65px);
+            position: fixed;
+            bottom: calc(env(safe-area-inset-bottom, 12px) + 65px); /* 距离底部的高度，如果觉得离输入框太远或太近，可以微调这个 65px */
             right: 16px;
             left: 16px;
             background: var(--white);
@@ -192,7 +176,7 @@
             gap: 8px;
             max-height: 180px;
             overflow-y: auto;
-            z-index: 100;
+            z-index: 1001;
             border: 1px solid #eee;
             animation: fadeInOut 0.2s ease-out;
         }
@@ -215,14 +199,18 @@
             background-color: var(--light-blue);
         }
 
-        /* 底部输入区域 */
         .input-wrapper {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
             background-color: var(--white);
             border-top: 1px solid #eee;
+            z-index: 1000;
             padding-bottom: env(safe-area-inset-bottom, 0);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
         }
 
-        /* 回复提示条 */
         .reply-hint-bar {
             display: none;
             padding: 8px 12px 0 12px;
@@ -231,6 +219,7 @@
             align-items: center;
             justify-content: space-between;
         }
+
         .reply-hint-bar .cancel-reply {
             color: var(--text-sub);
             cursor: pointer;
@@ -335,8 +324,9 @@
 <script>
     // targetParentId 为空时代表发一级留言；有值时代表发二级评论。
     let targetParentId = null;
+    // targetReplyUserId 记录被回复人的 ID
+    let targetReplyUserId = null;
 
-    // 解析 URL 中的参数
     function getQueryVariable(variable) {
         var reg = new RegExp("([?&])" + variable + "=([^&]*)(&|$)");
         var r = window.location.href.match(reg);
@@ -346,13 +336,9 @@
         return false;
     }
 
-    /**
-     * 智能时间格式化 (主楼和评论通用)
-     */
     function formatCommentTime(timeStr) {
         if (!timeStr) return "";
         const date = new Date(timeStr);
-        // 如果后端返回时间格式异常导致解析为 NaN，原样返回
         if (isNaN(date.getTime())) return timeStr;
 
         const time = date.getTime();
@@ -391,14 +377,12 @@
         }
     }
 
-    // 获取 userId
     const userIdFromUrl = getQueryVariable("userId");
     let currentUserId = userIdFromUrl || localStorage.getItem('userId');
     if (userIdFromUrl) {
         localStorage.setItem('userId', userIdFromUrl);
     }
 
-    // DOM 元素
     const msgList = document.getElementById('msgList');
     const userInput = document.getElementById('userInput');
     const sendBtn = document.getElementById('sendAction');
@@ -407,7 +391,6 @@
     const replyHintBar = document.getElementById('replyHintBar');
     const replyHintText = document.getElementById('replyHintText');
 
-    // 表情包初始化
     const emojis = [
         '😀','😂','😊','😍','😘','😜','😎','🤩','😏','😔',
         '😭','😡','🤔','🙄','😬','👍','🙌','👏','🙏','💪',
@@ -444,20 +427,18 @@
     /**
      * 触发回复动作
      * @param {number|string} parentId 主楼留言的 ID (保证只有两级)
+     * @param {number|string} replyUserId 被回复者的用户 ID
      * @param {string} nickname 被回复者的昵称
-     * @param {boolean} isSubReply 是否是在回复一个二级评论
      */
-    function handleReply(parentId, nickname, isSubReply) {
+    function handleReply(parentId, replyUserId, nickname) {
         targetParentId = parentId;
+        targetReplyUserId = replyUserId;
+
         replyHintBar.style.display = 'flex';
         replyHintText.innerText = `正在回复 @${nickname}`;
 
-        if (isSubReply) {
-            userInput.value = `回复 @${nickname}: `;
-        } else {
-            userInput.value = '';
-        }
-
+        // 输入框保持干净，不用再塞入文字前缀
+        userInput.value = '';
         userInput.focus();
         emojiPicker.style.display = 'none';
     }
@@ -467,11 +448,11 @@
      */
     function cancelReply() {
         targetParentId = null;
+        targetReplyUserId = null;
         replyHintBar.style.display = 'none';
         userInput.value = '';
         userInput.placeholder = '留个言吧...';
     }
-
 
     /**
      * 加载留言列表
@@ -491,7 +472,7 @@
     }
 
     /**
-     * 渲染留言列表到页面 (支持二级树)
+     * 渲染留言列表到页面
      */
     function renderMessages(messages) {
         msgList.innerHTML = '';
@@ -524,9 +505,21 @@
                     const replyTimeStr = formatCommentTime(reply.createTime);
                     const replyAuthor = reply.nickname || '匿名用户';
 
+                    // 构建 A ▷ B 样式
+                    // A 的元素，点击 A 可以回复 A
+                    let authorDisplay = `<span class="reply-user" onclick="handleReply(${msg.id}, ${reply.userId}, '${replyAuthor}')">${replyAuthor}</span>`;
+
+                    // 如果存在 B (被回复人)，则加上 ▷ B，点击 B 可以回复 B
+                    if (reply.replyNickname) {
+                        authorDisplay += `
+                            <span style="color: var(--text-sub); margin: 0 4px; font-size: 11px;">▷</span>
+                            <span class="reply-user" onclick="handleReply(${msg.id}, ${reply.replyUserId}, '${reply.replyNickname}')">${reply.replyNickname}</span>
+                        `;
+                    }
+
                     repliesHtml += `
                         <div class="reply-item">
-                            <span class="reply-user" onclick="handleReply(${msg.id}, '${replyAuthor}', true)">${replyAuthor}:</span>
+                            ${authorDisplay}:
                             <span class="reply-content">${reply.content}</span>
                             <span class="reply-time">${replyTimeStr}</span>
                         </div>
@@ -545,8 +538,9 @@
                 </div>
                 <div class="msg-content">${msg.content}</div>
 
-                ${repliesHtml} <div class="msg-actions">
-                    <button class="action-btn" onclick="handleReply(${msg.id}, '${authorName}', false)">
+                ${repliesHtml}
+                <div class="msg-actions">
+                    <button class="action-btn" onclick="handleReply(${msg.id}, ${msg.userId}, '${authorName}')">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                         回复
                     </button>
@@ -573,16 +567,18 @@
         sendBtn.disabled = true;
         sendBtn.innerText = '发送中...';
 
-        // 构建请求体
         const requestBody = {
             userId: parseInt(currentUserId),
             content: val
         };
 
-        // 如果 targetParentId 不为 null，说明是一条二级评论
-        // 请将 `parentId` 替换为你后端实际接收的参数名，如 `messageId` 等
         if (targetParentId) {
             requestBody.parentId = targetParentId;
+        }
+
+        // 携带上被回复人的 ID
+        if (targetReplyUserId) {
+            requestBody.replyUserId = targetReplyUserId;
         }
 
         try {
@@ -595,10 +591,9 @@
             const res = await response.json();
 
             if (res.status === 0 || res.code === 200 || res.msg === "留言发布成功") {
-                // 发送成功后重置状态
                 cancelReply();
                 emojiPicker.style.display = 'none';
-                fetchMessageList(); // 重新拉取列表
+                fetchMessageList();
             } else {
                 alert(res.msg || "发布失败");
             }
@@ -620,7 +615,12 @@
     window.onload = () => {
         fetchMessageList();
     };
-
+    document.addEventListener('touchmove', function(e) {
+        const isScrollableArea = e.target.closest('.message-container') || e.target.closest('.emoji-picker');
+        if (!isScrollableArea) {
+            e.preventDefault();
+        }
+    }, { passive: false });
 </script>
 </body>
 </html>

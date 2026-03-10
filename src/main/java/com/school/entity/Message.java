@@ -11,17 +11,34 @@ public class Message {
     private String content;
     private Date createTime;
     private Integer state;
-    private Integer parentId; // 新增：父级ID
+    private Integer parentId;
+    private Integer replyUserId;
+    private String rejectReason;
     public Message() {}
 
+    public String getRejectReason() {
+        return rejectReason;
+    }
 
+    public void setRejectReason(String rejectReason) {
+        this.rejectReason = rejectReason;
+    }
 
-    public Message(Integer userId, String content, Date now, int i, Integer pId) {
+    public Integer getReplyUserId() {
+        return replyUserId;
+    }
+
+    public void setReplyUserId(Integer replyUserId) {
+        this.replyUserId = replyUserId;
+    }
+
+    public Message(Integer userId, String content, Date now, int i, Integer pId, Integer replyUserId) {
         this.userId = userId;
         this.content = content;
         this.createTime = now;
         this.state = i;
         this.parentId = pId;
+        this.replyUserId = replyUserId;
     }
 
     public Integer getParentId() {

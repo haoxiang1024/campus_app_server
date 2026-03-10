@@ -21,8 +21,9 @@ public class MessageController {
         Integer userId = (Integer) params.get("userId");
         String content = (String) params.get("content");
         Integer parentId = (Integer) params.get("parentId");
+        Integer replyUserId = (Integer) params.get("replyUserId"); // 新增接收参数
 
-        return messageService.addMessage(userId, content, parentId);
+        return messageService.addMessage(userId, content, parentId, replyUserId);
     }
 
     /**

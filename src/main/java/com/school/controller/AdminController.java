@@ -3,6 +3,7 @@ package com.school.controller;
 import com.school.entity.User;
 import com.school.services.api.AdminService;
 import com.school.services.api.LostFoundService;
+import com.school.services.api.MessageService;
 import com.school.services.api.UserService;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
@@ -27,7 +28,8 @@ public class AdminController {
     private Util util;                   // 工具类
     @Autowired
     private LostFoundService lostFoundService;  // 失物招领服务
-    
+    @Autowired
+    private MessageService messageService;
     /**
      * 获取所有用户数据
      * @return 返回ServerResponse对象，包含所有用户信息
@@ -318,5 +320,35 @@ public class AdminController {
     @PostMapping("/deleteTypeBatch")
     public ServerResponse deleteTypeBatch(@RequestParam("ids") String ids) {
         return adminService.deleteTypeBatch(ids);
+    }
+
+
+
+    // 分页获取留言列表
+    @ResponseBody
+    @GetMapping("/getMessageByPage")
+    public ServerResponse getMessageByPage(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Integer state) {
+        return messageService.getAdminMessagePage(page, pageSize, keyword, state);
+    }
+
+    // 审核：修改留言状态
+    @ResponseBody
+    @PostMapping("/updateMessageStatus")
+    public ServerResponse updateMessageStatus(
+            @RequestParam Integer messageId,
+            @RequestParam Integer state,
+            @RequestParam(required = false) String reason) {
+        return messageService.updateCommentStatus(messageId, state, reason);
+    }
+
+    // 删除留言
+    @ResponseBody
+    @PostMapping("/deleteMessage")
+    public ServerResponse deleteMessage(@RequestParam Integer messageId) {
+        return messageService.deleteCommentById(messageId);
     }
 }

@@ -15,6 +15,42 @@ public class MessageVO {
     private String photo;
     private Integer parentId; // 标识是否是子评论
     private List<MessageVO> replies; // 用于存放该留言下的所有二级评论
+    private Integer replyUserId;    // 被回复人ID
+    private String replyNickname;   // 被回复人昵称（通过联表查询获得）
+    private String rejectReason;
+    private Integer state;
+
+    public Integer getState() {
+        return state;
+    }
+
+    public void setState(Integer state) {
+        this.state = state;
+    }
+
+    public Integer getReplyUserId() {
+        return replyUserId;
+    }
+
+    public String getRejectReason() {
+        return rejectReason;
+    }
+
+    public void setRejectReason(String rejectReason) {
+        this.rejectReason = rejectReason;
+    }
+
+    public void setReplyUserId(Integer replyUserId) {
+        this.replyUserId = replyUserId;
+    }
+
+    public String getReplyNickname() {
+        return replyNickname;
+    }
+
+    public void setReplyNickname(String replyNickname) {
+        this.replyNickname = replyNickname;
+    }
 
     @Override
     public String toString() {

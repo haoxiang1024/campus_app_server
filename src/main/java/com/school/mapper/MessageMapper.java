@@ -25,4 +25,18 @@ public interface MessageMapper {
      * @return 留言视图对象列表
      */
     List<MessageVO> getMessageList();
+    //  查询总数（用于分页）
+    int countAdminMessages(@Param("keyword") String keyword, @Param("state") Integer state);
+
+    //  分页获取留言列表
+    List<MessageVO> getAdminMessageList(@Param("offset") int offset,
+                                        @Param("pageSize") int pageSize,
+                                        @Param("keyword") String keyword,
+                                        @Param("state") Integer state);
+
+    //  更新留言状态与原因
+    int updateMessageState(@Param("id") Integer id, @Param("state") Integer state, @Param("reason") String reason);
+
+    //  删除留言
+    int deleteMessageById(@Param("id") Integer id);
 }

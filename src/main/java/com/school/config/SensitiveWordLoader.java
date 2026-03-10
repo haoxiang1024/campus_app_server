@@ -25,6 +25,5 @@ public class SensitiveWordLoader {
     public void refreshWordCount() {
         List<String> words = sensitiveWordMapper.getWords();
         sensitiveWordUtil.initKeyWord(new HashSet<>(words));
-        System.out.println("DFA敏感词库加载完成，词数：" + words.size());
     }
 }

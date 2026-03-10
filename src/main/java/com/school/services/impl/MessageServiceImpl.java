@@ -5,15 +5,13 @@ import com.school.entity.MessageVO;
 import com.school.mapper.MessageMapper;
 import com.school.services.api.MessageService;
 import com.school.utils.DateUtil;
+import com.school.utils.SensitiveWordUtil;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,20 +19,27 @@ public class MessageServiceImpl implements MessageService {
 
     @Autowired
     private MessageMapper messageMapper;
-
+    @Autowired
+    private SensitiveWordUtil sensitiveWordUtil;
     @Autowired
     private Util util;
 
-    public ServerResponse addMessage(Integer userId, String content, Integer parentId) {
+    public ServerResponse addMessage(Integer userId, String content, Integer parentId, Integer replyUserId) {
         if (content == null || content.trim().isEmpty()) {
             return ServerResponse.createServerResponseByFail("留言内容不能为空");
         }
 
         Date now = DateUtil.getTime();
-        // 如果 parentId 为空，设为 0 作为主楼标识
         Integer pId = (parentId == null) ? 0 : parentId;
-        Message msg = new Message(userId, content, now, 1, pId);
 
+        // 传入 replyUserId
+        //敏感词检测
+        if(sensitiveWordUtil.contains(content)){
+            Message msg = new Message(userId, content, now, 2, pId, replyUserId);//驳回
+            messageMapper.insertMessage(msg);
+            return ServerResponse.createServerResponseByFail("留言含敏感词！请修改后再次留言!");
+        }
+        Message msg = new Message(userId, content, now, 1, pId, replyUserId);//审核
         int result = messageMapper.insertMessage(msg);
         if (result > 0) {
             return ServerResponse.createServerResponseBySuccess("留言发布成功");
@@ -73,5 +78,45 @@ public class MessageServiceImpl implements MessageService {
         }
 
         return ServerResponse.createServerResponseBySuccess(rootMessages, "获取留言成功");
+    }
+
+    @Override
+    public ServerResponse getAdminMessagePage(int page, int pageSize, String keyword, Integer state) {
+        int offset = (page - 1) * pageSize;
+
+        // 查询总数
+        int total = messageMapper.countAdminMessages(keyword, state);
+
+        // 查询当前页数据
+        List<MessageVO> list = messageMapper.getAdminMessageList(offset, pageSize, keyword, state);
+
+        // 计算总页数
+        int totalPages = (int) Math.ceil((double) total / pageSize);
+        if (totalPages == 0) totalPages = 1;
+        // 封装前端需要的分页对象
+        Map<String, Object> data = new HashMap<>();
+        data.put("list", list);
+        data.put("total", total);
+        data.put("totalPages", totalPages);
+
+        return ServerResponse.createServerResponseBySuccess(data, "获取成功");
+    }
+
+    @Override
+    public ServerResponse updateCommentStatus(Integer commentId, Integer state, String reason) {
+        int row = messageMapper.updateMessageState(commentId, state, reason);
+        if (row > 0) {
+            return ServerResponse.createServerResponseBySuccess("状态更新成功");
+        }
+        return ServerResponse.createServerResponseByFail("更新失败");
+    }
+
+    @Override
+    public ServerResponse deleteCommentById(Integer commentId) {
+        int row = messageMapper.deleteMessageById(commentId);
+        if (row > 0) {
+            return ServerResponse.createServerResponseBySuccess("删除成功");
+        }
+        return ServerResponse.createServerResponseByFail("删除失败");
     }
 }

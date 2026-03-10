@@ -29,7 +29,6 @@ public class SpringMvcSupport implements WebMvcConfigurer {
         registry.addResourceHandler("/upload/**")
                 .addResourceLocations(locations);
 
-        System.out.println("文件上传映射路径: " + locations);
     }
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
