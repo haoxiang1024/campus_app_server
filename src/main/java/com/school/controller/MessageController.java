@@ -33,4 +33,23 @@ public class MessageController {
     public ServerResponse getMessageList() {
         return messageService.getMessageList();
     }
+
+    /**
+     * 根据用户ID获取留言列表
+     * GET /message/userList?userId=1
+     */
+    @GetMapping("/userList")
+    public ServerResponse getMessagesByUserId(@RequestParam("userId") Integer userId) {
+        return messageService.getMessagesByUserId(userId);
+    }
+
+    /**
+     * 删除留言
+     * DELETE /message/{id}
+     */
+    @DeleteMapping("/{id}")
+    public ServerResponse deleteMessage(@PathVariable("id") Integer id) {
+        // 直接调用已经写好的删除服务逻辑
+        return messageService.deleteCommentById(id);
+    }
 }

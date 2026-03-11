@@ -39,4 +39,11 @@ public interface MessageMapper {
 
     //  删除留言
     int deleteMessageById(@Param("id") Integer id);
+
+    /**
+     * 根据用户ID获取留言列表
+     * @param userId 用户ID
+     * @return 留言视图对象列表
+     */
+    List<MessageVO> getMessagesByUserId(@Param("userId") Integer userId);
 }

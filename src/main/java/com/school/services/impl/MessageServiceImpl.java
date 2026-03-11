@@ -119,4 +119,26 @@ public class MessageServiceImpl implements MessageService {
         }
         return ServerResponse.createServerResponseByFail("删除失败");
     }
+
+    @Override
+    public ServerResponse getMessagesByUserId(Integer userId) {
+        if (userId == null) {
+            return ServerResponse.createServerResponseByFail("用户ID不能为空");
+        }
+
+        List<MessageVO> list = messageMapper.getMessagesByUserId(userId);
+
+        if (list == null || list.isEmpty()) {
+            return ServerResponse.createServerResponseBySuccess(new ArrayList<>(), "暂无留言");
+        }
+
+        // 处理头像图片路径
+        for (MessageVO vo : list) {
+            if (vo.getPhoto() != null && !vo.getPhoto().isEmpty()) {
+                vo.setPhoto(util.updatePic(vo.getPhoto()));
+            }
+        }
+
+        return ServerResponse.createServerResponseBySuccess(list, "获取留言成功");
+    }
 }

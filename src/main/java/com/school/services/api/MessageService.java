@@ -40,4 +40,11 @@ public interface MessageService {
      * @return 操作结果
      */
     ServerResponse deleteCommentById(Integer commentId);
+
+    /**
+     * 根据用户ID获取留言列表
+     * @param userId 用户ID
+     * @return 留言列表结果
+     */
+    ServerResponse getMessagesByUserId(Integer userId);
 }
