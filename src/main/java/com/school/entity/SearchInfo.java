@@ -52,6 +52,15 @@ public class SearchInfo {
 
     /** 发布用户昵称 */
     private String nickname;
+    private String type;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     /**
      * 默认构造函数
@@ -59,24 +68,7 @@ public class SearchInfo {
     public SearchInfo() {
     }
 
-    /**
-     * 全参数构造函数
-     * 
-     * @param id 搜索信息ID
-     * @param title 标题
-     * @param img 图片URL
-     * @param pub_date 发布时间
-     * @param content 内容描述
-     * @param place 地点
-     * @param phone 联系电话
-     * @param state 状态
-     * @param stick 是否置顶
-     * @param lostfoundtype_id 类型ID
-     * @param lostfoundtype 类型对象
-     * @param user_id 用户ID
-     * @param nickname 用户昵称
-     */
-    public SearchInfo(Integer id, String title, String img, Date pub_date, String content, String place, String phone, String state, Integer stick, Integer lostfoundtype_id, LostFoundType lostfoundtype, Integer user_id, String nickname) {
+    public SearchInfo(Integer id, String title, String img, Date pub_date, String content, String place, String phone, String state, Integer stick, Integer lostfoundtype_id, LostFoundType lostfoundtype, Integer user_id, String nickname, String type) {
         this.id = id;
         this.title = title;
         this.img = img;
@@ -90,6 +82,7 @@ public class SearchInfo {
         this.lostfoundtype = lostfoundtype;
         this.user_id = user_id;
         this.nickname = nickname;
+        this.type = type;
     }
 
     /**
@@ -329,6 +322,7 @@ public class SearchInfo {
                 ", lostfoundtype=" + lostfoundtype +
                 ", user_id=" + user_id +
                 ", nickname='" + nickname + '\'' +
+                ", type='" + type + '\'' +
                 '}';
     }
 }
