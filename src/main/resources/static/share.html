@@ -3,29 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>失物招领详情</title>
+    <title id="html-title">校园物品详情</title>
     <style>
         body { text-align: center; padding: 50px 20px; font-family: sans-serif; background-color: #f5f6f9;}
         h2 { color: #333; }
         .btn { display: inline-block; margin-top: 30px; padding: 12px 24px; background-color: #0099FF; color: white; text-decoration: none; border-radius: 6px; font-size: 16px; }
         .tip { margin-top: 20px; font-size: 14px; color: #999; }
+        .tip a { color: #0099FF; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
-<h2>发现一条校园失物招领</h2>
+<h2 id="page-title">发现一条校园信息</h2>
 <p>请在 App 中查看物品照片和联系方式</p>
 
 <a href="javascript:void(0);" class="btn" onclick="openApp()">在 App 中打开查看</a>
 
 <p class="tip">
-    如果此页面无法直接打开App，请先点击右上角在浏览器打开，或前往<a href="https://gitee.com/hx_a/campus_app_android/releases/tag/1.0">下载中心下载app</a>。
+    如果此页面无法直接打开App，请先点击右上角在浏览器打开，或前往<a href="https://gitee.com/hx_a/campus_app_android/releases/tag/1.0">下载中心</a>下载app
 </p>
+
 <script>
-    // 获取 URL 上的 id 参数
+    // 获取 URL 上的参数
     function getQueryVariable(variable) {
         var query = window.location.search.substring(1);
         var vars = query.split("&");
-        for (var i=0;i<vars.length;i++) {
+        for (var i=0; i<vars.length; i++) {
             var pair = vars[i].split("=");
             if(pair[0] == variable){return pair[1];}
         }
@@ -34,18 +36,31 @@
 
     function openApp() {
         var id = getQueryVariable("id");
-        if(id) {
-            // 核心：唤起 Android 的 hxcampus 协议
-            window.location.href = "hxcampus://found/detail?id=" + id;
+        var type = getQueryVariable("type") || "found"; // 如果没有传 type，默认兼容老版本的 found
 
-            // setTimeout(function() {
-            //      window.location.href = "http://你的服务器/download.html";
-            // }, 5000);
+        if(id) {
+            // 根据 type 动态生成唤起 App 的协议路径
+            var hostPath = (type === "lost") ? "lost" : "found";
+            window.location.href = "hxcampus://" + hostPath + "/detail?id=" + id;
         }
     }
 
-    // 页面加载完自动尝试唤起一次
+    // 页面加载完执行初始化
     window.onload = function() {
+        var type = getQueryVariable("type") || "found";
+        var titleElement = document.getElementById("page-title");
+        var htmlTitleElement = document.getElementById("html-title");
+
+        // 动态修改页面的文案展示
+        if (type === "lost") {
+            htmlTitleElement.innerText = "寻物启事详情";
+            titleElement.innerText = "发现一条校园寻物启事";
+        } else {
+            htmlTitleElement.innerText = "失物招领详情";
+            titleElement.innerText = "发现一条校园失物招领";
+        }
+
+        // 自动尝试唤起一次
         openApp();
     };
 </script>
