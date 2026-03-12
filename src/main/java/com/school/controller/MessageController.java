@@ -45,10 +45,11 @@ public class MessageController {
 
     /**
      * 删除留言
-     * DELETE /message/{id}
+     * DELETE /deleteMessage/{id}
      */
-    @DeleteMapping("/{id}")
-    public ServerResponse deleteMessage(@PathVariable("id") Integer id) {
+    @ResponseBody
+    @PostMapping("/deleteMessage")
+    public ServerResponse deleteMessage(@RequestParam("id") Integer id) {
         // 直接调用已经写好的删除服务逻辑
         return messageService.deleteCommentById(id);
     }
