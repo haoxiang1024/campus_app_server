@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>失物招领详情</title>
+    <style>
+        body { text-align: center; padding: 50px 20px; font-family: sans-serif; background-color: #f5f6f9;}
+        h2 { color: #333; }
+        .btn { display: inline-block; margin-top: 30px; padding: 12px 24px; background-color: #0099FF; color: white; text-decoration: none; border-radius: 6px; font-size: 16px; }
+        .tip { margin-top: 20px; font-size: 14px; color: #999; }
+    </style>
+</head>
+<body>
+<h2>发现一条校园失物招领</h2>
+<p>请在 App 中查看物品照片和联系方式</p>
+
+<a href="javascript:void(0);" class="btn" onclick="openApp()">在 App 中打开查看</a>
+
+<p class="tip">
+    如果此页面无法直接打开App，请先点击右上角在浏览器打开，或前往<a href="https://gitee.com/hx_a/campus_app_android/releases/tag/1.0">下载中心下载app</a>。
+</p>
+<script>
+    // 获取 URL 上的 id 参数
+    function getQueryVariable(variable) {
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        for (var i=0;i<vars.length;i++) {
+            var pair = vars[i].split("=");
+            if(pair[0] == variable){return pair[1];}
+        }
+        return(false);
+    }
+
+    function openApp() {
+        var id = getQueryVariable("id");
+        if(id) {
+            // 核心：唤起 Android 的 hxcampus 协议
+            window.location.href = "hxcampus://found/detail?id=" + id;
+
+            // setTimeout(function() {
+            //      window.location.href = "http://你的服务器/download.html";
+            // }, 5000);
+        }
+    }
+
+    // 页面加载完自动尝试唤起一次
+    window.onload = function() {
+        openApp();
+    };
+</script>
+</body>
+</html>
