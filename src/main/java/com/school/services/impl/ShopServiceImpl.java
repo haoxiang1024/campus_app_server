@@ -53,7 +53,7 @@ public class ShopServiceImpl implements ShopService {
         }
 
         //  扣除用户积分 (带有余额足够判断)
-        int pointsRow = userMapper.deductPoints(userId, item.getRequiredPoints());
+        int pointsRow = userMapper.deductPoints(userId, item.getRequired_points());
         if (pointsRow == 0) {
             // 积分不够扣减失败，抛出异常以回滚上方扣掉的库存
             throw new RuntimeException("您的积分不足，无法兑换");
@@ -63,7 +63,7 @@ public class ShopServiceImpl implements ShopService {
         PointHistory history = new PointHistory();
         history.setUserId(userId);
         history.setType(3); // 假设 3 代表消耗兑换
-        history.setPointsChanged(-item.getRequiredPoints());
+        history.setPointsChanged(-item.getRequired_points());
         history.setDescription("兑换了商品：" + item.getName());
         pointHistoryMapper.insert(history);
 

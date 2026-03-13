@@ -113,7 +113,6 @@ public class UserServiceImpl implements UserService {
         if (isMatch) {
             // 密码正确，获取详细用户信息
             User userInfo = userMapper.userInfo(userid);
-            
             // 检查用户是否被禁用
              if (userInfo.getstate() == 0) {
                  return ServerResponse.createServerResponseByFail("该账号已被禁用");
