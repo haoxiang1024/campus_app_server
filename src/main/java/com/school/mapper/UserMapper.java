@@ -117,4 +117,6 @@ public interface UserMapper {
      * @return 影响行数
      */
     int deleteUserById(@Param("id") int id);
+    //积分变动
+    int deductPoints(@Param("userId") Integer userId, @Param("points") Integer points);
 }

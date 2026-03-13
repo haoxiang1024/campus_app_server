@@ -28,12 +28,8 @@ public class User {
     
     /** 用户手机号码 */
     private String phone;
-    
-    /** 用户账户余额 */
-    private Integer balance;
-    
-    /** 用户声望值 */
-    private Integer prestige;
+
+    private int points; // 用户当前积分余额
     
     /** 用户注册时间 */
     private Date reg_date;
@@ -49,6 +45,14 @@ public class User {
     
     /** 即时通讯token */
     private String im_token;
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
+    }
 
     /**
      * 获取即时通讯token
@@ -120,18 +124,17 @@ public class User {
         this.email = email;
     }
 
-    public User(String photo, String phone, String sex, Integer balance, Integer prestige, Date reg_date, String email, int state, int role, String nickname, String password) {
+    public User(String photo, String phone, String sex, int points, Date reg_date, String email, int state, int role, String nickname, String password) {
         this.photo = photo;
         this.phone = phone;
         this.sex = sex;
-        this.balance = balance;
-        this.prestige = prestige;
         this.reg_date = reg_date;
         this.email = email;
         this.state = state;
         this.role = role;
         this.nickname = nickname;
         this.password = password;
+        this.points = points;
     }
 
     public User() {
@@ -233,37 +236,9 @@ public class User {
         this.phone = phone;
     }
 
-    /**
-     * 获取用户余额
-     * @return 用户账户余额
-     */
-    public Integer getBalance() {
-        return balance;
-    }
 
-    /**
-     * 设置用户余额
-     * @param balance 用户账户余额
-     */
-    public void setBalance(Integer balance) {
-        this.balance = balance;
-    }
 
-    /**
-     * 获取用户声望值
-     * @return 用户声望值
-     */
-    public Integer getPrestige() {
-        return prestige;
-    }
 
-    /**
-     * 设置用户声望值
-     * @param prestige 用户声望值
-     */
-    public void setPrestige(Integer prestige) {
-        this.prestige = prestige;
-    }
 
     /**
      * 获取用户注册时间
@@ -290,8 +265,7 @@ public class User {
                 ", photo='" + photo + '\'' +
                 ", sex='" + sex + '\'' +
                 ", phone='" + phone + '\'' +
-                ", balance=" + balance +
-                ", prestige=" + prestige +
+                ", points=" + points +
                 ", reg_date=" + reg_date +
                 ", email='" + email + '\'' +
                 ", state=" + state +

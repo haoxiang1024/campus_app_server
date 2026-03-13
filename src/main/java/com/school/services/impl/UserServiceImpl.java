@@ -40,8 +40,7 @@ public class UserServiceImpl implements UserService {
     public ServerResponse register(String phone,String email,String password) {
         // 初始化用户基本属性
         Date time = DateUtil.getTime();//获取时间
-        Integer balance = 1000;  // 初始余额
-        Integer prestige = 1000; // 初始声望值
+        int points=0;//初始积分
         String sex=Util.SexRandom(); // 随机性别
         String nickname = Util.NickNameRandom();//随机获取昵称
         String photo; // 头像URL
@@ -59,7 +58,7 @@ public class UserServiceImpl implements UserService {
         }
         
         // 创建用户对象
-        User user = new User(photo,phone,sex,balance,prestige,time,email,state,role,nickname,hashedPwd);
+        User user = new User(photo,phone,sex,points,time,email,state,role,nickname,hashedPwd);
         
         // 验证手机号是否已经注册过
         List<User> userList = userMapper.getalll();
