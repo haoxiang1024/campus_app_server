@@ -45,6 +45,11 @@
             <if test="im_token != null">
                 im_token = #{im_token},
             </if>
+
+        <if test="points != null">
+            points =  #{points},
+        </if>
+
         </set>
         WHERE id = #{id}
     </update>

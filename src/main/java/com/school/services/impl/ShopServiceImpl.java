@@ -7,6 +7,7 @@ import com.school.mapper.ShopItemMapper;
 import com.school.mapper.UserMapper;
 import com.school.services.api.ShopService;
 import com.school.utils.ServerResponse;
+import com.school.utils.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,8 @@ public class ShopServiceImpl implements ShopService {
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private Util util;
 
     @Autowired
     private PointHistoryMapper pointHistoryMapper;
@@ -28,6 +31,9 @@ public class ShopServiceImpl implements ShopService {
     @Override
     public ServerResponse getActiveShopItems() {
         List<ShopItem> items = shopItemMapper.selectAllActive();
+        for (ShopItem shopItem : items) {
+            shopItem.setImage_url(util.updatePic(shopItem.getImage_url()));
+        }
         return ServerResponse.createServerResponseBySuccess(items);
     }
 
