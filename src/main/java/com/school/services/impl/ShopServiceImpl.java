@@ -89,7 +89,7 @@ public class ShopServiceImpl implements ShopService {
         history.setDescription("兑换了商品：" + item.getName());
         pointHistoryMapper.insert(history);
 
-        return ServerResponse.createServerResponseBySuccess("兑换成功！", verifyCode);
+        return ServerResponse.createServerResponseBySuccess( verifyCode,"兑换成功！");
     }
 
     @Override

@@ -21,17 +21,18 @@ class UserServiceImplTest {
     @Test
         void registerUserToProvider() {
         try {
-            rongCloudApi.unblock("2");
-            List<User> userList = userMapper.getalll();
-            for (User user : userList) {
+            //rongCloudApi.refresh("1","admin","67197891-bab2-439b-8cfd-21e4d01d4db5.jpg");
+            //rongCloudApi.unblock("2");
+//            List<User> userList = userMapper.getalll();
+//            for (User user : userList) {
 //                String response = rongCloudApi.getToken(String.valueOf(user.getId()), user.getNickname(), user.getPhoto());
 //                System.out.println("服务商返回原始数据: " + response);
 //                JSONObject jsonObject = JSON.parseObject(response);
 //                String token = jsonObject.getString("token");
 //                user.setIm_token(token);
-//                user.setEmail("3502777299@qq.com");
+////                user.setEmail("3502777299@qq.com");
 //                userMapper.updateUserInfo(user);
-            }
+//            }
         } catch (Exception e) {
             System.err.println("调用接口失败: " + e.getMessage());
         }

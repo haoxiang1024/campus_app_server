@@ -177,7 +177,7 @@ public class UserServiceImpl implements UserService {
             String pic = util.updatePic(userInfo.getPhoto());
             userInfo.setPhoto(pic);
             //IM用户资料同步修改
-            String res=rongCloudApi.refresh(String.valueOf(id),userInfo.getNickname(),pic);
+            String res=rongCloudApi.refresh(String.valueOf(id),userInfo.getNickname(),photo);
             JSONObject jsonObject = JSON.parseObject(res);
             String code = jsonObject.getString("code");
             if(code.equals("200")){
@@ -206,7 +206,7 @@ public class UserServiceImpl implements UserService {
             String pic = util.updatePic(userInfo.getPhoto());
             userInfo.setPhoto(pic);
             //IM用户资料同步修改
-            String res=rongCloudApi.refresh(String.valueOf(id),nickname,pic);
+            String res=rongCloudApi.refresh(String.valueOf(id),nickname,userInfo.getPhoto());
             JSONObject jsonObject = JSON.parseObject(res);
             String code = jsonObject.getString("code");
             if(code.equals("200")){
