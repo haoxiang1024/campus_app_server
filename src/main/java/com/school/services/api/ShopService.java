@@ -9,4 +9,5 @@ public interface ShopService {
     ServerResponse getActiveShopItems();
     ServerResponse exchangeItem(Integer userId, Integer itemId);
     ServerResponse getPointHistory(Integer userId);
+    ServerResponse verifyOrder(String verifyCode, Integer adminId);
 }

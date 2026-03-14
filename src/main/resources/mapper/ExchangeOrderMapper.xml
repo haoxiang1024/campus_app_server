@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.school.mapper.ExchangeOrderMapper">
+    <insert id="insertOrder" parameterType="com.school.entity.ExchangeOrder" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO exchange_order (order_no, user_id, item_id, item_name, points_cost, verify_code, status, create_time)
+        VALUES (#{order_no}, #{user_id}, #{item_id}, #{item_name}, #{points_cost}, #{verify_code}, 0, NOW())    </insert>
+</mapper>

@@ -1,7 +1,9 @@
 package com.school.services.impl;
 
+import com.school.entity.ExchangeOrder;
 import com.school.entity.PointHistory;
 import com.school.entity.ShopItem;
+import com.school.mapper.ExchangeOrderMapper;
 import com.school.mapper.PointHistoryMapper;
 import com.school.mapper.ShopItemMapper;
 import com.school.mapper.UserMapper;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ShopServiceImpl implements ShopService {
@@ -27,6 +30,8 @@ public class ShopServiceImpl implements ShopService {
 
     @Autowired
     private PointHistoryMapper pointHistoryMapper;
+    @Autowired
+    private ExchangeOrderMapper exchangeOrderMapper;
 
     @Override
     public ServerResponse getActiveShopItems() {
@@ -64,7 +69,18 @@ public class ShopServiceImpl implements ShopService {
             // 积分不够扣减失败，抛出异常以回滚上方扣掉的库存
             throw new RuntimeException("您的积分不足，无法兑换");
         }
-
+        //生成提货码
+        String verifyCode = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        String orderNo = "EX" + System.currentTimeMillis();
+        //  生成订单记录
+        ExchangeOrder order = new ExchangeOrder();
+        order.setOrder_no(orderNo);
+        order.setUser_id(userId);
+        order.setItem_id(itemId);
+        order.setItem_name(item.getName());
+        order.setPoints_cost(item.getRequired_points());
+        order.setVerify_code(verifyCode);
+        exchangeOrderMapper.insertOrder(order);
         //  插入积分变动流水
         PointHistory history = new PointHistory();
         history.setUserId(userId);
@@ -73,12 +89,33 @@ public class ShopServiceImpl implements ShopService {
         history.setDescription("兑换了商品：" + item.getName());
         pointHistoryMapper.insert(history);
 
-        return ServerResponse.createServerResponseBySuccess("兑换成功！可以在个人中心查看");
+        return ServerResponse.createServerResponseBySuccess("兑换成功！", verifyCode);
     }
 
     @Override
     public ServerResponse getPointHistory(Integer userId) {
         List<PointHistory> histories = pointHistoryMapper.selectByUserId(userId);
         return ServerResponse.createServerResponseBySuccess(histories);
+    }
+
+    /**
+     * 管理员核销提货码
+     */
+    @Override
+    public ServerResponse verifyOrder(String verifyCode, Integer adminId) {
+        ExchangeOrder order = exchangeOrderMapper.selectByVerifyCode(verifyCode);
+        if (order == null) {
+            return ServerResponse.createServerResponseByFail("无效的提货码");
+        }
+        if (order.getStatus() != 0) {
+            return ServerResponse.createServerResponseByFail("该提货码已被核销或作废！");
+        }
+
+        // 执行核销
+        int updateCount = exchangeOrderMapper.verifyOrder(verifyCode, adminId);
+        if (updateCount > 0) {
+            return ServerResponse.createServerResponseBySuccess("核销成功！商品：【" + order.getItem_name() + "】");
+        }
+        return ServerResponse.createServerResponseByFail("核销失败，请重试");
     }
 }

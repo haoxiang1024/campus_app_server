@@ -1,10 +1,7 @@
 package com.school.controller;
 
 import com.school.entity.User;
-import com.school.services.api.AdminService;
-import com.school.services.api.LostFoundService;
-import com.school.services.api.MessageService;
-import com.school.services.api.UserService;
+import com.school.services.api.*;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +27,9 @@ public class AdminController {
     private LostFoundService lostFoundService;  // 失物招领服务
     @Autowired
     private MessageService messageService;
+    @Autowired
+    private ShopService shopService;
+
     /**
      * 获取所有用户数据
      * @return 返回ServerResponse对象，包含所有用户信息
@@ -350,5 +350,11 @@ public class AdminController {
     @PostMapping("/deleteMessage")
     public ServerResponse deleteMessage(@RequestParam Integer messageId) {
         return messageService.deleteCommentById(messageId);
+    }
+
+    @PostMapping("/verifyOrder")
+    public ServerResponse verifyOrder(@RequestParam("verifyCode") String verifyCode,
+                                      @RequestParam("adminId") Integer adminId) {
+       return shopService.verifyOrder(verifyCode, adminId);
     }
 }
