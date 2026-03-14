@@ -351,7 +351,7 @@ public class AdminController {
     public ServerResponse deleteMessage(@RequestParam Integer messageId) {
         return messageService.deleteCommentById(messageId);
     }
-
+    @ResponseBody
     @PostMapping("/verifyOrder")
     public ServerResponse verifyOrder(@RequestParam("verifyCode") String verifyCode,
                                       @RequestParam("adminId") Integer adminId) {
