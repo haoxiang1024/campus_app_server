@@ -4,4 +4,16 @@
     <insert id="insertOrder" parameterType="com.school.entity.ExchangeOrder" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO exchange_order (order_no, user_id, item_id, item_name, points_cost, verify_code, status, create_time)
         VALUES (#{order_no}, #{user_id}, #{item_id}, #{item_name}, #{points_cost}, #{verify_code}, 0, NOW())    </insert>
+    <select id="selectByUserIdAndKeyword" resultType="com.school.entity.ExchangeOrder">
+        SELECT * FROM exchange_order
+        WHERE user_id = #{userId}
+        <if test="keyword != null and keyword != ''">
+            AND item_name LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <delete id="deleteOrder">
+        DELETE FROM exchange_order WHERE id = #{id} AND user_id = #{userId}
+    </delete>
 </mapper>

@@ -1,11 +1,13 @@
 package com.school.controller;
 
+import com.school.entity.ExchangeOrder;
 import com.school.services.api.ShopService;
 import com.school.utils.ServerResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequestMapping("/shop")
@@ -61,5 +63,16 @@ public class ShopController {
         } catch (Exception e) {
             return ServerResponse.createServerResponseByFail("查询失败，请稍后再试");
         }
+    }
+    // 获取我的订单
+    @GetMapping("/myOrders")
+    public ServerResponse getMyOrders(@RequestParam(required = false) Integer  userId, @RequestParam(required = false) String keyword) {
+        return shopService.getMyOrders(userId, keyword);
+    }
+    // 删除订单
+    @ResponseBody
+    @RequestMapping("/deleteOrder")
+    public ServerResponse deleteOrder(int id, int userId) {
+        return shopService.deleteOrder(id,userId);
     }
 }

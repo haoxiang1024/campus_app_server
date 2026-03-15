@@ -118,4 +118,22 @@ public class ShopServiceImpl implements ShopService {
         }
         return ServerResponse.createServerResponseByFail("核销失败，请重试");
     }
+
+    @Override
+    public ServerResponse getMyOrders(Integer userId, String keyword) {
+        List<ExchangeOrder> orders = exchangeOrderMapper.selectByUserIdAndKeyword(userId, keyword);
+        if (orders != null) {
+            return ServerResponse.createServerResponseBySuccess(orders);
+        }
+        return ServerResponse.createServerResponseByFail("没有找到相关订单");
+    }
+
+    @Override
+    public ServerResponse deleteOrder(Integer id, Integer userId) {
+        int deleteCount = exchangeOrderMapper.deleteOrder(id, userId);
+        if (deleteCount > 0) {
+            return ServerResponse.createServerResponseBySuccess("删除成功");
+        }
+        return ServerResponse.createServerResponseByFail("删除失败");
+    }
 }
