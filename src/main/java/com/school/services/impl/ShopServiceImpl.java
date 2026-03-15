@@ -83,9 +83,9 @@ public class ShopServiceImpl implements ShopService {
         exchangeOrderMapper.insertOrder(order);
         //  插入积分变动流水
         PointHistory history = new PointHistory();
-        history.setUserId(userId);
+        history.setUser_id(userId);
         history.setType(3); // 假设 3 代表消耗兑换
-        history.setPointsChanged(-item.getRequired_points());
+        history.setPoints_changed(-item.getRequired_points());
         history.setDescription("兑换了商品：" + item.getName());
         pointHistoryMapper.insert(history);
 

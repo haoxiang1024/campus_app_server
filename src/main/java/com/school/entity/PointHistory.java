@@ -4,26 +4,52 @@ import java.util.Date;
 
 public class PointHistory {
     private Integer id;
-    private Integer userId;
+    private Integer user_id;
     private Integer type; // 1-获取, 3-兑换消耗等
-    private Integer pointsChanged; // 变动数值(正负)
+    private Integer points_changed; // 变动数值(正负)
     private String description;
-    private Date createTime;
+    private Date create_time;
 
-    public PointHistory() {
+    public Integer getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(Integer user_id) {
+        this.user_id = user_id;
+    }
+
+    public Integer getPoints_changed() {
+        return points_changed;
+    }
+
+    public void setPoints_changed(Integer points_changed) {
+        this.points_changed = points_changed;
+    }
+
+    public Date getCreate_time() {
+        return create_time;
+    }
+
+    public void setCreate_time(Date create_time) {
+        this.create_time = create_time;
     }
 
     @Override
     public String toString() {
         return "PointHistory{" +
                 "id=" + id +
-                ", userId=" + userId +
+                ", user_id=" + user_id +
                 ", type=" + type +
-                ", pointsChanged=" + pointsChanged +
+                ", points_changed=" + points_changed +
                 ", description='" + description + '\'' +
-                ", createTime=" + createTime +
+                ", create_time=" + create_time +
                 '}';
     }
+
+    public PointHistory() {
+    }
+
+
 
     public Integer getId() {
         return id;
@@ -33,13 +59,7 @@ public class PointHistory {
         this.id = id;
     }
 
-    public Integer getUserId() {
-        return userId;
-    }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
 
     public Integer getType() {
         return type;
@@ -49,13 +69,7 @@ public class PointHistory {
         this.type = type;
     }
 
-    public Integer getPointsChanged() {
-        return pointsChanged;
-    }
 
-    public void setPointsChanged(Integer pointsChanged) {
-        this.pointsChanged = pointsChanged;
-    }
 
     public String getDescription() {
         return description;
@@ -65,11 +79,5 @@ public class PointHistory {
         this.description = description;
     }
 
-    public Date getCreateTime() {
-        return createTime;
-    }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
 }
