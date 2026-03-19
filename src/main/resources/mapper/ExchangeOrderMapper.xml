@@ -24,10 +24,24 @@
     <select id="selectAllWithUserInfo" resultType="com.school.entity.ExchangeOrder">
         SELECT o.*, u.nickname, u.phone
         FROM exchange_order o
-                 LEFT JOIN user u ON o.user_id = u.id
+        LEFT JOIN user u ON o.user_id = u.id
+        <where>
+            <if test="status != null">
+                AND o.status = #{status}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (o.order_no LIKE CONCAT('%', #{keyword}, '%')
+                OR o.item_name LIKE CONCAT('%', #{keyword}, '%')
+                OR o.verify_code LIKE CONCAT('%', #{keyword}, '%')
+                OR u.nickname LIKE CONCAT('%', #{keyword}, '%')
+                OR u.phone LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
         ORDER BY o.create_time DESC
     </select>
-
+    <delete id="deleteOrderById">
+        DELETE FROM exchange_order WHERE id = #{id}
+    </delete>
     <update id="updateStatus">
         UPDATE exchange_order
         SET status = #{status}, verify_time = #{verifyTime}, verify_admin_id = #{verifyAdminId}

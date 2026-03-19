@@ -19,4 +19,6 @@ public interface ShopItemMapper {
     int update(ShopItem item);
     // 修改商品上架状态
     int updateStatus(@Param("id") Integer id, @Param("status") Integer status);
+    // 支持商品名称模糊查询的分页查询接口
+    List<ShopItem> selectAllWithSearch(@Param("keyword") String keyword);
 }

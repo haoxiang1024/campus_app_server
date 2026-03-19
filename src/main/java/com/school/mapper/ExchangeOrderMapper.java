@@ -24,8 +24,11 @@ public interface ExchangeOrderMapper {
     List<ExchangeOrder> selectByUserIdAndKeyword(@Param("userId") Integer userId, @Param("keyword") String keyword);
     // 删除订单
     int deleteOrder(@Param("id") Integer id, @Param("userId") Integer userId);
-    // 查询所有订单
-    List<ExchangeOrder> selectAllWithUserInfo();
+
     // 更新订单状态
     int updateStatus(ExchangeOrder order);
+    // 管理员直接删除订单
+    int deleteOrderById(@Param("id") Integer id);
+    // 支持动态条件查询所有订单
+    List<ExchangeOrder> selectAllWithUserInfo(@Param("keyword") String keyword, @Param("status") Integer status);
 }

@@ -25,12 +25,15 @@ public class ShopController {
         return shopService.getActiveShopItems();
     }
     /**
-     * 获取所有商品列表
+     * 获取所有商品列表（分页 + 模糊搜索）
      */
     @ResponseBody
     @RequestMapping("/items/all")
-    public ServerResponse allItems() {
-        return shopService.getAllItems();
+    public ServerResponse allItems(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
+            @RequestParam(value = "keyword", required = false) String keyword) {
+        return shopService.getAllItems(page, pageSize, keyword);
     }
 
     @PostMapping("/item/save")
@@ -52,8 +55,18 @@ public class ShopController {
 
     @ResponseBody
     @RequestMapping("/orders")
-    public ServerResponse listOrders() {
-        return shopService.getAllOrders();
+    public ServerResponse listOrders(@RequestParam(defaultValue = "1") int page,
+                                     @RequestParam(defaultValue = "10") int pageSize,
+                                     @RequestParam(value = "keyword", required = false) String keyword,
+                                     @RequestParam(value = "status", required = false) Integer status) {
+        return shopService.getAllOrders(page, pageSize, keyword, status);
+    }
+    /**
+     * 管理员强制删除订单接口
+     */
+    @PostMapping("/deleteOrderById")
+    public ServerResponse deleteOrderById(Integer id) {
+        return shopService.deleteOrderById(id);
     }
     /**
      * 发起积分兑换

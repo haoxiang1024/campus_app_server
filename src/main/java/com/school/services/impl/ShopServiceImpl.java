@@ -1,5 +1,7 @@
 package com.school.services.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.school.entity.ExchangeOrder;
 import com.school.entity.PointHistory;
 import com.school.entity.ShopItem;
@@ -14,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -40,6 +44,19 @@ public class ShopServiceImpl implements ShopService {
             shopItem.setImage_url(util.updatePic(shopItem.getImage_url()));
         }
         return ServerResponse.createServerResponseBySuccess(items);
+    }
+
+    @Override
+    public ServerResponse deleteOrderById(Integer id) {
+        if (id == null) {
+            return ServerResponse.createServerResponseByFail("参数错误：订单ID不能为空");
+        }
+
+        int rowCount = exchangeOrderMapper.deleteOrderById(id);
+        if (rowCount > 0) {
+            return ServerResponse.createServerResponseBySuccess("订单删除成功");
+        }
+        return ServerResponse.createServerResponseByFail("订单删除失败，可能是数据不存在");
     }
 
     /**
@@ -138,12 +155,22 @@ public class ShopServiceImpl implements ShopService {
     }
 
     @Override
-    public ServerResponse getAllItems() {
-        List<ShopItem> items = shopItemMapper.selectAll();
-        for (ShopItem shopItem : items) {
-            shopItem.setImage_url(util.updatePic(shopItem.getImage_url()));
-        }
-        return ServerResponse.createServerResponseBySuccess(items);    }
+    public ServerResponse getAllItems(int page, int pageSize, String keyword) {
+        // 开启分页
+        PageHelper.startPage(page, pageSize);
+        // 执行带搜索条件的查询
+        List<ShopItem> list = shopItemMapper.selectAllWithSearch(keyword);
+        // 包装成分页对象
+        PageInfo<ShopItem> pageInfo = new PageInfo<>(list);
+
+        // 组装返回给前端的分页格式数据
+        Map<String, Object> result = new HashMap<>();
+        result.put("list", pageInfo.getList()); // 当前页数据列表
+        result.put("total", pageInfo.getTotal()); // 总条数
+        result.put("totalPages", pageInfo.getPages()); // 总页数
+
+        return ServerResponse.createServerResponseBySuccess(result);
+    }
 
     @Override
     public ServerResponse saveOrUpdateItem(ShopItem item) {
@@ -154,6 +181,19 @@ public class ShopServiceImpl implements ShopService {
             result = shopItemMapper.update(item);
         }
         return result > 0 ? ServerResponse.createServerResponseBySuccess("操作成功") : ServerResponse.createServerResponseByFail("操作失败");
+    }
+
+    @Override
+    public ServerResponse getAllOrders(int page, int pageSize, String keyword, Integer status) {
+        PageHelper.startPage(page, pageSize);
+        List<ExchangeOrder> orderList = exchangeOrderMapper.selectAllWithUserInfo(keyword, status);
+        PageInfo<ExchangeOrder> pageInfo = new PageInfo<>(orderList);
+        Map<String, Object> result = new HashMap<>();
+        result.put("list", pageInfo.getList());
+        result.put("total", pageInfo.getTotal());
+        result.put("totalPages", pageInfo.getPages());
+
+        return ServerResponse.createServerResponseBySuccess(result);
     }
 
     // 修改商品上架状态
@@ -170,7 +210,5 @@ public class ShopServiceImpl implements ShopService {
         return ServerResponse.createServerResponseByFail("操作失败");
     }
 
-    @Override
-    public ServerResponse getAllOrders() {
-        return ServerResponse.createServerResponseBySuccess(exchangeOrderMapper.selectAllWithUserInfo());    }
+
 }

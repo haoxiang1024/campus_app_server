@@ -15,6 +15,24 @@ public class ExchangeOrder {
     private Date verify_time;//核销时间
     private Integer verify_admin_id; // 核销管理员ID
     private String item_image;
+    private String nickname;
+    private String phone;
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
 
     public String getItem_image() {
         return item_image;

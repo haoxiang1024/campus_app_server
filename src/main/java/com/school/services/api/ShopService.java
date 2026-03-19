@@ -13,7 +13,10 @@ public interface ShopService {
      * @return ServerResponse 包含活跃商城物品列表的响应对象
      */
     ServerResponse getActiveShopItems();
-
+    /**
+     * 管理员根据ID直接删除订单
+     */
+    ServerResponse deleteOrderById(Integer id);
     /**
      * 兑换物品
      *
@@ -59,11 +62,14 @@ public interface ShopService {
     ServerResponse deleteOrder(Integer id, Integer userId);
 
     /**
-     * 获取所有商城物品（包括非活跃的）
+     * 分页获取所有商城物品，支持名称模糊查询
      *
-     * @return ServerResponse 包含所有商城物品列表的响应对象
+     * @param page 当前页码
+     * @param pageSize 每页条数
+     * @param keyword 搜索关键词（商品名称）
+     * @return ServerResponse 包含分页数据的响应对象
      */
-    ServerResponse getAllItems();
+    ServerResponse getAllItems(int page, int pageSize, String keyword);
 
     /**
      * 保存或更新商城物品
@@ -76,11 +82,15 @@ public interface ShopService {
 
 
     /**
-     * 获取所有订单（管理员功能）
+     * 获取所有订单（管理员功能），支持分页和条件查询
      *
-     * @return ServerResponse 包含所有订单列表的响应对象
+     * @param page 当前页码
+     * @param pageSize 每页条数
+     * @param keyword 搜索关键词（支持订单号、商品名、用户名等）
+     * @param status 订单状态 (0-待核销, 1-已领取, 2-已取消) 可为空
+     * @return ServerResponse 包含封装好的分页数据对象的响应
      */
-    ServerResponse getAllOrders();
+    ServerResponse getAllOrders(int page, int pageSize, String keyword, Integer status);
 
     // 修改商品上架状态
     ServerResponse updateStatus(Integer id, Integer status);
