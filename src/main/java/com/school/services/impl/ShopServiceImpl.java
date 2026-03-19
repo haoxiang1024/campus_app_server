@@ -136,4 +136,41 @@ public class ShopServiceImpl implements ShopService {
         }
         return ServerResponse.createServerResponseByFail("删除失败");
     }
+
+    @Override
+    public ServerResponse getAllItems() {
+        List<ShopItem> items = shopItemMapper.selectAll();
+        for (ShopItem shopItem : items) {
+            shopItem.setImage_url(util.updatePic(shopItem.getImage_url()));
+        }
+        return ServerResponse.createServerResponseBySuccess(items);    }
+
+    @Override
+    public ServerResponse saveOrUpdateItem(ShopItem item) {
+        int result;
+        if (item.getId() == null) {
+            result = shopItemMapper.insert(item);
+        } else {
+            result = shopItemMapper.update(item);
+        }
+        return result > 0 ? ServerResponse.createServerResponseBySuccess("操作成功") : ServerResponse.createServerResponseByFail("操作失败");
+    }
+
+    // 修改商品上架状态
+    @Override
+    public ServerResponse updateStatus(Integer id, Integer status) {
+        int updateStatus = shopItemMapper.updateStatus(id, status);
+        if (updateStatus > 0) {
+            if(status==0){
+                return ServerResponse.createServerResponseBySuccess("下架成功");
+            }else {
+                return ServerResponse.createServerResponseBySuccess("上架成功");
+            }
+        }
+        return ServerResponse.createServerResponseByFail("操作失败");
+    }
+
+    @Override
+    public ServerResponse getAllOrders() {
+        return ServerResponse.createServerResponseBySuccess(exchangeOrderMapper.selectAllWithUserInfo());    }
 }

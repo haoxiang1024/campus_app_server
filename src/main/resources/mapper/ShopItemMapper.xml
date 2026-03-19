@@ -9,8 +9,28 @@
     <select id="selectByPrimaryKey" resultType="com.school.entity.ShopItem">
         SELECT * FROM shop_item WHERE id = #{id}
     </select>
-
+    <select id="selectAll" resultType="com.school.entity.ShopItem">
+        SELECT * FROM shop_item
+    </select>
     <update id="deductStock">
         UPDATE shop_item SET stock = stock - 1 WHERE id = #{id} AND stock > 0
+    </update>
+
+    <insert id="insert" parameterType="com.school.entity.ShopItem">
+        INSERT INTO shop_item (name, description, image_url, required_points, stock, status)
+        VALUES (#{name}, #{description}, #{image_url}, #{required_points}, #{stock}, #{status})
+    </insert>
+
+    <update id="update" parameterType="com.school.entity.ShopItem">
+        UPDATE shop_item
+        SET name = #{name}, description = #{description}, image_url = #{image_url},
+            required_points = #{required_points}, stock = #{stock}, status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        update shop_item
+        set status = #{status}
+        where id = #{id}
     </update>
 </mapper>

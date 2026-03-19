@@ -13,12 +13,12 @@
     </select>
     <select id="typeIdByName" resultType="java.lang.Integer">
         select id
-        from school_app.lostfound_type
+        from lostfound_type
         where name = #{name}
     </select>
     <select id="selectTypeByPage" resultType="com.school.entity.LostFoundType">
         SELECT id, name
-        FROM lostfoundtype
+        FROM lostfound_type
         <where>
             <if test="keyword != null and keyword != ''">
                 name LIKE CONCAT('%', #{keyword}, '%')
@@ -42,7 +42,7 @@
     </delete>
 
     <delete id="deleteTypeBatch">
-        DELETE FROM lostfoundtype WHERE id IN
+        DELETE FROM lostfound_type WHERE id IN
         <foreach collection="ids" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>

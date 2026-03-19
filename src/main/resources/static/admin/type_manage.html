@@ -123,7 +123,6 @@
 
             $('#typeTableBody').html('<tr><td colspan="4" class="text-center text-muted">正在检索最新数据...</td></tr>');
 
-            // 注意：需要后端配合提供对应的接口 (假设路径如下)
             $.get('/school/admin/getTypeByPage', {
                 page: currentPage,
                 pageSize: pageSize,

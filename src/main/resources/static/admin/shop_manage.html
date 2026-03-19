@@ -1,0 +1,256 @@
+<style>
+    /* 统一页面容器与基础色调 */
+    .content-wrapper {
+        background: #ffffff !important;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        padding: 25px;
+        margin: 15px;
+        color: #333 !important;
+    }
+    .text-custom-blue { color: #00aaff !important; }
+
+    /* 统一表格结构 */
+    .table-light th {
+        background-color: #f8f9fa !important;
+        color: #666 !important;
+        font-weight: 600;
+    }
+
+    /* 业务图片样式优化 */
+    .table img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+    }
+
+    /* 商品图片预览样式 */
+    #itemImagePreview {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 6px;
+        border: 2px solid #00aaff;
+        margin-bottom: 10px;
+    }
+    .status-on { color: #28a745; font-weight: 500; }
+    .status-off { color: #dc3545; font-weight: 500; }
+</style>
+
+<div class="content-wrapper">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <button class="btn btn-warning btn-sm text-white px-3" onclick="showAddModal()">
+            + 添加商品
+        </button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>图片</th>
+                <th>商品名称</th>
+                <th>所需积分</th>
+                <th>库存</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="itemList">
+            <tr><td colspan="7" class="text-center text-muted">正在加载数据...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="itemModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold text-custom-blue" id="modalTitle">编辑商品</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="itemForm" enctype="multipart/form-data">
+                    <input type="hidden" id="itemId" name="id">
+
+                    <div class="mb-3 text-center">
+                        <div><img src="./img/default.png" id="itemImagePreview" onerror="this.src='./img/default.png'"></div>
+                        <label for="itemImageFile" class="btn btn-sm btn-outline-secondary">上传商品图片</label>
+                        <input type="file" id="itemImageFile" name="imageFile" accept="image/*" style="display: none;">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">商品名称</label>
+                        <input type="text" class="form-control" id="itemName" name="name" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">所需积分</label>
+                            <input type="number" class="form-control" id="itemPoints" name="required_points" required>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">库存</label>
+                            <input type="number" class="form-control" id="itemStock" name="stock" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">状态</label>
+                        <select class="form-select" id="itemStatus" name="status">
+                            <option value="1">上架</option>
+                            <option value="0">下架</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">描述</label>
+                        <textarea class="form-control" id="itemDesc" name="description" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary btn-sm" style="background-color: #00aaff; border-color: #00aaff;" onclick="saveItem()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function() {
+        loadItems();
+
+        // 选中图片预览逻辑
+        $('#itemImageFile').on('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#itemImagePreview').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    });
+
+    // 加载商品列表数据
+    function loadItems() {
+        $.get('/school/shop/items/all', function(res) {
+            if(res.status === 0) {
+                let html = '';
+                if (!res.data || res.data.length === 0) {
+                    html = '<tr><td colspan="7" class="text-center text-muted">暂无商品数据</td></tr>';
+                } else {
+                    res.data.forEach(item => {
+                        // 根据当前状态判断操作按钮显示的文字和颜色
+                        const statusBtnText = item.status === 1 ? '下架' : '上架';
+                        const statusBtnClass = item.status === 1 ? 'text-danger' : 'text-success';
+                        const targetStatus = item.status === 1 ? 0 : 1;
+
+                        html += `
+                            <tr>
+                                <td>${item.id}</td>
+                                <td><img src="${item.image_url || './img/default.png'}" onerror="this.src='./img/default.png'"></td>
+                                <td class="fw-bold">${item.name}</td>
+                                <td><span class="badge bg-warning text-dark">${item.required_points}</span></td>
+                                <td>${item.stock}</td>
+                                <td><span class="${item.status === 1 ? 'status-on' : 'status-off'}">
+                                    ${item.status === 1 ? '上架' : '已下架'}</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-link text-custom-blue p-0 me-2" style="text-decoration: none" onclick='editItem(${JSON.stringify(item)})'>编辑</button>
+                                    <button class="btn btn-sm btn-link ${statusBtnClass} p-0" style="text-decoration: none"
+                                            onclick="updateStatus(${item.id}, ${targetStatus})">${statusBtnText}</button>
+                                </td>
+                            </tr>`;
+                    });
+                }
+                $('#itemList').html(html);
+            }
+        });
+    }
+
+    // 显示新增弹窗
+    function showAddModal() {
+        $('#itemForm')[0].reset();
+        $('#itemId').val('');
+        $('#itemImagePreview').attr('src', './img/default.png');
+        $('#modalTitle').text('添加商品');
+        new bootstrap.Modal($('#itemModal')).show();
+    }
+
+    // 回显编辑弹窗数据
+    function editItem(item) {
+        $('#itemId').val(item.id);
+        $('#itemName').val(item.name);
+        $('#itemPoints').val(item.required_points || item.requiredPoints);
+        $('#itemStock').val(item.stock);
+        $('#itemStatus').val(item.status);
+        $('#itemDesc').val(item.description);
+        $('#itemImagePreview').attr('src', item.image_url || './img/default.png');
+        $('#modalTitle').text('编辑商品');
+        new bootstrap.Modal($('#itemModal')).show();
+    }
+
+    // 保存商品信息
+    function saveItem() {
+        const formData = new FormData(document.getElementById('itemForm'));
+
+        $.ajax({
+            url: '/school/shop/item/save',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(res) {
+                if(res.status === 0) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '保存成功',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                    bootstrap.Modal.getInstance($('#itemModal')).hide();
+                    loadItems();
+                } else {
+                    Swal.fire({ icon: 'error', title: '保存失败', text: res.msg });
+                }
+            }
+        });
+    }
+
+    // 调用后端 updateStatus 接口切换商品状态
+    function updateStatus(id, status) {
+        const actionText = status === 1 ? '上架' : '下架';
+
+        Swal.fire({
+            title: `确定要${actionText}该商品吗?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#00aaff',
+            confirmButtonText: '确定',
+            cancelButtonText: '取消'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post('/school/shop/updateStatus', { id: id, status: status }, function(res) {
+                    if(res.status === 0) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: `${actionText}成功`,
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        loadItems();
+                    } else {
+                        Swal.fire({ icon: 'error', title: '操作失败', text: res.msg });
+                    }
+                });
+            }
+        });
+    }
+</script>

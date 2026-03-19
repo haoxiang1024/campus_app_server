@@ -1,0 +1,144 @@
+<style>
+  /* 统一页面容器与基础色调 */
+  .content-wrapper {
+    background: #ffffff !important;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 25px;
+    margin: 15px;
+    color: #333 !important;
+  }
+  .text-custom-blue { color: #00aaff !important; }
+  .bg-custom-blue { background-color: #00aaff !important; color: white !important; }
+  .btn-custom-blue { background-color: #00aaff; color: white; border: none; }
+  .btn-custom-blue:hover { background-color: #0088cc; color: white; }
+
+  /* 统一表格样式 */
+  .table-light th {
+    background-color: #f8f9fa !important;
+    color: #666 !important;
+    font-weight: 600;
+  }
+  .form-control:focus {
+    border-color: #00aaff;
+    box-shadow: 0 0 0 0.25rem rgba(0, 170, 255, 0.25);
+  }
+
+  /* 特定业务样式 */
+  .verify-badge {
+    font-family: monospace;
+    font-size: 1.1em;
+    letter-spacing: 1px;
+    font-weight: bold;
+  }
+</style>
+
+<div class="content-wrapper">
+  <div class="d-flex justify-content-between align-items-center mb-4 gap-3 flex-wrap">
+
+
+    <div class="input-group input-group-sm" style="width: 300px;">
+      <input type="text" id="verifyInput" class="form-control" placeholder="输入核销码...">
+      <button class="btn btn-custom-blue px-3" onclick="verifyOrder()">核销提货</button>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+      <tr>
+        <th>订单号</th>
+        <th>用户信息</th>
+        <th>商品名称</th>
+        <th>消耗积分</th>
+        <th>核销码</th>
+        <th>状态</th>
+        <th>下单时间</th>
+      </tr>
+      </thead>
+      <tbody id="orderList">
+      <tr><td colspan="7" class="text-center text-muted">正在加载数据...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  $(function() {
+    loadOrders();
+  });
+
+  function loadOrders() {
+    $.get('/school/shop/orders', function(res) {
+      if(res.status === 0) {
+        let html = '';
+        if (!res.data || res.data.length === 0) {
+          html = '<tr><td colspan="7" class="text-center text-muted">暂无订单数据</td></tr>';
+        } else {
+          res.data.forEach(order => {
+            let statusHtml = '';
+            if(order.status === 0) statusHtml = '<span class="badge bg-info">待核销</span>';
+            else if(order.status === 1) statusHtml = '<span class="badge bg-success">已领取</span>';
+            else statusHtml = '<span class="badge bg-secondary">已取消</span>';
+
+            html += `
+                            <tr>
+                                <td><small class="text-muted">${order.orderNo}</small></td>
+                                <td>${order.nickname}<br><small class="text-muted">${order.phone}</small></td>
+                                <td class="fw-bold">${order.itemName}</td>
+                                <td><span class="badge bg-warning text-dark">${order.pointsCost}</span></td>
+                                <td><span class="text-custom-blue verify-badge">${order.verifyCode}</span></td>
+                                <td>${statusHtml}</td>
+                                <td><small class="text-muted">${new Date(order.createTime).toLocaleString()}</small></td>
+                            </tr>`;
+          });
+        }
+        $('#orderList').html(html);
+      }
+    }).fail(function() {
+      $('#orderList').html('<tr><td colspan="7" class="text-center text-danger">数据加载失败</td></tr>');
+    });
+  }
+
+  function verifyOrder() {
+    const code = $('#verifyInput').val().trim();
+    if(!code) {
+      Swal.fire({
+        icon: 'warning',
+        title: '请输入核销码',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000
+      });
+      return;
+    }
+
+    $.post('/school/shop/order/verify', { verifyCode: code }, function(res) {
+      if(res.status === 0) {
+        Swal.fire({
+          icon: 'success',
+          title: '核销成功',
+          text: '商品已发放',
+          confirmButtonColor: '#00aaff'
+        });
+        $('#verifyInput').val('');
+        loadOrders();
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: '核销失败',
+          text: res.msg,
+          confirmButtonColor: '#00aaff'
+        });
+      }
+    }).fail(function() {
+      Swal.fire({
+        icon: 'error',
+        title: '网络异常',
+        text: '请检查网络连接',
+        confirmButtonColor: '#00aaff'
+      });
+    });
+  }
+</script>
