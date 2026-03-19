@@ -1,5 +1,6 @@
 <link href="./css/sweetalert2.min.css" rel="stylesheet">
 <style>
+    /* 页面基础样式 */
     .content-wrapper {
         background: #ffffff !important;
         border-radius: 12px;
@@ -15,15 +16,16 @@
     .btn-outline-custom:disabled { cursor: not-allowed; opacity: 0.5; }
     .btn-link { text-decoration: none !important; }
     .form-select-sm { border-color: #dee2e6 !important; color: #666; }
+    /* 评论内容防溢出 */
     .comment-content { max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 </style>
 
 <div class="content-wrapper">
-    <div class="d-flex justify-content-between align-items-center mb-4 gap-3 flex-wrap ">
+    <div class="d-flex justify-content-between align-items-center mb-4 gap-3 flex-wrap">
         <div class="d-flex gap-2">
-            <button class="btn btn-outline-success btn-sm" id="batchApproveBtn">批量通过</button>
-            <button class="btn btn-outline-warning btn-sm" id="batchRejectBtn">批量驳回</button>
-            <button class="btn btn-outline-danger btn-sm" id="batchDeleteBtn">批量删除</button>
+            <button class="btn btn-outline-success btn-sm" id="batchApproveBtn">通过</button>
+            <button class="btn btn-outline-warning btn-sm" id="batchRejectBtn">驳回</button>
+            <button class="btn btn-outline-danger btn-sm" id="batchDeleteBtn">删除</button>
         </div>
         <div class="d-flex gap-2">
             <select id="stateFilter" class="form-select form-select-sm" style="width: 120px;">
@@ -34,7 +36,7 @@
             </select>
             <div class="input-group input-group-sm" style="width: 220px;">
                 <input type="text" id="searchInput" class="form-control" placeholder="搜索评论内容/评论人/帖子...">
-                <button class="btn btn-primary" type="button" id="searchBtn" >
+                <button class="btn btn-primary" type="button" id="searchBtn">
                     <i class="fa fa-search"></i>
                 </button>
             </div>
@@ -46,7 +48,7 @@
             <thead class="table-light">
             <tr>
                 <th style="width: 45px;"><input type="checkbox" id="selectAll" class="form-check-input"></th>
-                <th style="width: 25%;">评论内容</th>
+                <th style="width: 60px;">ID</th> <th style="width: 25%;">评论内容</th>
                 <th>评论人</th>
                 <th>关联帖子标题</th>
                 <th>发布时间</th>
@@ -55,7 +57,7 @@
             </tr>
             </thead>
             <tbody id="commentTableBody">
-            <tr><td colspan="7" class="text-center text-muted">正在检索数据...</td></tr>
+            <tr><td colspan="8" class="text-center text-muted">正在检索数据...</td></tr>
             </tbody>
         </table>
     </div>
@@ -96,7 +98,7 @@
 <script src="./js/sweetalert2@11.js"></script>
 
 <script>
-    // 统一定制 Toast 提示
+    // 统一定制 Toast 提示工具
     window.Toast = window.Toast || {
         success: (msg) => { Swal.fire({ icon: 'success', title: msg, toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, width: '220px', padding: '0.5rem' }); },
         error: (msg) => { Swal.fire({ icon: 'error', title: '操作失败', text: msg, confirmButtonColor: '#00aaff', width: '320px' }); },
@@ -105,24 +107,26 @@
     };
 
     (function() {
+        // 分页及数据状态变量
         let currentPage = 1;
         let totalPages = 1;
         const pageSize = 10;
         let allData = [];
 
+        // 时间戳格式化
         function formatDate(ts) {
             if (!ts) return '-';
             const d = new Date(ts);
             return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
         }
 
-        // 加载评论数据
+        // 加载表格数据
         function loadData(page) {
             currentPage = page;
             const keyword = $('#searchInput').val().trim();
             const state = $('#stateFilter').val();
 
-            $('#commentTableBody').html('<tr><td colspan="7" class="text-center text-muted">正在检索最新数据...</td></tr>');
+            $('#commentTableBody').html('<tr><td colspan="8" class="text-center text-muted">正在检索最新数据...</td></tr>');
 
             $.get('/school/admin/getCommentsByPage', {
                 page: page,
@@ -137,39 +141,34 @@
 
                     renderTable(allData);
 
+                    // 更新分页状态
                     $('#pageInfo').text(`第 ${currentPage} 页 / 共 ${totalPages} 页`);
                     $('#totalCount').text(totalItems);
                     $('#btnFirstPage, #btnPrevPage').prop('disabled', currentPage <= 1);
                     $('#btnNextPage, #btnLastPage').prop('disabled', currentPage >= totalPages);
                     $('#selectAll').prop('checked', false);
                 } else {
-                    $('#commentTableBody').html('<tr><td colspan="7" class="text-center text-danger">数据加载失败</td></tr>');
+                    $('#commentTableBody').html('<tr><td colspan="8" class="text-center text-danger">数据加载失败</td></tr>');
                 }
             });
         }
 
-        // 渲染表格
+        // 渲染表格 HTML
         function renderTable(data) {
             let html = '';
             if (!data.length) {
-                html = '<tr><td colspan="7" class="text-center text-muted">未找到匹配的记录</td></tr>';
+                html = '<tr><td colspan="8" class="text-center text-muted">未找到匹配的记录</td></tr>';
             } else {
                 data.forEach(item => {
                     let badgeClass = 'bg-secondary';
-                    let stateText = item.state; // 默认值
+                    let stateText = item.state;
 
-                    // 数字转换为字符显示
-                    if(item.state == 0) {
-                        badgeClass = 'bg-info';
-                        stateText = '待审核';
-                    } else if(item.state == 1) {
-                        badgeClass = 'bg-success';
-                        stateText = '已通过';
-                    } else if(item.state == 2) {
-                        badgeClass = 'bg-danger';
-                        stateText = '已驳回';
-                    }
+                    // 状态映射
+                    if(item.state == 0) { badgeClass = 'bg-info'; stateText = '待审核'; }
+                    else if(item.state == 1) { badgeClass = 'bg-success'; stateText = '已通过'; }
+                    else if(item.state == 2) { badgeClass = 'bg-danger'; stateText = '已驳回'; }
 
+                    // 操作按钮组
                     let btns = `<button class="btn btn-sm btn-link text-custom-blue p-0 me-2" onclick="showDetail(${item.id})">详情</button>`;
                     if(item.state == 0) {
                         btns += `<button class="btn btn-sm btn-link text-success p-0 me-2 fw-bold" onclick="updateStatus(${item.id}, '已通过')">通过</button>`;
@@ -177,8 +176,10 @@
                     }
                     btns += `<button class="btn btn-sm btn-link text-danger p-0" onclick="deleteItem(${item.id})">删除</button>`;
 
+                    // 拼接行数据 (新增了 <td>${item.id}</td>)
                     html += `<tr>
                         <td><input type="checkbox" class="item-checkbox form-check-input" value="${item.id}"></td>
+                        <td>${item.id}</td>
                         <td><div class="comment-content" title="${item.content}">${item.content}</div></td>
                         <td>${item.nickname || '-'}</td>
                         <td class="text-muted">${item.title || '-'}</td>
@@ -191,12 +192,11 @@
             $('#commentTableBody').html(html);
         }
 
-        // 批量操作通用函数
+        // 批量操作核心逻辑
         function batchOperate(targetStateText, confirmTitle, successMsg, requireReason = false) {
             const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get();
             if (!selectedIds.length) return window.Toast.error('请先勾选项目');
 
-            // 判断使用 == 0，兼容数字和字符串
             const targetItems = allData.filter(item => selectedIds.includes(item.id.toString()) && item.state == 0);
             if (targetItems.length === 0) return window.Toast.error('选中的记录中没有可处理的【待审核】项');
 
@@ -226,6 +226,7 @@
             }
         }
 
+        // 绑定批量审核按钮
         $('#batchApproveBtn').on('click', () => batchOperate('已通过', '批量通过', '审核通过', false));
         $('#batchRejectBtn').on('click', () => batchOperate('已驳回', '批量驳回', '已驳回', true));
 
@@ -246,7 +247,7 @@
             });
         });
 
-        // 单个审核操作 (通过/驳回)
+        // 单条审核操作
         window.updateStatus = (id, state) => {
             if (state === '已驳回') {
                 window.Toast.prompt('审核驳回', '说明驳回理由（可选）', (reason) => {
@@ -259,17 +260,13 @@
             }
         };
 
+        // 发送状态更新请求
         function sendUpdateRequest(id, stateText, reason) {
             const stateCode = stateText === '已通过' ? 1 : 2;
-
             $.ajax({
                 url: '/school/admin/updateCommentStatus',
                 type: 'POST',
-                data: {
-                    commentId: id,
-                    state: stateCode,
-                    reason: reason
-                },
+                data: { commentId: id, state: stateCode, reason: reason },
                 success: (res) => {
                     if(res.status === 0) {
                         window.Toast.success(`已${stateText}`);
@@ -278,13 +275,11 @@
                         window.Toast.error(res.msg || "操作失败");
                     }
                 },
-                error: () => {
-                    window.Toast.error("请求失败，请检查参数或网络");
-                }
+                error: () => window.Toast.error("请求失败，请检查参数或网络")
             });
         }
 
-        // 单个删除
+        // 单条删除
         window.deleteItem = (id) => {
             window.Toast.confirm("删除确认", "确定永久删除此评论吗？", () => {
                 $.post('/school/admin/deleteCommentById', { commentId: id }, (res) => {
@@ -293,12 +288,11 @@
             });
         };
 
-        // 查看详情
+        // 展示详情弹窗
         window.showDetail = (id) => {
             const item = allData.find(u => u.id == id);
             if (!item) return;
 
-            // 详情弹窗中的状态映射
             let stateText = '未知状态';
             let badgeClass = 'bg-secondary';
             if (item.state == 0) { stateText = '待审核'; badgeClass = 'bg-info'; }
@@ -306,6 +300,7 @@
             else if (item.state == 2) { stateText = '已驳回'; badgeClass = 'bg-danger'; }
 
             const content = `
+                <div class="mb-2"><strong>评论 ID：</strong>${item.id}</div>
                 <div class="mb-2"><strong>评论人：</strong>${item.nickname || '未知用户'}</div>
                 <div class="mb-2"><strong>关联帖子：</strong>${item.title || '未知帖子'}</div>
                 <div class="mb-2"><strong>发布时间：</strong>${formatDate(item.create_time)}</div>
@@ -320,18 +315,21 @@
             new bootstrap.Modal('#detailModal').show();
         };
 
-        // 事件监听
+        // 绑定搜索与筛选事件
         $('#searchBtn').on('click', () => loadData(1));
         $('#searchInput').on('keypress', e => { if(e.which === 13) loadData(1); });
         $('#stateFilter').on('change', () => loadData(1));
+
+        // 全选联动
         $('#selectAll').on('change', function() { $('.item-checkbox').prop('checked', this.checked); });
 
+        // 绑定分页按钮事件
         $('#btnFirstPage').on('click', () => loadData(1));
         $('#btnLastPage').on('click', () => loadData(totalPages));
         $('#btnPrevPage').on('click', () => { if(currentPage > 1) loadData(currentPage - 1); });
         $('#btnNextPage').on('click', () => { if(currentPage < totalPages) loadData(currentPage + 1); });
 
-        // 初始化加载（默认加载待审核状态，已在 HTML 静态绑定）
+        // 初始化加载数据
         loadData(1);
 
     })();

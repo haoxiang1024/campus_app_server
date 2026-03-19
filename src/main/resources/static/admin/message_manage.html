@@ -5,6 +5,7 @@
     <title>留言管理</title>
     <link href="./css/sweetalert2.min.css" rel="stylesheet">
     <style>
+        /* 页面基础样式 */
         .content-wrapper {
             background: #ffffff !important;
             border-radius: 12px;
@@ -20,6 +21,7 @@
         .btn-outline-custom:disabled { cursor: not-allowed; opacity: 0.5; }
         .btn-link { text-decoration: none !important; }
         .form-select-sm { border-color: #dee2e6 !important; color: #666; }
+        /* 留言内容防溢出 */
         .msg-content { max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     </style>
 </head>
@@ -28,9 +30,9 @@
 <div class="content-wrapper">
     <div class="d-flex justify-content-between align-items-center mb-4 gap-3 flex-wrap ">
         <div class="d-flex gap-2">
-            <button class="btn btn-outline-success btn-sm" id="batchApproveBtn">批量通过</button>
-            <button class="btn btn-outline-warning btn-sm" id="batchRejectBtn">批量驳回</button>
-            <button class="btn btn-outline-danger btn-sm" id="batchDeleteBtn">批量删除</button>
+            <button class="btn btn-outline-success btn-sm" id="batchApproveBtn">通过</button>
+            <button class="btn btn-outline-warning btn-sm" id="batchRejectBtn">驳回</button>
+            <button class="btn btn-outline-danger btn-sm" id="batchDeleteBtn">删除</button>
         </div>
         <div class="d-flex gap-2">
             <select id="stateFilter" class="form-select form-select-sm" style="width: 120px;">
@@ -53,7 +55,7 @@
             <thead class="table-light">
             <tr>
                 <th style="width: 45px;"><input type="checkbox" id="selectAll" class="form-check-input"></th>
-                <th style="width: 30%;">留言内容</th>
+                <th style="width: 60px;">ID</th> <th style="width: 30%;">留言内容</th>
                 <th>留言人</th>
                 <th>层级</th>
                 <th>发布时间</th>
@@ -62,7 +64,7 @@
             </tr>
             </thead>
             <tbody id="msgTableBody">
-            <tr><td colspan="7" class="text-center text-muted">正在检索数据...</td></tr>
+            <tr><td colspan="8" class="text-center text-muted">正在检索数据...</td></tr>
             </tbody>
         </table>
     </div>
@@ -117,6 +119,7 @@
         const pageSize = 10;
         let allData = [];
 
+        // 格式化时间
         function formatDate(ts) {
             if (!ts) return '-';
             const d = new Date(ts);
@@ -129,7 +132,7 @@
             const keyword = $('#searchInput').val().trim();
             const state = $('#stateFilter').val();
 
-            $('#msgTableBody').html('<tr><td colspan="7" class="text-center text-muted">正在检索最新数据...</td></tr>');
+            $('#msgTableBody').html('<tr><td colspan="8" class="text-center text-muted">正在检索最新数据...</td></tr>');
 
             $.get('/school/admin/getMessageByPage', {
                 page: page,
@@ -150,7 +153,7 @@
                     $('#btnNextPage, #btnLastPage').prop('disabled', currentPage >= totalPages);
                     $('#selectAll').prop('checked', false);
                 } else {
-                    $('#msgTableBody').html('<tr><td colspan="7" class="text-center text-danger">数据加载失败</td></tr>');
+                    $('#msgTableBody').html('<tr><td colspan="8" class="text-center text-danger">数据加载失败</td></tr>');
                 }
             });
         }
@@ -159,23 +162,16 @@
         function renderTable(data) {
             let html = '';
             if (!data.length) {
-                html = '<tr><td colspan="7" class="text-center text-muted">未找到匹配的记录</td></tr>';
+                html = '<tr><td colspan="8" class="text-center text-muted">未找到匹配的记录</td></tr>';
             } else {
                 data.forEach(item => {
                     let badgeClass = 'bg-secondary';
                     let stateText = '未知状态';
 
-                    // 核心逻辑：状态判断 (0待审核 1通过 2驳回)
-                    if(item.state == 0) {
-                        badgeClass = 'bg-info';
-                        stateText = '待审核';
-                    } else if(item.state == 1) {
-                        badgeClass = 'bg-success';
-                        stateText = '已通过';
-                    } else if(item.state == 2) {
-                        badgeClass = 'bg-danger';
-                        stateText = '已驳回';
-                    }
+                    // 状态判断 (0待审核 1通过 2驳回)
+                    if(item.state == 0) { badgeClass = 'bg-info'; stateText = '待审核'; }
+                    else if(item.state == 1) { badgeClass = 'bg-success'; stateText = '已通过'; }
+                    else if(item.state == 2) { badgeClass = 'bg-danger'; stateText = '已驳回'; }
 
                     // 动态生成操作按钮
                     let btns = `<button class="btn btn-sm btn-link text-custom-blue p-0 me-2" onclick="showDetail(${item.id})">详情</button>`;
@@ -190,8 +186,10 @@
                         ? `<span class="text-primary fw-bold">主留言</span>`
                         : `<span class="text-muted">楼层回复</span>`;
 
+                    // 新增 <td>${item.id}</td>
                     html += `<tr>
                         <td><input type="checkbox" class="item-checkbox form-check-input" value="${item.id}"></td>
+                        <td>${item.id}</td>
                         <td><div class="msg-content" title="${item.content}">${item.content}</div></td>
                         <td>${item.nickname || '-'}</td>
                         <td>${levelBadge}</td>
@@ -212,7 +210,6 @@
             const targetItems = allData.filter(item => selectedIds.includes(item.id.toString()) && item.state == 0);
             if (targetItems.length === 0) return window.Toast.error('选中的记录中没有可处理的【待审核】项');
 
-            // 核心映射：1表示通过，2表示驳回
             const stateCode = targetStateText === '已通过' ? 1 : 2;
 
             const executeBatch = (reason = '') => {
@@ -239,6 +236,7 @@
             }
         }
 
+        // 绑定批量操作
         $('#batchApproveBtn').on('click', () => batchOperate('已通过', '批量通过', '审核通过', false));
         $('#batchRejectBtn').on('click', () => batchOperate('已驳回', '批量驳回', '已驳回', true));
 
@@ -272,18 +270,14 @@
             }
         };
 
+        // 发送更新请求
         function sendUpdateRequest(id, stateText, reason) {
-            // 核心映射：1表示通过，2表示驳回
             const stateCode = stateText === '已通过' ? 1 : 2;
 
             $.ajax({
                 url: '/school/admin/updateMessageStatus',
                 type: 'POST',
-                data: {
-                    messageId: id,
-                    state: stateCode,
-                    reason: reason
-                },
+                data: { messageId: id, state: stateCode, reason: reason },
                 success: (res) => {
                     if(res.status === 0) {
                         window.Toast.success(`已${stateText}`);
@@ -292,9 +286,7 @@
                         window.Toast.error(res.msg || "操作失败");
                     }
                 },
-                error: () => {
-                    window.Toast.error("请求失败，请检查参数或网络");
-                }
+                error: () => window.Toast.error("请求失败，请检查参数或网络")
             });
         }
 
@@ -312,7 +304,6 @@
             const item = allData.find(u => u.id == id);
             if (!item) return;
 
-            // 详情弹窗中的状态映射 (0待审核 1通过 2驳回)
             let stateText = '未知状态';
             let badgeClass = 'bg-secondary';
             if (item.state == 0) { stateText = '待审核'; badgeClass = 'bg-info'; }
@@ -321,7 +312,9 @@
 
             let levelText = (!item.parentId || item.parentId === 0) ? '主留言' : '楼层回复';
 
+            // 新增 ID 显示
             const content = `
+                <div class="mb-2"><strong>留言 ID：</strong>${item.id}</div>
                 <div class="mb-2"><strong>留言人：</strong>${item.nickname || '未知用户'}</div>
                 <div class="mb-2"><strong>层级：</strong>${levelText}</div>
                 <div class="mb-2"><strong>发布时间：</strong>${formatDate(item.createTime)}</div>

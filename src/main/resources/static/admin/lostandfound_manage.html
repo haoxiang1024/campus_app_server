@@ -1,23 +1,15 @@
 <link href="./css/sweetalert2.min.css" rel="stylesheet">
 <style>
     /* 自定义开关颜色 */
-    .form-check-input.stick-switch:checked {
-        background-color: #00aaff;
-        border-color: #00aaff;
-    }
-    .content-wrapper {
-        background: #ffffff !important;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        padding: 25px;
-        margin: 15px;
-        color: #333 !important;
-    }
+    .form-check-input.stick-switch:checked { background-color: #00aaff; border-color: #00aaff; }
+    /* 页面基础样式 */
+    .content-wrapper { background: #ffffff !important; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 25px; margin: 15px; color: #333 !important; }
     .text-custom-blue { color: #00aaff !important; }
     .table-light th { background-color: #f8f9fa !important; color: #666 !important; font-weight: 600; }
     .btn-outline-custom { color: #00aaff !important; border-color: #dee2e6 !important; }
     .btn-outline-custom:hover:not(:disabled) { background-color: #00aaff !important; color: white !important; }
     .btn-outline-custom:disabled { cursor: not-allowed; opacity: 0.5; }
+    /* 图片预览框样式 */
     .detail-img-wrapper { text-align: center; padding: 15px; background: #fdfdfd; border: 1px dashed #dee2e6; border-radius: 8px; margin-top: 10px; }
     .detail-img { max-height: 250px; max-width: 100%; border-radius: 4px; cursor: zoom-in; }
     .btn-link { text-decoration: none !important; }
@@ -63,6 +55,7 @@
             <thead class="table-light">
             <tr>
                 <th style="width: 45px;"><input type="checkbox" id="selectAll" class="form-check-input"></th>
+                <th>ID</th>
                 <th style="width: 80px;">类型</th>
                 <th>置顶</th>
                 <th>标题</th>
@@ -74,7 +67,7 @@
             </tr>
             </thead>
             <tbody id="lostTableBody">
-            <tr><td colspan="8" class="text-center text-muted">正在检索数据...</td></tr>
+            <tr><td colspan="10" class="text-center text-muted">正在检索数据...</td></tr>
             </tbody>
         </table>
     </div>
@@ -109,6 +102,7 @@
         </div>
     </div>
 </div>
+
 <div class="modal fade" id="addModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -177,110 +171,50 @@
         </div>
     </div>
 </div>
+
 <script src="./js/jquery.min.js"></script>
 <script src="./js/bootstrap.bundle.min.js"></script>
 <script src="./js/sweetalert2@11.js"></script>
 
 <script>
-    // 统一定制 Toast 提示 - 修复参数传递逻辑，增加异常处理
+    // 统一定制 Toast 提示工具
     window.Toast = window.Toast || {
-        success: (msg) => {
-            Swal.fire({
-                icon: 'success',
-                title: msg,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 2000,
-                width: '220px',
-                padding: '0.5rem'
-            });
-        },
-        error: (msg) => {
-            Swal.fire({
-                icon: 'error',
-                title: '操作失败',
-                text: msg || '未知错误',
-                confirmButtonColor: '#00aaff',
-                width: '320px'
-            });
-        },
-        confirm: (title, text, callback) => {
-            Swal.fire({
-                title: title,
-                text: text,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#00aaff',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: '确定',
-                cancelButtonText: '取消'
-            }).then((result) => {
-                if (result.isConfirmed && typeof callback === 'function') {
-                    callback();
-                }
-            });
-        },
-        // 修复prompt方法：优化参数默认值，增加类型校验
-        prompt: (title, placeholder, callback) => {
-            // 确保参数有默认值，避免undefined
-            const promptTitle = title || '请输入信息';
-            const promptPlaceholder = placeholder || '请输入...';
-
-            Swal.fire({
-                title: promptTitle,
-                input: 'text',
-                inputPlaceholder: promptPlaceholder,
-                showCancelButton: true,
-                confirmButtonColor: '#00aaff',
-                confirmButtonText: '提交',
-                cancelButtonText: '取消',
-                inputValidator: (value) => {
-                    if (!value) return '请务必填写原因！';
-                }
-            }).then((result) => {
-                if (result.isConfirmed && typeof callback === 'function') {
-                    callback(result.value);
-                }
-            });
-        }
+        success: (msg) => { Swal.fire({ icon: 'success', title: msg, toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, width: '220px', padding: '0.5rem' }); },
+        error: (msg) => { Swal.fire({ icon: 'error', title: '操作失败', text: msg || '未知错误', confirmButtonColor: '#00aaff', width: '320px' }); },
+        confirm: (title, text, callback) => { Swal.fire({ title: title, text: text, icon: 'warning', showCancelButton: true, confirmButtonColor: '#00aaff', cancelButtonColor: '#6c757d', confirmButtonText: '确定', cancelButtonText: '取消' }).then((result) => { if (result.isConfirmed && typeof callback === 'function') { callback(); } }); },
+        prompt: (title, placeholder, callback) => { const promptTitle = title || '请输入信息'; const promptPlaceholder = placeholder || '请输入...'; Swal.fire({ title: promptTitle, input: 'text', inputPlaceholder: promptPlaceholder, showCancelButton: true, confirmButtonColor: '#00aaff', confirmButtonText: '提交', cancelButtonText: '取消', inputValidator: (value) => { if (!value) return '请务必填写原因！'; } }).then((result) => { if (result.isConfirmed && typeof callback === 'function') { callback(result.value); } }); }
     };
 
     (function() {
         let currentLostPage = 1;
         let totalLostPages = 1;
         const pageSize = 10;
-        let allData = []; // 当前页数据缓存
+        let allData = [];
 
-        // 获取图片URL - 增加空值校验
+        // 获取图片地址，处理本地和网络图片
         function getPhotoUrl(photo) {
             if (!photo || photo.trim() === '') return './svgs/solid/circle-user.svg';
             if (photo.startsWith('http')) return photo;
             return '/school/upload/' + photo;
         }
 
-        // 格式化日期 - 增加时间戳有效性校验
+        // 格式化时间戳
         function formatDate(ts) {
             if (!ts) return '未设置';
-
-            // 如果传入的是纯数字字符串（如时间戳），先转成 Number；如果是 ISO 字符串，原样保留
             const parseValue = isNaN(Number(ts)) ? ts : Number(ts);
             const d = new Date(parseValue);
-
-            // 校验日期是否有效 (如果无效，d.getTime() 会返回 NaN)
             if (isNaN(d.getTime())) return '未设置';
-
             return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
         }
 
-        // 加载数据 - 增加错误处理
+        // 加载表格数据
         function loadData(page) {
             currentLostPage = page || 1;
             const keyword = $('#searchInput').val().trim();
             const state = $('#stateFilter').val();
             const type = $('#typeFilter').val();
 
-            $('#lostTableBody').html('<tr><td colspan="8" class="text-center text-muted">正在检索最新数据...</td></tr>');
+            $('#lostTableBody').html('<tr><td colspan="10" class="text-center text-muted">正在检索最新数据...</td></tr>');
 
             $.get('/school/admin/getLostFoundByPage', {
                 page: currentLostPage,
@@ -296,40 +230,42 @@
 
                     renderLostTable(allData);
 
+                    // 更新分页组件状态
                     $('#lostPageInfo').text(`第 ${currentLostPage} 页 / 共 ${totalLostPages} 页`);
                     $('#lostTotalCount').text(totalItems);
                     $('#btnLostFirstPage, #btnLostPrevPage').prop('disabled', currentLostPage <= 1);
                     $('#btnLostNextPage, #btnLostLastPage').prop('disabled', currentLostPage >= totalLostPages);
                     $('#selectAll').prop('checked', false);
                 } else {
-                    $('#lostTableBody').html('<tr><td colspan="8" class="text-center text-danger">数据加载失败：' + (res?.msg || '接口返回异常') + '</td></tr>');
+                    $('#lostTableBody').html('<tr><td colspan="10" class="text-center text-danger">数据加载失败：' + (res?.msg || '接口返回异常') + '</td></tr>');
                 }
             }).fail(function(xhr, status, error) {
-                // 增加AJAX请求失败的处理
-                $('#lostTableBody').html('<tr><td colspan="8" class="text-center text-danger">数据加载失败：网络异常</td></tr>');
+                $('#lostTableBody').html('<tr><td colspan="10" class="text-center text-danger">数据加载失败：网络异常</td></tr>');
                 console.error('加载数据失败：', error);
             });
         }
 
-        // 渲染表格 - 优化DOM操作，增加数据校验
+        // 渲染表格 HTML
         function renderLostTable(data) {
             let html = '';
             if (!data || !data.length) {
-                html = '<tr><td colspan="8" class="text-center text-muted">未找到匹配的记录</td></tr>';
+                html = '<tr><td colspan="10" class="text-center text-muted">未找到匹配的记录</td></tr>';
             } else {
                 data.forEach(item => {
-                    // 确保item有值，避免undefined报错
                     item = item || {};
+                    // 类型徽章
                     let typeBadge = item.type === '招领'
                         ? '<span class="badge border text-success border-success">招领</span>'
                         : '<span class="badge border text-danger border-danger">失物</span>';
 
+                    // 状态徽章
                     let badgeClass = 'bg-secondary';
                     if(item.state === '待审核') badgeClass = 'bg-info';
                     else if(item.state === '寻找中') badgeClass = 'bg-primary';
                     else if(item.state === '已认领') badgeClass = 'bg-success';
                     else if(item.state === '已驳回') badgeClass = 'bg-danger';
 
+                    // 操作按钮
                     let btns = `<button class="btn btn-sm btn-link text-custom-blue p-0 me-2" onclick="showLostDetail(${item.id || 0})">详情</button>`;
                     if(item.state === '待审核') {
                         btns += `<button class="btn btn-sm btn-link text-success p-0 me-2 fw-bold" onclick="approveSingle(${item.id || 0})">通过</button>`;
@@ -337,8 +273,10 @@
                     }
                     btns += `<button class="btn btn-sm btn-link text-danger p-0" onclick="deleteItem(${item.id || 0})">删除</button>`;
 
+                    // 拼接行
                     html += `<tr>
                         <td><input type="checkbox" class="item-checkbox form-check-input" value="${item.id || 0}"></td>
+                        <td>${item.id || 0}</td>
                         <td>${typeBadge}</td>
                         <td>
                             <div class="form-check form-switch">
@@ -359,10 +297,9 @@
             }
             $('#lostTableBody').html(html);
 
-            // 绑定置顶开关事件 - 增加防抖和异常处理
+            // 绑定置顶开关事件
             $('.stick-switch').off('change').on('change', function() {
                 const $this = $(this);
-                // 防止重复触发
                 if ($this.data('processing')) return;
                 $this.data('processing', true);
 
@@ -375,7 +312,7 @@
             });
         }
 
-        // 更新置顶状态 - 改为返回Promise，增加异常处理
+        // 发送更新置顶状态请求
         function updateStickStatus(id, stick) {
             return $.post('/school/admin/updateStickStatus', { id: id, stick: stick })
                 .done(function(res) {
@@ -383,7 +320,6 @@
                         window.Toast.success(stick === 1 ? '已置顶' : '取消置顶');
                     } else {
                         window.Toast.error(res?.msg || '操作失败');
-                        // 回滚开关状态
                         $(`.stick-switch[data-id="${id}"]`).prop('checked', stick === 1 ? false : true);
                         loadData(currentLostPage);
                     }
@@ -395,34 +331,22 @@
                 });
         }
 
-        // 批量通过
+        // 批量审核通过
         $('#batchApproveBtn').on('click', function() {
-            const selectedIds = $('.item-checkbox:checked').map(function() {
-                return $(this).val();
-            }).get().filter(id => id); // 过滤空值
-
+            const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get().filter(id => id);
             if (!selectedIds.length) return window.Toast.error('请先勾选项目');
 
-            const targetItems = allData.filter(item =>
-                selectedIds.includes(item.id.toString()) && item.state === '待审核'
-            );
-
-            if (targetItems.length === 0) {
-                return window.Toast.error('选中的记录中没有待审核的项');
-            }
+            const targetItems = allData.filter(item => selectedIds.includes(item.id.toString()) && item.state === '待审核');
+            if (targetItems.length === 0) return window.Toast.error('选中的记录中没有待审核的项');
 
             window.Toast.confirm('批量通过', `确定要审核通过这 ${targetItems.length} 条记录吗？`, () => {
                 const promises = targetItems.map(item => {
                     const targetState = (item.type === '失物') ? '寻找中' : '待认领';
-                    return $.post('/school/admin/updateLostFoundStatus', {
-                        lostFoundId: item.id,
-                        state: targetState
-                    });
+                    return $.post('/school/admin/updateLostFoundStatus', { lostFoundId: item.id, state: targetState });
                 });
 
-                Promise.allSettled(promises).then(results => { // 改用allSettled，避免一个失败全部失败
+                Promise.allSettled(promises).then(results => {
                     const successCount = results.filter(res => res.status === 'fulfilled' && res.value?.status === 0).length;
-
                     if (successCount === targetItems.length) {
                         window.Toast.success(`批量操作成功，共处理 ${successCount} 条记录`);
                     } else {
@@ -431,40 +355,29 @@
                     loadData(currentLostPage);
                 }).catch(err => {
                     window.Toast.error("网络异常，批量请求未能全部完成");
-                    console.error(err);
                 });
             });
         });
 
         // 批量驳回
         $('#batchRejectBtn').on('click', function() {
-            const selectedIds = $('.item-checkbox:checked').map(function() {
-                return $(this).val();
-            }).get().filter(id => id);
-
+            const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get().filter(id => id);
             if (!selectedIds.length) return window.Toast.error('请先勾选项目');
 
             const targetIds = [];
             let skipCount = 0;
             selectedIds.forEach(id => {
                 const item = allData.find(u => u.id == id);
-                if (item && item.state === '待审核') {
-                    targetIds.push(id);
-                } else {
-                    skipCount++;
-                }
+                if (item && item.state === '待审核') targetIds.push(id);
+                else skipCount++;
             });
 
-            if (!targetIds.length) return window.Toast.error('选中项中没有符合驳回条件（待审核）的记录');
+            if (!targetIds.length) return window.Toast.error('选中项中没有符合驳回条件');
 
-            const title = skipCount > 0 ? `批量驳回 (将跳过 ${skipCount} 项)` : '批量驳回';
+            const title = skipCount > 0 ? `批量驳回 跳过已审核项` : '批量驳回';
             window.Toast.prompt(title, '请输入统一的驳回原因', (reason) => {
                 const promises = targetIds.map(id => {
-                    return $.post('/school/admin/updateLostFoundStatus', {
-                        lostFoundId: id,
-                        state: '已驳回',
-                        reason: reason
-                    });
+                    return $.post('/school/admin/updateLostFoundStatus', { lostFoundId: id, state: '已驳回', reason: reason });
                 });
 
                 Promise.allSettled(promises).then(results => {
@@ -480,17 +393,11 @@
 
         // 批量删除
         $('#batchDeleteBtn').on('click', function() {
-            const selectedIds = $('.item-checkbox:checked').map(function() {
-                return $(this).val();
-            }).get().filter(id => id);
-
+            const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get().filter(id => id);
             if (!selectedIds.length) return window.Toast.error('请勾选要删除的项目');
 
             window.Toast.confirm("批量删除", `确定永久删除选中的 ${selectedIds.length} 项记录吗？`, () => {
-                const promises = selectedIds.map(id => {
-                    return $.post('/school/admin/deleteLostFoundById', { lostFoundId: id });
-                });
-
+                const promises = selectedIds.map(id => $.post('/school/admin/deleteLostFoundById', { lostFoundId: id }));
                 Promise.allSettled(promises).then(() => {
                     window.Toast.success("删除操作完成");
                     loadData(1);
@@ -511,33 +418,18 @@
                 const $stickSwitch = $row.find('.stick-switch');
                 const id = $(this).val();
 
-                if (id && !$stickSwitch.prop('checked')) {
-                    targetIds.push(id);
-                } else {
-                    skipCount++;
-                }
+                if (id && !$stickSwitch.prop('checked')) targetIds.push(id);
+                else skipCount++;
             });
 
             if (targetIds.length === 0) {
-                if (skipCount > 0) {
-                    return window.Toast.error('选中的项目已全部处于置顶状态');
-                } else {
-                    return window.Toast.error('请先勾选项目');
-                }
+                return skipCount > 0 ? window.Toast.error('选中的项目已全部处于置顶状态') : window.Toast.error('请先勾选项目');
             }
 
-            const confirmMsg = skipCount > 0
-                ? `确定要置顶选中的 ${targetIds.length} 条记录吗？(已自动跳过 ${skipCount} 条已置顶记录)`
-                : `确定要置顶选中的 ${targetIds.length} 条记录吗？`;
+            const confirmMsg = skipCount > 0 ? `确定要置顶选中的记录吗 跳过已置顶记录` : `确定要置顶选中的 ${targetIds.length} 条记录吗？`;
 
             window.Toast.confirm('批量置顶', confirmMsg, () => {
-                const promises = targetIds.map(id => {
-                    return $.post('/school/admin/updateStickStatus', {
-                        id: id,
-                        stick: 1
-                    });
-                });
-
+                const promises = targetIds.map(id => $.post('/school/admin/updateStickStatus', { id: id, stick: 1 }));
                 Promise.allSettled(promises).then(results => {
                     const successCount = results.filter(res => res.status === 'fulfilled' && res.value?.status === 0).length;
                     window.Toast.success(`操作完成：${successCount} 条成功`);
@@ -559,33 +451,18 @@
                 const $stickSwitch = $row.find('.stick-switch');
                 const id = $(this).val();
 
-                if (id && $stickSwitch.prop('checked')) {
-                    targetIds.push(id);
-                } else {
-                    skipCount++;
-                }
+                if (id && $stickSwitch.prop('checked')) targetIds.push(id);
+                else skipCount++;
             });
 
             if (targetIds.length === 0) {
-                if (skipCount > 0) {
-                    return window.Toast.error('选中的项目本就未置顶，无需取消');
-                } else {
-                    return window.Toast.error('请先勾选项目');
-                }
+                return skipCount > 0 ? window.Toast.error('选中的项目本就未置顶，无需取消') : window.Toast.error('请先勾选项目');
             }
 
-            const confirmMsg = skipCount > 0
-                ? `确定要取消选中的 ${targetIds.length} 条记录的置顶吗？(已跳过 ${skipCount} 条本就未置顶记录)`
-                : `确定要取消选中的 ${targetIds.length} 条记录的置顶吗？`;
+            const confirmMsg = skipCount > 0 ? `确定要取消选中的记录置顶吗 跳过本就未置顶记录` : `确定要取消选中的 ${targetIds.length} 条记录的置顶吗？`;
 
             window.Toast.confirm('取消置顶', confirmMsg, () => {
-                const promises = targetIds.map(id => {
-                    return $.post('/school/admin/updateStickStatus', {
-                        id: id,
-                        stick: 0
-                    });
-                });
-
+                const promises = targetIds.map(id => $.post('/school/admin/updateStickStatus', { id: id, stick: 0 }));
                 Promise.allSettled(promises).then(results => {
                     const successCount = results.filter(res => res.status === 'fulfilled' && res.value?.status === 0).length;
                     window.Toast.success(`操作完成：成功取消 ${successCount} 条置顶`);
@@ -600,57 +477,39 @@
         // 单个通过
         window.approveSingle = (id) => {
             if (!id) return window.Toast.error('无效的记录ID');
-
             const item = allData.find(u => u.id == id);
             if (!item) return window.Toast.error('记录不存在');
 
             const targetState = item.type === '失物' ? '寻找中' : '待认领';
 
-            window.Toast.confirm('审核通过', `确认将该${item.type}信息发布为“${targetState}”吗？`, () => {
-                $.post('/school/admin/updateLostFoundStatus', {
-                    lostFoundId: id,
-                    state: targetState
-                }, (res) => {
+            window.Toast.confirm('审核通过', `确认将该信息发布为 ${targetState} 吗？`, () => {
+                $.post('/school/admin/updateLostFoundStatus', { lostFoundId: id, state: targetState }, (res) => {
                     if(res && res.status === 0) {
                         window.Toast.success("已发布");
                         loadData(currentLostPage);
                     } else {
                         window.Toast.error(res?.msg || '操作失败');
                     }
-                }).fail(() => {
-                    window.Toast.error('网络异常，操作失败');
-                });
+                }).fail(() => window.Toast.error('网络异常，操作失败'));
             });
         };
 
-        // 单个驳回 - 修复核心问题：确保prompt函数调用正常
+        // 单个驳回
         window.rejectSingle = (id) => {
             if (!id) return window.Toast.error('无效的记录ID');
-
-            // 确认window.Toast.prompt存在且是函数
-            if (typeof window.Toast.prompt !== 'function') {
-                return window.Toast.error('提示组件初始化失败，请刷新页面');
-            }
-
             window.Toast.prompt('审核驳回', '请输入驳回理由', (reason) => {
-                $.post('/school/admin/updateLostFoundStatus', {
-                    lostFoundId: id,
-                    state: '已驳回',
-                    reason: reason
-                }, (res) => {
+                $.post('/school/admin/updateLostFoundStatus', { lostFoundId: id, state: '已驳回', reason: reason }, (res) => {
                     if(res && res.status === 0) {
                         window.Toast.success("已驳回");
                         loadData(currentLostPage);
                     } else {
                         window.Toast.error(res?.msg || '操作失败');
                     }
-                }).fail(() => {
-                    window.Toast.error('网络异常，操作失败');
-                });
+                }).fail(() => window.Toast.error('网络异常，操作失败'));
             });
         };
 
-        // 查看详情
+        // 查看详情弹窗内容构建
         window.showLostDetail = (id) => {
             if (!id) return window.Toast.error('无效的记录ID');
 
@@ -661,7 +520,9 @@
                 if(res && res.status === 0 && res.data) {
                     const item = res.data;
                     const typeLabel = item.type === '招领' ? '招领' : '失物';
+                    // 在此处新增了 ID 字段展示
                     const content = `
+                        <div class="mb-2"><strong>ID：</strong>${item.id || id}</div>
                         <div class="mb-2"><strong>类型：</strong>${typeLabel}</div>
                         <div class="mb-2"><strong>标题：</strong>${item.title || '未命名'}</div>
                         <div class="mb-2"><strong>地点：</strong>${item.place || '-'}</div>
@@ -674,15 +535,12 @@
                 } else {
                     window.Toast.error('获取详情失败');
                 }
-            }).fail(() => {
-                window.Toast.error('网络异常，无法获取详情');
-            });
+            }).fail(() => window.Toast.error('网络异常，无法获取详情'));
         };
 
-        // 删除单个
+        // 单个删除
         window.deleteItem = (id) => {
             if (!id) return window.Toast.error('无效的记录ID');
-
             window.Toast.confirm("删除确认", "确定永久删除此信息吗？", () => {
                 $.post('/school/admin/deleteLostFoundById', { lostFoundId: id }, (res) => {
                     if(res && res.status === 0) {
@@ -691,9 +549,7 @@
                     } else {
                         window.Toast.error(res?.msg || '删除失败');
                     }
-                }).fail(() => {
-                    window.Toast.error('网络异常，删除失败');
-                });
+                }).fail(() => window.Toast.error('网络异常，删除失败'));
             });
         };
 
@@ -708,23 +564,21 @@
         $('#btnLostPrevPage').on('click', () => { if(currentLostPage > 1) loadData(currentLostPage - 1); });
         $('#btnLostNextPage').on('click', () => { if(currentLostPage < totalLostPages) loadData(currentLostPage + 1); });
 
-        // 首次加载
+        // 初始化加载数据
         loadData(1);
 
-        // 打开登记弹窗
+        // 打开新增弹窗
         window.openAddModal = () => {
             $('#addForm')[0].reset();
-            // 设置默认时间为当前
             const now = new Date();
             now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
             $('#addTime').val(now.toISOString().slice(0, 16));
             new bootstrap.Modal('#addModal').show();
         };
 
-        // 提交登记信息 - 增加表单校验和异常处理
+        // 提交登记
         window.submitRegistration = () => {
             const addForm = $('#addForm')[0];
-            // HTML5表单校验
             if (!addForm.checkValidity()) {
                 addForm.reportValidity();
                 return;
@@ -739,7 +593,6 @@
 
             if (!file) return window.Toast.error("请选择物品图片");
 
-            // 构造JSON数据
             const itemData = {
                 title: $('#addForm [name="title"]').val().trim(),
                 place: $('#addForm [name="place"]').val().trim(),
@@ -780,11 +633,8 @@
                         window.Toast.error(res?.msg || "发布失败");
                     }
                 },
-                error: function() {
-                    window.Toast.error("服务器响应异常");
-                }
+                error: function() { window.Toast.error("服务器响应异常"); }
             });
         };
-
     })();
 </script>

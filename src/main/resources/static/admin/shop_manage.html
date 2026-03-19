@@ -41,15 +41,20 @@
 
 <div class="content-wrapper">
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-        <button class="btn btn-warning btn-sm text-white px-3" onclick="showAddModal()">
-            + 添加商品
-        </button>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-success btn-sm" id="batchOnShelfBtn">批量上架</button>
+            <button class="btn btn-outline-danger btn-sm" id="batchOffShelfBtn">批量下架</button>
+            <button class="btn btn-warning btn-sm text-white px-3" onclick="showAddModal()">
+                + 添加商品
+            </button>
+        </div>
     </div>
 
     <div class="table-responsive">
         <table class="table table-hover align-middle">
             <thead class="table-light">
             <tr>
+                <th style="width: 45px;"><input type="checkbox" id="selectAll" class="form-check-input"></th>
                 <th>ID</th>
                 <th>图片</th>
                 <th>商品名称</th>
@@ -60,7 +65,7 @@
             </tr>
             </thead>
             <tbody id="itemList">
-            <tr><td colspan="7" class="text-center text-muted">正在加载数据...</td></tr>
+            <tr><td colspan="8" class="text-center text-muted">正在加载数据...</td></tr>
             </tbody>
         </table>
     </div>
@@ -76,6 +81,7 @@
             <div class="modal-body">
                 <form id="itemForm" enctype="multipart/form-data">
                     <input type="hidden" id="itemId" name="id">
+                    <input type="hidden" id="existingImage" name="image_url">
 
                     <div class="mb-3 text-center">
                         <div><img src="./img/default.png" id="itemImagePreview" onerror="this.src='./img/default.png'"></div>
@@ -119,138 +125,192 @@
 </div>
 
 <script>
-    $(function() {
-        loadItems();
+    // 使用立即执行函数封装作用域，防止频繁切换页面导致变量命名冲突报错
+    (function() {
 
-        // 选中图片预览逻辑
-        $('#itemImageFile').on('change', function() {
-            const file = this.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    $('#itemImagePreview').attr('src', e.target.result);
-                }
-                reader.readAsDataURL(file);
-            }
+        let allItemsData = [];
+
+        // 页面DOM加载完毕后执行初始化
+        $(function() {
+            loadItems();
+            initEvents();
         });
-    });
 
-    // 加载商品列表数据
-    function loadItems() {
-        $.get('/school/shop/items/all', function(res) {
-            if(res.status === 0) {
-                let html = '';
-                if (!res.data || res.data.length === 0) {
-                    html = '<tr><td colspan="7" class="text-center text-muted">暂无商品数据</td></tr>';
-                } else {
-                    res.data.forEach(item => {
-                        // 根据当前状态判断操作按钮显示的文字和颜色
-                        const statusBtnText = item.status === 1 ? '下架' : '上架';
-                        const statusBtnClass = item.status === 1 ? 'text-danger' : 'text-success';
-                        const targetStatus = item.status === 1 ? 0 : 1;
-
-                        html += `
-                            <tr>
-                                <td>${item.id}</td>
-                                <td><img src="${item.image_url || './img/default.png'}" onerror="this.src='./img/default.png'"></td>
-                                <td class="fw-bold">${item.name}</td>
-                                <td><span class="badge bg-warning text-dark">${item.required_points}</span></td>
-                                <td>${item.stock}</td>
-                                <td><span class="${item.status === 1 ? 'status-on' : 'status-off'}">
-                                    ${item.status === 1 ? '上架' : '已下架'}</span></td>
-                                <td>
-                                    <button class="btn btn-sm btn-link text-custom-blue p-0 me-2" style="text-decoration: none" onclick='editItem(${JSON.stringify(item)})'>编辑</button>
-                                    <button class="btn btn-sm btn-link ${statusBtnClass} p-0" style="text-decoration: none"
-                                            onclick="updateStatus(${item.id}, ${targetStatus})">${statusBtnText}</button>
-                                </td>
-                            </tr>`;
-                    });
+        // 绑定页面内的各项事件
+        function initEvents() {
+            // 选中图片预览
+            $('#itemImageFile').off('change').on('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#itemImagePreview').attr('src', e.target.result);
+                    }
+                    reader.readAsDataURL(file);
                 }
-                $('#itemList').html(html);
-            }
-        });
-    }
+            });
 
-    // 显示新增弹窗
-    function showAddModal() {
-        $('#itemForm')[0].reset();
-        $('#itemId').val('');
-        $('#itemImagePreview').attr('src', './img/default.png');
-        $('#modalTitle').text('添加商品');
-        new bootstrap.Modal($('#itemModal')).show();
-    }
+            // 全选逻辑
+            $('#selectAll').off('change').on('change', function() {
+                $('.item-checkbox').prop('checked', this.checked);
+            });
 
-    // 回显编辑弹窗数据
-    function editItem(item) {
-        $('#itemId').val(item.id);
-        $('#itemName').val(item.name);
-        $('#itemPoints').val(item.required_points || item.requiredPoints);
-        $('#itemStock').val(item.stock);
-        $('#itemStatus').val(item.status);
-        $('#itemDesc').val(item.description);
-        $('#itemImagePreview').attr('src', item.image_url || './img/default.png');
-        $('#modalTitle').text('编辑商品');
-        new bootstrap.Modal($('#itemModal')).show();
-    }
+            // 批量按钮事件
+            $('#batchOnShelfBtn').off('click').on('click', () => handleBatchStatusUpdate(1, '上架'));
+            $('#batchOffShelfBtn').off('click').on('click', () => handleBatchStatusUpdate(0, '下架'));
+        }
 
-    // 保存商品信息
-    function saveItem() {
-        const formData = new FormData(document.getElementById('itemForm'));
-
-        $.ajax({
-            url: '/school/shop/item/save',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(res) {
+        // 挂载到全局window对象供HTML标签里的onclick属性调用
+        window.loadItems = function() {
+            $.get('/school/shop/items/all', function(res) {
                 if(res.status === 0) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: '保存成功',
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 2000
-                    });
-                    bootstrap.Modal.getInstance($('#itemModal')).hide();
-                    loadItems();
-                } else {
-                    Swal.fire({ icon: 'error', title: '保存失败', text: res.msg });
-                }
-            }
-        });
-    }
-
-    // 调用后端 updateStatus 接口切换商品状态
-    function updateStatus(id, status) {
-        const actionText = status === 1 ? '上架' : '下架';
-
-        Swal.fire({
-            title: `确定要${actionText}该商品吗?`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#00aaff',
-            confirmButtonText: '确定',
-            cancelButtonText: '取消'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.post('/school/shop/updateStatus', { id: id, status: status }, function(res) {
-                    if(res.status === 0) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: `${actionText}成功`,
-                            toast: true,
-                            position: 'top-end',
-                            showConfirmButton: false,
-                            timer: 1500
+                    allItemsData = res.data || [];
+                    let html = '';
+                    if (allItemsData.length === 0) {
+                        html = '<tr><td colspan="8" class="text-center text-muted">暂无商品数据</td></tr>';
+                    } else {
+                        allItemsData.forEach(item => {
+                            const statusBtnText = item.status === 1 ? '下架' : '上架';
+                            const statusBtnClass = item.status === 1 ? 'text-danger' : 'text-success';
+                            const targetStatus = item.status === 1 ? 0 : 1;
+                            html += `
+                                <tr>
+                                    <td><input type="checkbox" class="item-checkbox form-check-input" value="${item.id}"></td>
+                                    <td>${item.id}</td>
+                                    <td><img src="${item.image_url || './img/default.png'}" onerror="this.src='./img/default.png'"></td>
+                                    <td class="fw-bold">${item.name}</td>
+                                    <td><span class="badge bg-warning text-dark">${item.required_points}</span></td>
+                                    <td>${item.stock}</td>
+                                    <td><span class="${item.status === 1 ? 'status-on' : 'status-off'}">
+                                        ${item.status === 1 ? '上架' : '已下架'}</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-link text-custom-blue p-0 me-2" style="text-decoration: none" onclick='showEditModal(${JSON.stringify(item)})'>编辑</button>
+                                        <button class="btn btn-sm btn-link ${statusBtnClass} p-0" style="text-decoration: none"
+                                                onclick="updateStatus(${item.id}, ${targetStatus})">${statusBtnText}</button>
+                                    </td>
+                                </tr>`;
                         });
+                    }
+                    $('#itemList').html(html);
+                    $('#selectAll').prop('checked', false);
+                }
+            });
+        }
+
+        // 挂载展示新增弹窗方法
+        window.showAddModal = function() {
+            $('#itemForm')[0].reset();
+            $('#itemId').val('');
+            $('#existingImage').val('');
+            $('#itemImageFile').val('');
+            $('#itemImagePreview').attr('src', './img/default.png');
+            $('#modalTitle').text('添加商品');
+            new bootstrap.Modal($('#itemModal')).show();
+        }
+
+        // 挂载展示编辑弹窗方法
+        window.showEditModal = function(item) {
+            $('#itemId').val(item.id);
+            $('#itemName').val(item.name);
+            $('#itemPoints').val(item.required_points || item.requiredPoints);
+            $('#itemStock').val(item.stock);
+            $('#itemStatus').val(item.status);
+            $('#itemDesc').val(item.description);
+            $('#existingImage').val(item.image_url || '');
+            $('#itemImageFile').val('');
+            $('#itemImagePreview').attr('src', item.image_url || './img/default.png');
+            $('#modalTitle').text('编辑商品');
+            new bootstrap.Modal($('#itemModal')).show();
+        }
+
+        // 挂载保存表单方法
+        window.saveItem = function() {
+            const formData = new FormData(document.getElementById('itemForm'));
+            const fileInput = document.getElementById('itemImageFile');
+
+            // 如果没有选择新文件则删除该字段防止覆盖原图
+            if (fileInput.files.length === 0) {
+                formData.delete('imageFile');
+            }
+
+            $.ajax({
+                url: '/school/shop/item/save',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(res) {
+                    if(res.status === 0) {
+                        Swal.fire({ icon: 'success', title: '保存成功', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+                        bootstrap.Modal.getInstance($('#itemModal')).hide();
                         loadItems();
                     } else {
-                        Swal.fire({ icon: 'error', title: '操作失败', text: res.msg });
+                        Swal.fire({ icon: 'error', title: '保存失败', text: res.msg });
                     }
-                });
+                }
+            });
+        }
+
+        // 挂载单条状态更新方法
+        window.updateStatus = function(id, status) {
+            const actionText = status === 1 ? '上架' : '下架';
+            Swal.fire({
+                title: `确定要${actionText}该商品吗?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#00aaff',
+                confirmButtonText: '确定',
+                cancelButtonText: '取消'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('/school/shop/updateStatus', { id: id, status: status }, function(res) {
+                        if(res.status === 0) {
+                            Swal.fire({ icon: 'success', title: `${actionText}成功`, toast: true, position: 'top-end', showConfirmButton: false, timer: 1500 });
+                            loadItems();
+                        } else {
+                            Swal.fire({ icon: 'error', title: '操作失败', text: res.msg });
+                        }
+                    });
+                }
+            });
+        }
+
+        // 批量更新核心逻辑提取内部使用
+        function handleBatchStatusUpdate(targetStatus, actionText) {
+            const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get();
+            if (!selectedIds.length) {
+                Swal.fire({ icon: 'warning', title: '提示', text: '请先勾选商品' });
+                return;
             }
-        });
-    }
+
+            const targetIds = [];
+            selectedIds.forEach(id => {
+                const item = allItemsData.find(u => u.id == id);
+                if (item && item.status !== targetStatus) targetIds.push(id);
+            });
+
+            if (!targetIds.length) {
+                Swal.fire({ icon: 'info', title: '提示', text: `商品已处于${actionText}状态` });
+                return;
+            }
+
+            Swal.fire({
+                title: `批量${actionText}`,
+                text: `确定操作选中的 ${targetIds.length} 件商品吗？`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#00aaff',
+                confirmButtonText: '确定',
+                cancelButtonText: '取消'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const promises = targetIds.map(id => $.post('/school/shop/updateStatus', { id: id, status: targetStatus }));
+                    Promise.allSettled(promises).then(() => {
+                        Swal.fire({ icon: 'success', title: '批量处理完成', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+                        loadItems();
+                    });
+                }
+            });
+        }
+    })();
 </script>

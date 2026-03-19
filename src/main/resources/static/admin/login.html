@@ -150,7 +150,6 @@
                 }
             },
             error: function(xhr, status, error) {
-                // 处理非200状态码（如401/500）
                 let errorMsg = "服务器内部错误";
                 if (xhr.responseJSON) {
                     // 解析服务端返回的错误信息
