@@ -11,12 +11,12 @@
   .table-light th { background-color: #f8f9fa !important; color: #666 !important; font-weight: 600; }
   .form-control:focus, .form-select:focus { border-color: #00aaff; box-shadow: 0 0 0 0.25rem rgba(0, 170, 255, 0.25); }
 
-  /* 核心修复：添加 !important 防止被 Bootstrap 默认样式覆盖，完全对齐商品管理的按钮样式 */
+  /* 添加 !important 防止被 Bootstrap 默认样式覆盖 */
   .btn-outline-custom { color: #00aaff !important; border-color: #dee2e6 !important; }
   .btn-outline-custom:hover:not(:disabled) { background-color: #00aaff !important; color: white !important; }
   .btn-outline-custom:disabled { cursor: not-allowed; opacity: 0.5; }
 
-  /* 核销码字体增强 */
+  /* 核验码字体增强 */
   .verify-badge { font-family: monospace; font-size: 1.1em; letter-spacing: 1px; font-weight: bold; }
   /* 表格超链接按钮无下划线 */
   .text-decoration-none { text-decoration: none !important; }
@@ -28,17 +28,18 @@
 <div class="content-wrapper">
   <div class="d-flex justify-content-between align-items-center mb-4 gap-3 flex-wrap">
     <div class="d-flex gap-2 align-items-center">
+      <button class="btn btn-outline-success btn-sm" id="batchVerifyBtn">核验</button>
       <button class="btn btn-outline-danger btn-sm" id="batchDeleteBtn">删除</button>
       <div class="input-group input-group-sm ms-2" style="width: 250px;">
-        <input type="text" id="verifyInput" class="form-control" placeholder="输入核销码核验...">
-        <button class="btn btn-custom-blue px-3" style="background-color: #0d6efd" onclick="verifyOrder()">核销</button>
+        <input type="text" id="verifyInput" class="form-control" placeholder="输入核验码核验...">
+        <button class="btn btn-custom-blue px-3" style="background-color: #0d6efd" onclick="verifyOrder()">核验</button>
       </div>
     </div>
 
     <div class="d-flex gap-2">
       <select id="stateFilter" class="form-select form-select-sm" style="width: 100px;">
         <option value="">所有状态</option>
-        <option value="0">待核销</option>
+        <option value="0">待核验</option>
         <option value="1">已领取</option>
         <option value="2">已取消</option>
       </select>
@@ -60,7 +61,7 @@
         <th>用户信息</th>
         <th>商品名称</th>
         <th>消耗积分</th>
-        <th>核销码</th>
+        <th>核验码</th>
         <th>状态</th>
         <th>下单时间</th>
         <th class="text-center">操作</th>
@@ -88,6 +89,21 @@
   </div>
 </div>
 
+<div class="modal fade" id="detailModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content shadow-lg border-0">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold text-custom-blue">订单详情</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body pt-0" id="detailContent"></div>
+      <div class="modal-footer border-top-0">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="./js/jquery.min.js"></script>
 <script src="./js/bootstrap.bundle.min.js"></script>
 <script src="./js/sweetalert2@11.js"></script>
@@ -100,12 +116,13 @@
       success: (msg) => Swal.fire({ icon: 'success', title: msg, toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, width: '220px' }),
       error: (msg) => Swal.fire({ icon: 'error', title: '操作失败', text: msg || '未知错误', confirmButtonColor: '#00aaff' }),
       warning: (msg) => Swal.fire({ icon: 'warning', title: msg, toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 }),
-      confirm: (title, text, callback) => Swal.fire({ title: title, text: text, icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#6c757d', confirmButtonText: '确定', cancelButtonText: '取消' }).then(res => { if (res.isConfirmed) callback(); })
+      confirm: (title, text, callback) => Swal.fire({ title: title, text: text, icon: 'warning', showCancelButton: true, confirmButtonColor: '#00aaff', cancelButtonColor: '#6c757d', confirmButtonText: '确定', cancelButtonText: '取消' }).then(res => { if (res.isConfirmed) callback(); })
     };
 
     let currentPage = 1;
     let totalPages = 1;
     const pageSize = 10;
+    let allOrders = []; // 新增：保存当前页面的订单数据用于详情展示
 
     // 挂载到 window，保证 HTML 上的 onclick 能够调用
     window.loadOrders = function(page) {
@@ -115,7 +132,6 @@
 
       $('#orderList').html('<tr><td colspan="9" class="text-center text-muted">正在检索数据...</td></tr>');
 
-      // 获取订单接口保持原样
       $.get('/school/shop/orders', {
         page: currentPage,
         pageSize: pageSize,
@@ -123,11 +139,11 @@
         status: status || null
       }, function(res) {
         if(res.status === 0 && res.data) {
-          const list = res.data.list || res.data || [];
-          const totalItems = res.data.total || list.length || 0;
+          allOrders = res.data.list || res.data || []; // 缓存当前页数据
+          const totalItems = res.data.total || allOrders.length || 0;
           totalPages = res.data.pages || res.data.totalPages || Math.ceil(totalItems / pageSize) || 1;
 
-          renderTable(list);
+          renderTable(allOrders);
 
           // 更新分页信息状态
           $('#pageInfo').text(`第 ${currentPage} 页 / 共 ${totalPages} 页`);
@@ -150,13 +166,15 @@
       }
 
       let html = list.map(order => {
-        let statusHtml = order.status === 0 ? '<span class="badge bg-info">待核销</span>' :
+        let statusHtml = order.status === 0 ? '<span class="badge bg-info">待核验</span>' :
                 order.status === 1 ? '<span class="badge bg-success">已领取</span>' :
                         '<span class="badge bg-secondary">已取消</span>';
 
-        let actionHtml = '';
+        // 新增：详情按钮
+        let actionHtml = `<button class="btn btn-sm btn-link text-decoration-none text-custom-blue p-0 me-3 " onclick="showOrderDetail(${order.id})">详情</button>`;
+
         if(order.status === 0) {
-          actionHtml += `<button class="btn btn-sm btn-link text-decoration-none text-success p-0 me-3 fw-bold" onclick="verifyOrder('${order.verify_code || ''}')">核销</button>`;
+          actionHtml += `<button class="btn btn-sm btn-link text-decoration-none text-success p-0 me-3 fw-bold" onclick="verifyOrder('${order.verify_code || ''}')">核验</button>`;
         }
         actionHtml += `<button class="btn btn-sm btn-link text-decoration-none text-danger p-0" onclick="deleteSingleOrder(${order.id})">删除</button>`;
 
@@ -180,9 +198,37 @@
       $('#orderList').html(html);
     }
 
+    // 新增：打开详情弹窗
+    window.showOrderDetail = function(id) {
+      const order = allOrders.find(o => o.id === id);
+      if(!order) return window.Toast.error('未找到该订单信息');
+
+      const statusText = order.status === 0 ? '<span class="text-info">待核验</span>' :
+              order.status === 1 ? '<span class="text-success">已领取</span>' :
+                      '<span class="text-secondary">已取消</span>';
+
+      const dateStr = order.create_time ? new Date(order.create_time).toLocaleString() : '-';
+
+      const content = `
+          <div class="mt-3 mb-2"><strong>订单编号：</strong>${order.order_no || '-'}</div>
+          <div class="mb-2"><strong>商品名称：</strong>${order.item_name || '-'}</div>
+          <div class="mb-2"><strong>消耗积分：</strong><span class="text-warning fw-bold">${order.points_cost || 0}</span></div>
+          <div class="mb-2"><strong>核验号码：</strong><span class="verify-badge text-custom-blue">${order.verify_code || '-'}</span></div>
+          <div class="mb-2"><strong>订单状态：</strong>${statusText}</div>
+          <hr>
+          <div class="mb-2"><strong>下单用户：</strong>${order.nickname || '未知用户'}</div>
+          <div class="mb-2"><strong>联系电话：</strong>${order.phone || '-'}</div>
+          <div class="mb-2"><strong>下单时间：</strong>${dateStr}</div>
+      `;
+      $('#detailContent').html(content);
+
+      // 兼容直接调用的方式打开弹窗
+      new bootstrap.Modal(document.getElementById('detailModal')).show();
+    };
+
     window.verifyOrder = function(inlineCode) {
       const code = inlineCode || $('#verifyInput').val().trim();
-      if(!code) return window.Toast.warning('请输入核销码');
+      if(!code) return window.Toast.warning('请输入核验码');
 
       const adminId = sessionStorage.getItem('adminId') || localStorage.getItem('userId') || 1;
 
@@ -191,11 +237,11 @@
         adminId: adminId
       }, function(res) {
         if(res.status === 0) {
-          window.Toast.success('核销成功，商品已发放');
+          window.Toast.success('核验成功，商品已发放');
           $('#verifyInput').val('');
           window.loadOrders(currentPage);
         } else {
-          window.Toast.error(res.msg || '核销失败');
+          window.Toast.error(res.msg || '核验失败');
         }
       }).fail(function() {
         window.Toast.error('网络异常，请确保接口连接正常');
@@ -225,6 +271,7 @@
             .off('click', '#btnLastPage').on('click', '#btnLastPage', () => window.loadOrders(totalPages))
             .off('click', '#btnPrevPage').on('click', '#btnPrevPage', () => { if(currentPage > 1) window.loadOrders(currentPage - 1); })
             .off('click', '#btnNextPage').on('click', '#btnNextPage', () => { if(currentPage < totalPages) window.loadOrders(currentPage + 1); })
+            // 原有批量删除
             .off('click', '#batchDeleteBtn').on('click', '#batchDeleteBtn', function() {
       const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get();
       if (!selectedIds.length) return window.Toast.warning('请先勾选要删除的订单');
@@ -233,6 +280,40 @@
         const promises = selectedIds.map(id => $.post('/school/shop/deleteOrderById', { id: id }));
         Promise.allSettled(promises).then(() => {
           window.Toast.success("批量删除操作完成");
+          $('#selectAll').prop('checked', false);
+          window.loadOrders(currentPage);
+        });
+      });
+    })
+            // 新增：批量核验事件绑定
+            .off('click', '#batchVerifyBtn').on('click', '#batchVerifyBtn', function() {
+      const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get();
+      if (!selectedIds.length) return window.Toast.warning('请先勾选要核验的订单');
+
+      // 过滤出勾选项中状态为待核验（0）的订单
+      const targetOrders = allOrders.filter(o => selectedIds.includes(o.id.toString()) && o.status === 0);
+
+      if (targetOrders.length === 0) {
+        return window.Toast.warning('勾选的订单中没有处于【待核验】状态的记录');
+      }
+
+      const adminId = sessionStorage.getItem('adminId') || localStorage.getItem('userId') || 1;
+      const msg = targetOrders.length < selectedIds.length ?
+              `勾选中含有非待核验订单，将自动跳过。确定核验剩余的 ${targetOrders.length} 个订单吗？` :
+              `确定要批量核验这 ${targetOrders.length} 个订单吗？`;
+
+      window.Toast.confirm("批量核验", msg, () => {
+        const promises = targetOrders.map(order =>
+                $.post('/school/admin/verifyOrder', { verifyCode: order.verify_code, adminId: adminId })
+        );
+
+        Promise.allSettled(promises).then(results => {
+          const successCount = results.filter(res => res.status === 'fulfilled' && res.value?.status === 0).length;
+          if(successCount === targetOrders.length) {
+            window.Toast.success(`批量核验成功，共处理 ${successCount} 个订单`);
+          } else {
+            window.Toast.success(`操作完成：${successCount} 成功，${targetOrders.length - successCount} 失败`);
+          }
           $('#selectAll').prop('checked', false);
           window.loadOrders(currentPage);
         });

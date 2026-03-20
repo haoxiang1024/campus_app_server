@@ -132,7 +132,7 @@ public class ShopServiceImpl implements ShopService {
     }
 
     /**
-     * 管理员核销提货码
+     * 管理员核验提货码
      */
     @Override
     public ServerResponse verifyOrder(String verifyCode, Integer adminId) {
@@ -141,21 +141,25 @@ public class ShopServiceImpl implements ShopService {
             return ServerResponse.createServerResponseByFail("无效的提货码");
         }
         if (order.getStatus() != 0) {
-            return ServerResponse.createServerResponseByFail("该提货码已被核销或作废！");
+            return ServerResponse.createServerResponseByFail("该提货码已被核验或作废！");
         }
 
-        // 执行核销
+        // 执行核验
         int updateCount = exchangeOrderMapper.verifyOrder(verifyCode, adminId);
         if (updateCount > 0) {
-            return ServerResponse.createServerResponseBySuccess("核销成功！商品：【" + order.getItem_name() + "】");
+            return ServerResponse.createServerResponseBySuccess("核验成功！商品：【" + order.getItem_name() + "】");
         }
-        return ServerResponse.createServerResponseByFail("核销失败，请重试");
+        return ServerResponse.createServerResponseByFail("核验失败，请重试");
     }
 
     @Override
     public ServerResponse getMyOrders(Integer userId, String keyword) {
         List<ExchangeOrder> orders = exchangeOrderMapper.selectByUserIdAndKeyword(userId, keyword);
         if (orders != null) {
+            // 更新图片路径
+            for (ExchangeOrder order : orders) {
+                order.setItem_image(util.updatePic(order.getItem_image()));
+            }
             return ServerResponse.createServerResponseBySuccess(orders);
         }
         return ServerResponse.createServerResponseByFail("没有找到相关订单");

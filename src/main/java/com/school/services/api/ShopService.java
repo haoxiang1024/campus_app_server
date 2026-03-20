@@ -86,7 +86,7 @@ public interface ShopService {
      * @param page 当前页码
      * @param pageSize 每页条数
      * @param keyword 搜索关键词（支持订单号、商品名、用户名等）
-     * @param status 订单状态 (0-待核销, 1-已领取, 2-已取消) 可为空
+     * @param status 订单状态 (0-待核验, 1-已领取, 2-已取消) 可为空
      * @return ServerResponse 包含封装好的分页数据对象的响应
      */
     ServerResponse getAllOrders(int page, int pageSize, String keyword, Integer status);
