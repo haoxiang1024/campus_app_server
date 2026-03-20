@@ -10,14 +10,19 @@
   /* 统一表格样式 */
   .table-light th { background-color: #f8f9fa !important; color: #666 !important; font-weight: 600; }
   .form-control:focus, .form-select:focus { border-color: #00aaff; box-shadow: 0 0 0 0.25rem rgba(0, 170, 255, 0.25); }
-  .btn-outline-custom { color: #00aaff; border-color: #dee2e6; }
-  .btn-outline-custom:hover:not(:disabled) { background-color: #00aaff; color: white; }
+
+  /* 核心修复：添加 !important 防止被 Bootstrap 默认样式覆盖，完全对齐商品管理的按钮样式 */
+  .btn-outline-custom { color: #00aaff !important; border-color: #dee2e6 !important; }
+  .btn-outline-custom:hover:not(:disabled) { background-color: #00aaff !important; color: white !important; }
   .btn-outline-custom:disabled { cursor: not-allowed; opacity: 0.5; }
 
   /* 核销码字体增强 */
   .verify-badge { font-family: monospace; font-size: 1.1em; letter-spacing: 1px; font-weight: bold; }
   /* 表格超链接按钮无下划线 */
   .text-decoration-none { text-decoration: none !important; }
+
+  /* 统一的下拉框边框样式 */
+  .form-select-sm { border-color: #dee2e6 !important; color: #666; }
 </style>
 
 <div class="content-wrapper">
@@ -25,21 +30,23 @@
     <div class="d-flex gap-2 align-items-center">
       <button class="btn btn-outline-danger btn-sm" id="batchDeleteBtn">删除</button>
       <div class="input-group input-group-sm ms-2" style="width: 250px;">
-        <input type="text" id="verifyInput" class="form-control" placeholder="输入核销码快速提货...">
-        <button class="btn btn-custom-blue px-3" onclick="verifyOrder()">核销</button>
+        <input type="text" id="verifyInput" class="form-control" placeholder="输入核销码核验...">
+        <button class="btn btn-custom-blue px-3" style="background-color: #0d6efd" onclick="verifyOrder()">核销</button>
       </div>
     </div>
 
     <div class="d-flex gap-2">
-      <select id="stateFilter" class="form-select form-select-sm" style="width: 120px;">
+      <select id="stateFilter" class="form-select form-select-sm" style="width: 100px;">
         <option value="">所有状态</option>
         <option value="0">待核销</option>
         <option value="1">已领取</option>
         <option value="2">已取消</option>
       </select>
-      <div class="input-group input-group-sm" style="width: 250px;">
+      <div class="input-group input-group-sm" style="width: 220px;">
         <input type="text" id="searchInput" class="form-control" placeholder="搜索关键词...">
-        <button class="btn btn-primary" type="button" id="searchBtn">搜索</button>
+        <button class="btn btn-primary" type="button" id="searchBtn">
+          <i class="fa fa-search"></i>
+        </button>
       </div>
     </div>
   </div>
@@ -65,7 +72,7 @@
     </table>
   </div>
 
-  <div class="d-flex flex-column align-items-center mt-4" id="paginationWrapper">
+  <div class="d-flex flex-column align-items-center mt-4">
     <div class="d-flex align-items-center gap-3">
       <div class="btn-group">
         <button class="btn btn-sm btn-outline-custom px-3" id="btnFirstPage">首页</button>
@@ -122,6 +129,7 @@
 
           renderTable(list);
 
+          // 更新分页信息状态
           $('#pageInfo').text(`第 ${currentPage} 页 / 共 ${totalPages} 页`);
           $('#totalCount').text(totalItems);
           $('#btnFirstPage, #btnPrevPage').prop('disabled', currentPage <= 1);
@@ -176,7 +184,6 @@
       const code = inlineCode || $('#verifyInput').val().trim();
       if(!code) return window.Toast.warning('请输入核销码');
 
-      // 从本地存储获取当前登录的管理员ID，如果没有则设置一个默认值保护请求成功
       const adminId = sessionStorage.getItem('adminId') || localStorage.getItem('userId') || 1;
 
       $.post('/school/admin/verifyOrder', {
@@ -208,7 +215,7 @@
       });
     };
 
-    // --- 使用全局事件委托机制，防止侧边栏切换导致的事件丢失或重复绑定 ---
+    // 事件绑定区域
     $(document)
             .off('click', '#searchBtn').on('click', '#searchBtn', () => window.loadOrders(1))
             .off('keypress', '#searchInput').on('keypress', '#searchInput', (e) => { if(e.which === 13) window.loadOrders(1); })

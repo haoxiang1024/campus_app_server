@@ -44,7 +44,10 @@
             <if test="keyword != null and keyword != ''">
                 AND name LIKE CONCAT('%', #{keyword}, '%')
             </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
         </where>
-        ORDER BY create_time DESC
+        ORDER BY id ASC
     </select>
 </mapper>

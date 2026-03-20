@@ -25,15 +25,16 @@ public class ShopController {
         return shopService.getActiveShopItems();
     }
     /**
-     * 获取所有商品列表（分页 + 模糊搜索）
+     * 获取所有商品列表（分页 + 模糊搜索 + 状态筛选）
      */
     @ResponseBody
     @RequestMapping("/items/all")
     public ServerResponse allItems(
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
-            @RequestParam(value = "keyword", required = false) String keyword) {
-        return shopService.getAllItems(page, pageSize, keyword);
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "status", required = false) Integer status) { // 新增状态筛选参数
+        return shopService.getAllItems(page, pageSize, keyword, status);
     }
 
     @PostMapping("/item/save")

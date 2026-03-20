@@ -69,8 +69,7 @@ public interface ShopService {
      * @param keyword 搜索关键词（商品名称）
      * @return ServerResponse 包含分页数据的响应对象
      */
-    ServerResponse getAllItems(int page, int pageSize, String keyword);
-
+    ServerResponse getAllItems(int page, int pageSize, String keyword, Integer status);
     /**
      * 保存或更新商城物品
      *

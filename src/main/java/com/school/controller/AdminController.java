@@ -204,20 +204,23 @@ public class AdminController {
             @RequestParam(required = false) String state) {
         return adminService.getLostFoundByPage(page, pageSize, keyword, type, state);
     }
-    
+
     /**
-     * 分页搜索用户列表
+     * 分页搜索用户列表 (带关键字和状态筛选)
      * @param page 页码，默认为1
      * @param pageSize 每页大小，默认为10
      * @param keyword 搜索关键字（可选）
+     * @param state 状态筛选（可选）
      * @return 返回ServerResponse对象，包含分页的用户搜索结果
      */
     @ResponseBody
     @GetMapping("/searchList")
     public ServerResponse searchList(@RequestParam(defaultValue = "1") int page,
-                               @RequestParam(defaultValue = "10") int pageSize,
-                               @RequestParam(required = false) String keyword) {
-        return userService.getUserList(page, pageSize, keyword);
+                                     @RequestParam(defaultValue = "10") int pageSize,
+                                     @RequestParam(required = false) String keyword,
+                                     @RequestParam(required = false) Integer state) {
+        // 调用 AdminService 处理包含状态的多条件查询
+        return adminService.getUserListByPage(page, pageSize, keyword, state);
     }
     
     /**

@@ -18,7 +18,13 @@ import java.util.List;
  */
 @Mapper
 public interface AdminMapper {
-
+    /**
+     * 多条件分页查询用户列表
+     * @param keyword 搜索关键字
+     * @param state 用户状态
+     * @return 用户列表
+     */
+    List<User> getUserListByCondition(@Param("keyword") String keyword, @Param("state") Integer state);
     /**
      * 获取系统总用户数
      * @return 用户总数

@@ -172,19 +172,15 @@ public class ShopServiceImpl implements ShopService {
     }
 
     @Override
-    public ServerResponse getAllItems(int page, int pageSize, String keyword) {
-        // 开启分页
+    public ServerResponse getAllItems(int page, int pageSize, String keyword, Integer status) { // 接收状态参数
         PageHelper.startPage(page, pageSize);
-        // 执行带搜索条件的查询
-        List<ShopItem> list = shopItemMapper.selectAllWithSearch(keyword);
-        // 包装成分页对象
+        List<ShopItem> list = shopItemMapper.selectAllWithSearch(keyword, status); // 传递给Mapper
         PageInfo<ShopItem> pageInfo = new PageInfo<>(list);
 
-        // 组装返回给前端的分页格式数据
         Map<String, Object> result = new HashMap<>();
-        result.put("list", pageInfo.getList()); // 当前页数据列表
-        result.put("total", pageInfo.getTotal()); // 总条数
-        result.put("totalPages", pageInfo.getPages()); // 总页数
+        result.put("list", pageInfo.getList());
+        result.put("total", pageInfo.getTotal());
+        result.put("totalPages", pageInfo.getPages());
 
         return ServerResponse.createServerResponseBySuccess(result);
     }

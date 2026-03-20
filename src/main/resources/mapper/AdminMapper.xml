@@ -24,7 +24,7 @@
                 AND state = #{state}
             </if>
         </where>
-        ORDER BY pub_date DESC
+        ORDER BY id ASC
         LIMIT #{offset}, #{pageSize}
     </select>
 
@@ -83,7 +83,24 @@
                 )
             </if>
         </where>
-        ORDER BY c.create_time DESC
+        ORDER BY id ASC
+    </select>
+    <select id="getUserListByCondition" resultType="com.school.entity.User">
+        SELECT id, nickname, photo, phone, sex, reg_date, email, state
+        FROM user
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                nickname LIKE CONCAT('%', #{keyword}, '%')
+                OR phone LIKE CONCAT('%', #{keyword}, '%')
+                OR email LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="state != null">
+                AND state = #{state}
+            </if>
+        </where>
+        ORDER BY id ASC
     </select>
 
     <update id="updateCommentSelective" parameterType="com.school.entity.Comment">

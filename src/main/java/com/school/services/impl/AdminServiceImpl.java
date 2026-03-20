@@ -352,4 +352,28 @@ public class AdminServiceImpl implements AdminService {
         int result = lostFoundTypeMapper.deleteTypeBatch(idList);
         return result > 0 ? ServerResponse.createServerResponseBySuccess("批量删除成功") : ServerResponse.createServerResponseByFail("批量删除失败");
     }
+
+    /**
+     * 分页获取用户列表 (包含关键字和状态筛选)
+     */
+    @Override
+    public ServerResponse getUserListByPage(int page, int pageSize, String keyword, Integer state) {
+        // 开启分页插件
+        PageHelper.startPage(page, pageSize);
+
+        // 执行多条件联合查询
+        List<User> list = adminMapper.getUserListByCondition(keyword, state);
+
+        // 封装分页信息
+        PageInfo<User> pageInfo = new PageInfo<>(list);
+
+        // 构建前端要求的数据格式
+        Map<String, Object> result = new HashMap<>();
+        result.put("list", pageInfo.getList());       // 当前页数据
+        result.put("total", pageInfo.getTotal());     // 真实总记录数
+        result.put("listSize", pageInfo.getList().size()); // 当前页数量
+        result.put("total_if", pageInfo.getTotal());  // 搜索后的总记录数
+
+        return ServerResponse.createServerResponseBySuccess(result);
+    }
 }

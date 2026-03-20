@@ -113,5 +113,15 @@ public interface AdminService {
      * @return ServerResponse 操作结果响应对象
      */
     ServerResponse deleteTypeBatch(String ids);
+
+    /**
+     * 分页获取用户列表 (包含关键字和状态筛选)
+     * @param page 页码
+     * @param pageSize 每页条数
+     * @param keyword 搜索关键字
+     * @param state 用户状态 (1:启用, 0:禁用)
+     * @return ServerResponse
+     */
+    ServerResponse getUserListByPage(int page, int pageSize, String keyword, Integer state);
 }
 
