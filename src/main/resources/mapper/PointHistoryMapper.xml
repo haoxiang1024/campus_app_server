@@ -4,10 +4,10 @@
 
     <insert id="insert" parameterType="com.school.entity.PointHistory">
         INSERT INTO point_history (user_id, type, points_changed, description, create_time)
-        VALUES (#{userId}, #{type}, #{pointsChanged}, #{description}, NOW())
+        VALUES (#{user_id}, #{type}, #{points_changed}, #{description}, NOW())
     </insert>
 
     <select id="selectByUserId" resultType="com.school.entity.PointHistory">
-        SELECT * FROM point_history WHERE user_id = #{userId} ORDER BY create_time DESC
+        SELECT * FROM point_history WHERE user_id = #{user_id} ORDER BY create_time DESC
     </select>
 </mapper>
