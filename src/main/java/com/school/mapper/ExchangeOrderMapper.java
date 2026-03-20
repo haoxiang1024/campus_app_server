@@ -1,6 +1,7 @@
 package com.school.mapper;
 
 import com.school.entity.ExchangeOrder;
+import com.school.entity.ShopItem;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -31,4 +32,6 @@ public interface ExchangeOrderMapper {
     int deleteOrderById(@Param("id") Integer id);
     // 支持动态条件查询所有订单
     List<ExchangeOrder> selectAllWithUserInfo(@Param("keyword") String keyword, @Param("status") Integer status);
+
+    ExchangeOrder selectByOrderId(Integer id);
 }

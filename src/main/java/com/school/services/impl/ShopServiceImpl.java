@@ -47,18 +47,34 @@ public class ShopServiceImpl implements ShopService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)// 开启事务
     public ServerResponse deleteOrderById(Integer id) {
         if (id == null) {
             return ServerResponse.createServerResponseByFail("参数错误：订单ID不能为空");
         }
+        ExchangeOrder exchangeOrder = exchangeOrderMapper.selectByOrderId(id);
+        if (exchangeOrder == null) {
+            return ServerResponse.createServerResponseByFail("订单不存在或已被删除");
+        }
+        if (exchangeOrder.getStatus() != null && exchangeOrder.getStatus() == 0) {
+            // 退还积分和库存
+            int pointsResult = userMapper.addPoints(exchangeOrder.getUser_id(), exchangeOrder.getPoints_cost());
+            shopItemMapper.addStock(exchangeOrder.getItem_id(), 1);
+
+            if (pointsResult <= 0) {
+                throw new RuntimeException("退还积分失败，操作中止"); // 抛异常触发表回滚
+            }
+        }
 
         int rowCount = exchangeOrderMapper.deleteOrderById(id);
-        if (rowCount > 0) {
-            return ServerResponse.createServerResponseBySuccess("订单删除成功");
-        }
-        return ServerResponse.createServerResponseByFail("订单删除失败，可能是数据不存在");
-    }
 
+        if (rowCount > 0) {
+            return ServerResponse.createServerResponseBySuccess("订单已删除" +
+                    (exchangeOrder.getStatus() == 0 ? "，积分已原路退回" : ""));
+        }
+
+        return ServerResponse.createServerResponseByFail("删除失败");
+    }
     /**
      * 核心积分兑换逻辑
      */
@@ -74,13 +90,13 @@ public class ShopServiceImpl implements ShopService {
             return ServerResponse.createServerResponseByFail("商品库存不足");
         }
 
-        //  扣减商品库存 (带有并发防超卖判断)
+        //  扣减商品库存
         int stockRow = shopItemMapper.deductStock(itemId);
         if (stockRow == 0) {
             return ServerResponse.createServerResponseByFail("哎呀，手慢了，商品刚刚被抢光啦！");
         }
 
-        //  扣除用户积分 (带有余额足够判断)
+        //  扣除用户积分
         int pointsRow = userMapper.deductPoints(userId, item.getRequired_points());
         if (pointsRow == 0) {
             // 积分不够扣减失败，抛出异常以回滚上方扣掉的库存
@@ -146,6 +162,7 @@ public class ShopServiceImpl implements ShopService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)// 开启事务
     public ServerResponse deleteOrder(Integer id, Integer userId) {
         int deleteCount = exchangeOrderMapper.deleteOrder(id, userId);
         if (deleteCount > 0) {

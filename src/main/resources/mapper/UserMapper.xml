@@ -7,6 +7,12 @@
         insert into user (nickname, phone, password, photo, sex, points, reg_date,state,role,email)
         VALUES (#{user.nickname}, #{user.phone}, #{user.password}, #{user.photo}, #{user.sex}, #{user.points}, #{user.reg_date},#{user.state},#{user.role},#{user.email})
     </insert>
+    <insert id="addPoints">
+
+        update user
+        set points=points+#{points}
+        where id = #{userId}
+    </insert>
     <update id="resetPwd">
         update user
         set password=#{password}

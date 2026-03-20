@@ -20,6 +20,11 @@
         INSERT INTO shop_item (name, description, image_url, required_points, stock, status)
         VALUES (#{name}, #{description}, #{image_url}, #{required_points}, #{stock}, #{status})
     </insert>
+    <insert id="addStock">
+        UPDATE shop_item
+        SET stock = stock + #{stock}
+        WHERE id = #{id}
+    </insert>
 
     <update id="update" parameterType="com.school.entity.ShopItem">
         UPDATE shop_item

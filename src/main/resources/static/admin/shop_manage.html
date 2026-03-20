@@ -1,63 +1,33 @@
 <link href="./css/sweetalert2.min.css" rel="stylesheet">
 <style>
-    /* 统一页面容器与基础色调 */
-    .content-wrapper {
-        background: #ffffff !important;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        padding: 25px;
-        margin: 15px;
-        color: #333 !important;
-    }
+    .content-wrapper { background: #ffffff !important; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 25px; margin: 15px; color: #333 !important; }
     .text-custom-blue { color: #00aaff !important; }
 
-    /* 统一表格结构 */
-    .table-light th {
-        background-color: #f8f9fa !important;
-        color: #666 !important;
-        font-weight: 600;
-    }
+    .table-light th { background-color: #f8f9fa !important; color: #666 !important; font-weight: 600; }
+    .table img { width: 45px; height: 45px; object-fit: cover; border-radius: 6px; border: 1px solid #dee2e6; }
 
-    /* 分页按钮自定义样式 */
+    .btn-link { text-decoration: none !important; }
+    .btn-link:hover { text-decoration: none !important; opacity: 0.8; }
+
     .btn-outline-custom { color: #00aaff !important; border-color: #dee2e6 !important; }
     .btn-outline-custom:hover:not(:disabled) { background-color: #00aaff !important; color: white !important; }
-    .btn-outline-custom:disabled { cursor: not-allowed; opacity: 0.5; }
-
-    /* 业务图片样式优化 */
-    .table img {
-        width: 50px;
-        height: 50px;
-        object-fit: cover;
-        border-radius: 6px;
-        border: 1px solid #dee2e6;
-    }
-
-    /* 商品图片预览样式 */
-    #itemImagePreview {
-        width: 80px;
-        height: 80px;
-        object-fit: cover;
-        border-radius: 6px;
-        border: 2px dashed #dee2e6;
-        margin-bottom: 10px;
-    }
     .status-on { color: #28a745; font-weight: 500; }
     .status-off { color: #dc3545; font-weight: 500; }
+
+    #itemImagePreview { width: 80px; height: 80px; object-fit: cover; border-radius: 6px; border: 2px dashed #dee2e6; margin-bottom: 10px; }
 </style>
 
 <div class="content-wrapper">
     <div class="d-flex justify-content-between align-items-center mb-4 gap-3 flex-wrap">
         <div class="d-flex gap-2">
-            <button class="btn btn-outline-success btn-sm" id="batchOnShelfBtn">上架</button>
-            <button class="btn btn-outline-danger btn-sm" id="batchOffShelfBtn">下架</button>
+            <button class="btn btn-outline-success btn-sm" id="batchOnShelfBtn">批量上架</button>
+            <button class="btn btn-outline-danger btn-sm" id="batchOffShelfBtn">批量下架</button>
             <button class="btn btn-warning btn-sm text-white px-3" onclick="showAddModal()">+ 添加商品</button>
         </div>
         <div class="d-flex gap-2">
             <div class="input-group input-group-sm" style="width: 250px;">
                 <input type="text" id="searchInput" class="form-control" placeholder="搜索商品名称...">
-                <button class="btn btn-primary" type="button" id="searchBtn">
-                    <i class="fa fa-search"></i>
-                </button>
+                <button class="btn btn-primary" type="button" id="searchBtn">搜索</button>
             </div>
         </div>
     </div>
@@ -73,16 +43,16 @@
                 <th>所需积分</th>
                 <th>库存</th>
                 <th>状态</th>
-                <th>操作</th>
+                <th class="text-center">操作</th>
             </tr>
             </thead>
             <tbody id="itemList">
-            <tr><td colspan="8" class="text-center text-muted">正在加载数据...</td></tr>
+            <tr><td colspan="8" class="text-center text-muted">数据加载中...</td></tr>
             </tbody>
         </table>
     </div>
 
-    <div class="d-flex flex-column align-items-center mt-4" id="paginationWrapper">
+    <div class="d-flex flex-column align-items-center mt-4">
         <div class="d-flex align-items-center gap-3">
             <div class="btn-group">
                 <button class="btn btn-sm btn-outline-custom px-3" id="btnFirstPage">首页</button>
@@ -106,16 +76,13 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="itemForm" enctype="multipart/form-data">
+                <form id="itemForm">
                     <input type="hidden" id="itemId" name="id">
-                    <input type="hidden" id="existingImage" name="image_url">
-
                     <div class="mb-3 text-center">
-                        <div><img src="./img/default.png" id="itemImagePreview" onerror="this.src='./img/default.png'"></div>
-                        <label for="itemImageFile" class="btn btn-sm btn-outline-secondary">上传商品图片</label>
+                        <div><img src="./img/default.png" id="itemImagePreview"></div>
+                        <label for="itemImageFile" class="btn btn-sm btn-outline-secondary mt-2">点击上传图片</label>
                         <input type="file" id="itemImageFile" name="imageFile" accept="image/*" style="display: none;">
                     </div>
-
                     <div class="mb-3">
                         <label class="form-label">商品名称</label>
                         <input type="text" class="form-control" id="itemName" name="name" required>
@@ -131,21 +98,17 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">状态</label>
+                        <label class="form-label">初始状态</label>
                         <select class="form-select" id="itemStatus" name="status">
                             <option value="1">上架</option>
                             <option value="0">下架</option>
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">描述</label>
-                        <textarea class="form-control" id="itemDesc" name="description" rows="3"></textarea>
-                    </div>
                 </form>
             </div>
-            <div class="modal-footer border-top-0">
+            <div class="modal-footer">
                 <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary btn-sm" onclick="saveItem()">保存</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="saveItem()">保存提交</button>
             </div>
         </div>
     </div>
@@ -156,218 +119,145 @@
 <script src="./js/sweetalert2@11.js"></script>
 
 <script>
+    // 使用IIFE封装，防止污染全局且解决侧边栏重复加载问题
     (function() {
-        // 分页及表格状态变量
         let currentPage = 1;
         let totalPages = 1;
         const pageSize = 10;
         let allItemsData = [];
 
-        // 统一Toast提示配置
+        // 统一提示工具
         window.Toast = window.Toast || {
-            success: (msg) => { Swal.fire({ icon: 'success', title: msg, toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, width: '220px', padding: '0.5rem' }); },
-            error: (msg) => { Swal.fire({ icon: 'error', title: '操作失败', text: msg || '未知错误', confirmButtonColor: '#00aaff', width: '320px' }); },
-            confirm: (title, text, callback) => { Swal.fire({ title: title, text: text, icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#6c757d', confirmButtonText: '确定', cancelButtonText: '取消' }).then((result) => { if (result.isConfirmed && typeof callback === 'function') { callback(); } }); }
+            success: (msg) => Swal.fire({ icon: 'success', title: msg, toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, width: '220px' }),
+            error: (msg) => Swal.fire({ icon: 'error', title: '失败', text: msg || '错误', confirmButtonColor: '#00aaff' }),
+            confirm: (title, text, cb) => Swal.fire({ title, text, icon: 'warning', showCancelButton: true, confirmButtonText: '确定', cancelButtonText: '取消' }).then(r => r.isConfirmed && cb())
         };
 
-        $(function() {
-            loadItems(1);
-            initEvents();
-        });
-
-        function initEvents() {
-            // 图片预览逻辑
-            $('#itemImageFile').off('change').on('change', function() {
-                const file = this.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        $('#itemImagePreview').attr('src', e.target.result);
-                    }
-                    reader.readAsDataURL(file);
-                }
-            });
-
-            // 全选逻辑
-            $('#selectAll').off('change').on('change', function() {
-                $('.item-checkbox').prop('checked', this.checked);
-            });
-
-            // 批量按钮操作
-            $('#batchOnShelfBtn').off('click').on('click', () => handleBatchStatusUpdate(1, '上架'));
-            $('#batchOffShelfBtn').off('click').on('click', () => handleBatchStatusUpdate(0, '下架'));
-
-            // 搜索与分页按钮事件绑定 (已适配放大镜图标按钮)
-            $('#searchBtn').off('click').on('click', () => loadItems(1));
-            $('#searchInput').off('keypress').on('keypress', e => { if(e.which === 13) loadItems(1); });
-
-            $('#btnFirstPage').off('click').on('click', () => loadItems(1));
-            $('#btnLastPage').off('click').on('click', () => loadItems(totalPages));
-            $('#btnPrevPage').off('click').on('click', () => { if(currentPage > 1) loadItems(currentPage - 1); });
-            $('#btnNextPage').off('click').on('click', () => { if(currentPage < totalPages) loadItems(currentPage + 1); });
-        }
-
-        // 加载表格数据（含分页和模糊搜索）
+        // 初始化加载
         window.loadItems = function(page) {
             currentPage = page || 1;
             const keyword = $('#searchInput').val().trim();
-            $('#itemList').html('<tr><td colspan="8" class="text-center text-muted">正在检索数据...</td></tr>');
+            $('#itemList').html('<tr><td colspan="8" class="text-center text-muted">数据检索中...</td></tr>');
 
-            $.get('/school/shop/items/all', {
-                page: currentPage,
-                pageSize: pageSize,
-                keyword: keyword
-            }, function(res) {
+            $.get('/school/shop/items/all', { page: currentPage, pageSize, keyword }, function(res) {
                 if(res.status === 0 && res.data) {
                     allItemsData = res.data.list || res.data || [];
-                    const totalItems = res.data.total || allItemsData.length;
-                    totalPages = res.data.totalPages || Math.ceil(totalItems / pageSize) || 1;
+                    const total = res.data.total || allItemsData.length;
+                    totalPages = res.data.totalPages || Math.ceil(total / pageSize) || 1;
 
-                    let html = '';
-                    if (allItemsData.length === 0) {
-                        html = '<tr><td colspan="8" class="text-center text-muted">暂无商品数据</td></tr>';
-                    } else {
-                        allItemsData.forEach(item => {
-                            const statusBtnText = item.status === 1 ? '下架' : '上架';
-                            const statusBtnClass = item.status === 1 ? 'text-danger' : 'text-success';
-                            const targetStatus = item.status === 1 ? 0 : 1;
+                    let html = allItemsData.length ? '' : '<tr><td colspan="8" class="text-center text-muted">暂无数据</td></tr>';
+                    allItemsData.forEach(item => {
+                        const isUp = item.status === 1;
+                        const imgUrl = item.image_url ? (item.image_url.startsWith('http') ? item.image_url : '/school/upload/' + item.image_url) : './img/default.png';
 
-                            // 处理图片路径，和失物招领统一处理逻辑
-                            let imgUrl = item.image_url ? '/school/upload/' + item.image_url : './img/default.png';
-                            if (item.image_url && item.image_url.startsWith('http')) imgUrl = item.image_url;
+                        html += `
+                            <tr>
+                                <td><input type="checkbox" class="item-checkbox form-check-input" value="${item.id}"></td>
+                                <td>${item.id}</td>
+                                <td><img src="${imgUrl}" onerror="this.src='./img/default.png'"></td>
+                                <td class="fw-bold">${item.name}</td>
+                                <td><span class="badge bg-warning text-dark">${item.required_points}</span></td>
+                                <td>${item.stock}</td>
+                                <td><span class="${isUp ? 'status-on' : 'status-off'}">${isUp ? '上架' : '已下架'}</span></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-link text-custom-blue p-0 me-2" onclick='showEditModal(${JSON.stringify(item)})'>编辑</button>
+                                    <button class="btn btn-sm btn-link ${isUp ? 'text-danger' : 'text-success'} p-0" onclick="updateStatus(${item.id}, ${isUp ? 0 : 1})">${isUp ? '下架' : '上架'}</button>
+                                </td>
+                            </tr>`;
+                    });
 
-                            html += `
-                                <tr>
-                                    <td><input type="checkbox" class="item-checkbox form-check-input" value="${item.id}"></td>
-                                    <td>${item.id}</td>
-                                    <td><img src="${imgUrl}" onerror="this.src='./img/default.png'"></td>
-                                    <td class="fw-bold">${item.name}</td>
-                                    <td><span class="badge bg-warning text-dark">${item.required_points}</span></td>
-                                    <td>${item.stock}</td>
-                                    <td><span class="${item.status === 1 ? 'status-on' : 'status-off'}">
-                                        ${item.status === 1 ? '上架' : '已下架'}</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-link text-custom-blue p-0 me-2" onclick='showEditModal(${JSON.stringify(item).replace(/'/g, "&apos;")})'>编辑</button>
-                                        <button class="btn btn-sm btn-link ${statusBtnClass} p-0" onclick="updateStatus(${item.id}, ${targetStatus})">${statusBtnText}</button>
-                                    </td>
-                                </tr>`;
-                        });
-                    }
                     $('#itemList').html(html);
-                    $('#selectAll').prop('checked', false);
-
                     $('#pageInfo').text(`第 ${currentPage} 页 / 共 ${totalPages} 页`);
-                    $('#totalCount').text(totalItems);
+                    $('#totalCount').text(total);
                     $('#btnFirstPage, #btnPrevPage').prop('disabled', currentPage <= 1);
                     $('#btnNextPage, #btnLastPage').prop('disabled', currentPage >= totalPages);
-                } else {
-                    $('#itemList').html('<tr><td colspan="8" class="text-center text-danger">数据加载失败</td></tr>');
+                    $('#selectAll').prop('checked', false);
                 }
-            }).fail(() => {
-                $('#itemList').html('<tr><td colspan="8" class="text-center text-danger">数据加载失败：网络异常</td></tr>');
             });
-        }
+        };
 
-        window.showAddModal = function() {
-            $('#itemForm')[0].reset();
-            $('#itemId').val('');
-            $('#existingImage').val('');
-            $('#itemImageFile').val('');
-            $('#itemImagePreview').attr('src', './img/default.png');
-            $('#modalTitle').text('添加商品');
-            new bootstrap.Modal('#itemModal').show();
-        }
-
-        window.showEditModal = function(item) {
-            $('#itemId').val(item.id);
-            $('#itemName').val(item.name);
-            $('#itemPoints').val(item.required_points || item.requiredPoints);
-            $('#itemStock').val(item.stock);
-            $('#itemStatus').val(item.status);
-            $('#itemDesc').val(item.description);
-            $('#existingImage').val(item.image_url || '');
-            $('#itemImageFile').val('');
-
-            let imgUrl = item.image_url ? '/school/upload/' + item.image_url : './img/default.png';
-            if (item.image_url && item.image_url.startsWith('http')) imgUrl = item.image_url;
-            $('#itemImagePreview').attr('src', imgUrl);
-
-            $('#modalTitle').text('编辑商品');
-            new bootstrap.Modal('#itemModal').show();
-        }
-
+        // 保存逻辑
         window.saveItem = function() {
             const form = $('#itemForm')[0];
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
+            if (!form.checkValidity()) return form.reportValidity();
 
             const formData = new FormData(form);
-            const fileInput = document.getElementById('itemImageFile');
-
-            if (fileInput.files.length === 0) {
-                formData.delete('imageFile');
-            }
-
             $.ajax({
                 url: '/school/shop/item/save',
                 type: 'POST',
                 data: formData,
                 processData: false,
                 contentType: false,
-                success: function(res) {
+                success: (res) => {
                     if(res.status === 0) {
-                        window.Toast.success('保存成功');
-                        bootstrap.Modal.getInstance('#itemModal').hide();
-                        loadItems(currentPage);
-                    } else {
-                        window.Toast.error(res.msg || '保存失败');
+                        window.Toast.success('提交成功');
+                        bootstrap.Modal.getOrCreateInstance('#itemModal').hide();
+                        window.loadItems(currentPage);
                     }
-                },
-                error: function() {
-                    window.Toast.error('服务器异常');
                 }
             });
-        }
+        };
 
+        // 状态更新
         window.updateStatus = function(id, status) {
-            const actionText = status === 1 ? '上架' : '下架';
-            window.Toast.confirm("状态修改", `确定要${actionText}该商品吗?`, () => {
-                $.post('/school/shop/updateStatus', { id: id, status: status }, function(res) {
-                    if(res.status === 0) {
-                        window.Toast.success(`${actionText}成功`);
-                        loadItems(currentPage);
-                    } else {
-                        window.Toast.error(res.msg || '操作失败');
-                    }
-                }).fail(() => window.Toast.error('网络异常'));
+            const txt = status === 1 ? '上架' : '下架';
+            window.Toast.confirm("操作确认", `确定${txt}该商品吗？`, () => {
+                $.post('/school/shop/updateStatus', { id, status }, (res) => {
+                    if(res.status === 0) { window.Toast.success(txt + '成功'); window.loadItems(currentPage); }
+                });
+            });
+        };
+
+        // 批量操作
+        function batchStatus(status, txt) {
+            const ids = $('.item-checkbox:checked').map(function(){ return $(this).val(); }).get();
+            if(!ids.length) return window.Toast.error('请勾选商品');
+
+            window.Toast.confirm("批量" + txt, `确定操作选中的 ${ids.length} 件商品吗？`, () => {
+                const reqs = ids.map(id => $.post('/school/shop/updateStatus', { id, status }));
+                Promise.allSettled(reqs).then(() => { window.Toast.success('批量处理完成'); window.loadItems(currentPage); });
             });
         }
 
-        function handleBatchStatusUpdate(targetStatus, actionText) {
-            const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get();
-            if (!selectedIds.length) {
-                return window.Toast.error('请先勾选商品');
+        // 弹窗管理
+        window.showAddModal = () => {
+            $('#itemForm')[0].reset();
+            $('#itemId').val('');
+            $('#itemImagePreview').attr('src', './img/default.png');
+            $('#modalTitle').text('添加新商品');
+            bootstrap.Modal.getOrCreateInstance('#itemModal').show();
+        };
+
+        window.showEditModal = (item) => {
+            $('#itemId').val(item.id);
+            $('#itemName').val(item.name);
+            $('#itemPoints').val(item.required_points);
+            $('#itemStock').val(item.stock);
+            $('#itemStatus').val(item.status);
+            const imgUrl = item.image_url ? (item.image_url.startsWith('http') ? item.image_url : '/school/upload/' + item.image_url) : './img/default.png';
+            $('#itemImagePreview').attr('src', imgUrl);
+            $('#modalTitle').text('编辑商品详情');
+            bootstrap.Modal.getOrCreateInstance('#itemModal').show();
+        };
+
+        $(document).off('click', '#searchBtn').on('click', '#searchBtn', () => window.loadOrders(1));
+        $(document).off('click', '#btnFirstPage').on('click', '#btnFirstPage', () => window.loadItems(1));
+        $(document).off('click', '#btnPrevPage').on('click', '#btnPrevPage', () => window.loadItems(currentPage - 1));
+        $(document).off('click', '#btnNextPage').on('click', '#btnNextPage', () => window.loadItems(currentPage + 1));
+        $(document).off('click', '#btnLastPage').on('click', '#btnLastPage', () => window.loadItems(totalPages));
+        $(document).off('change', '#selectAll').on('change', '#selectAll', function() { $('.item-checkbox').prop('checked', this.checked); });
+        $(document).off('click', '#batchOnShelfBtn').on('click', '#batchOnShelfBtn', () => batchStatus(1, '上架'));
+        $(document).off('click', '#batchOffShelfBtn').on('click', '#batchOffShelfBtn', () => batchStatus(0, '下架'));
+        $(document).off('change', '#itemImageFile').on('change', '#itemImageFile', function() {
+            const file = this.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => $('#itemImagePreview').attr('src', e.target.result);
+                reader.readAsDataURL(file);
             }
+        });
 
-            const targetIds = [];
-            selectedIds.forEach(id => {
-                const item = allItemsData.find(u => u.id == id);
-                if (item && item.status !== targetStatus) targetIds.push(id);
-            });
-
-            if (!targetIds.length) {
-                return window.Toast.success(`选中的商品已全部处于${actionText}状态`);
-            }
-
-            window.Toast.confirm(`批量${actionText}`, `确定操作选中的 ${targetIds.length} 件商品吗？`, () => {
-                const promises = targetIds.map(id => $.post('/school/shop/updateStatus', { id: id, status: targetStatus }));
-                Promise.allSettled(promises).then(() => {
-                    window.Toast.success('批量处理完成');
-                    loadItems(currentPage);
-                }).catch(() => window.Toast.error('部分请求异常'));
-            });
-        }
+        // 初始加载
+        window.loadItems(1);
     })();
 </script>
