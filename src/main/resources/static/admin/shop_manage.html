@@ -211,12 +211,39 @@
         };
 
         function batchStatus(status, txt) {
-            const ids = $('.item-checkbox:checked').map(function(){ return $(this).val(); }).get();
-            if(!ids.length) return window.Toast.error('请勾选商品');
+            const selectedIds = $('.item-checkbox:checked').map(function(){ return $(this).val(); }).get();
+            if(!selectedIds.length) return window.Toast.error('请勾选商品');
 
-            window.Toast.confirm("批量" + txt, `确定操作选中的 ${ids.length} 件商品吗？`, () => {
-                const reqs = ids.map(id => $.post('/school/shop/updateStatus', { id, status }));
-                Promise.allSettled(reqs).then(() => { window.Toast.success('批量处理完成'); window.loadItems(currentPage); });
+            const targetIds = [];
+            let skipCount = 0;
+
+            selectedIds.forEach(id => {
+                const item = allItemsData.find(i => i.id == id);
+                // 如果当前状态不等于目标状态，才加入待处理队列
+                if (item && item.status !== status) {
+                    targetIds.push(id);
+                } else {
+                    skipCount++;
+                }
+            });
+
+            // 如果筛选后没有需要操作的商品，直接拦截并提示
+            if (targetIds.length === 0) {
+                return window.Toast.error(skipCount > 0 ? `选中的商品已全部处于【${txt}】状态，无需操作` : '没有可操作的商品');
+            }
+
+            // 动态生成确认提示语
+            const confirmMsg = skipCount > 0
+                ? `确定批量${txt}选中的 ${targetIds.length} 件商品吗？(已智能跳过 ${skipCount} 件本就${txt}的商品)`
+                : `确定批量${txt}操作选中的 ${targetIds.length} 件商品吗？`;
+
+            window.Toast.confirm("批量" + txt, confirmMsg, () => {
+                const reqs = targetIds.map(id => $.post('/school/shop/updateStatus', { id, status }));
+                Promise.allSettled(reqs).then(() => {
+                    window.Toast.success('批量处理完成');
+                    $('#selectAll').prop('checked', false);
+                    window.loadItems(currentPage);
+                });
             });
         }
 
