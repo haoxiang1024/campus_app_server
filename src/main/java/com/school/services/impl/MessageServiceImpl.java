@@ -37,6 +37,8 @@ public class MessageServiceImpl implements MessageService {
         if(sensitiveWordUtil.contains(content)){
             Message msg = new Message(userId, content, now, 2, pId, replyUserId);//驳回
             messageMapper.insertMessage(msg);
+            //扣除用户积分
+
             return ServerResponse.createServerResponseByFail("留言含敏感词！请修改后再次留言!");
         }
         Message msg = new Message(userId, content, now, 1, pId, replyUserId);//审核

@@ -5,8 +5,11 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.school.entity.LostFound;
 import com.school.entity.LostFoundType;
+import com.school.entity.PointHistory;
 import com.school.mapper.LostFoundMapper;
 import com.school.mapper.LostFoundTypeMapper;
+import com.school.mapper.PointHistoryMapper;
+import com.school.mapper.UserMapper;
 import com.school.services.api.LostFoundService;
 import com.school.services.api.LostFoundTypeService;
 import com.school.utils.ResponseCode;
@@ -29,6 +32,10 @@ import java.util.Objects;
 public class LostFoundServiceImpl implements LostFoundService {
     @Autowired
     private LostFoundMapper lostFoundMapper;
+    @Autowired
+    private PointHistoryMapper pointHistoryMapper;
+    @Autowired
+    private UserMapper userMapper;
     @Autowired
     private Util util;
     @Autowired
@@ -101,7 +108,17 @@ public class LostFoundServiceImpl implements LostFoundService {
         //敏感词检测
         if(sensitiveWordUtil.contains(lostFound.getContent())||sensitiveWordUtil.contains(lostFound.getTitle())||sensitiveWordUtil.contains(lostFound.getPlace())){
             lostFound.setState("已驳回");
+            Integer userId = lostFound.getUserId();
             lostFoundMapper.addLostFound(lostFound);
+            //扣除积分
+            userMapper.deductPoints(lostFound.getUserId(),50 );
+            //记录积分流水
+            PointHistory history = new PointHistory();
+            history.setUser_id(userId);
+            history.setType(4); //系统扣除
+            history.setPoints_changed(-50);
+            history.setDescription("发布违规信息");
+            pointHistoryMapper.insert(history);
             return ServerResponse.createServerResponseByFail("内容包含敏感词，请修改后重试");
         }
         

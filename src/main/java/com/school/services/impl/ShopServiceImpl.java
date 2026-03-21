@@ -63,8 +63,9 @@ public class ShopServiceImpl implements ShopService {
             // 插入积分流水
             PointHistory history = new PointHistory();
             history.setUser_id(exchangeOrder.getUser_id());
+            history.setDescription(exchangeOrder.getItem_name()+"被退还");
             history.setType(2);
-            history.setPoints_changed(-exchangeOrder.getPoints_cost());
+            history.setPoints_changed(exchangeOrder.getPoints_cost());
             pointHistoryMapper.insert(history);
             if (pointsResult <= 0) {
                 throw new RuntimeException("退还积分失败，操作中止"); // 抛异常触发表回滚

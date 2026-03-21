@@ -86,7 +86,7 @@
         ORDER BY id ASC
     </select>
     <select id="getUserListByCondition" resultType="com.school.entity.User">
-        SELECT id, nickname, photo, phone, sex, reg_date, email, state
+        SELECT *
         FROM user
         <where>
             <if test="keyword != null and keyword != ''">

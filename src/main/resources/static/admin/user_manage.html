@@ -87,12 +87,13 @@
                 <th>注册时间</th>
                 <th>手机号码</th>
                 <th>Email</th>
+                <th>积分</th>
                 <th>状态</th>
                 <th class="text-center">操作</th>
             </tr>
             </thead>
             <tbody id="userTableBody">
-            <tr><td colspan="10" class="text-center text-muted">正在检索数据...</td></tr>
+            <tr><td colspan="11" class="text-center text-muted">正在检索数据...</td></tr>
             </tbody>
         </table>
     </div>
@@ -194,7 +195,8 @@
             allUsersData = list;
             const $tbody = $('#userTableBody');
             if (!list || list.length === 0) {
-                $tbody.html('<tr><td colspan="10" class="text-center text-muted">未找到匹配的用户数据</td></tr>');
+                // 修改 colspan 为 11
+                $tbody.html('<tr><td colspan="11" class="text-center text-muted">未找到匹配的用户数据</td></tr>');
                 return;
             }
             let html = '';
@@ -215,6 +217,7 @@
                 <td><small class="text-muted">${formatDate(u.reg_date)}</small></td>
                 <td>${u.phone || '-'}</td>
                 <td>${u.email || '-'}</td>
+                <td>${u.points != null ? u.points : 0}</td>
                 <td>
                     <div class="form-check form-switch">
                         <input class="form-check-input status-switch" type="checkbox" data-id="${u.id}" ${isChecked}>
@@ -256,7 +259,8 @@
             const kw = $('#userKeyword').val().trim();
             const state = $('#userState').val(); // 获取最新状态参数
 
-            $('#userTableBody').html('<tr><td colspan="10" class="text-center text-muted">正在检索数据...</td></tr>');
+            // 修改 colspan 为 11
+            $('#userTableBody').html('<tr><td colspan="11" class="text-center text-muted">正在检索数据...</td></tr>');
 
             const apiUrl = `/school/admin/searchList`;
 
@@ -283,10 +287,12 @@
                     $('#btnNextPage, #btnLastPage').prop('disabled', currentPage >= totalPages);
                     $('#selectAll').prop('checked', false);
                 } else {
-                    $('#userTableBody').html(`<tr><td colspan="10" class="text-center text-danger">加载失败: ${res.msg || '空数据'}</td></tr>`);
+                    // 修改 colspan 为 11
+                    $('#userTableBody').html(`<tr><td colspan="11" class="text-center text-danger">加载失败: ${res.msg || '空数据'}</td></tr>`);
                 }
             }).fail(function(xhr) {
-                $('#userTableBody').html(`<tr><td colspan="10" class="text-center text-danger">请求失败 (HTTP ${xhr.status})，请检查网络</td></tr>`);
+                // 修改 colspan 为 11
+                $('#userTableBody').html(`<tr><td colspan="11" class="text-center text-danger">请求失败 (HTTP ${xhr.status})，请检查网络</td></tr>`);
             });
         }
 
