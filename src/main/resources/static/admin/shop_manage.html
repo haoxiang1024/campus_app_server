@@ -134,11 +134,7 @@
         const pageSize = 10;
         let allItemsData = [];
 
-        window.Toast = window.Toast || {
-            success: (msg) => Swal.fire({ icon: 'success', title: msg, toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, width: '220px' }),
-            error: (msg) => Swal.fire({ icon: 'error', title: '失败', text: msg || '错误', confirmButtonColor: '#00aaff' }),
-            confirm: (title, text, cb) => Swal.fire({ title, text, icon: 'warning', showCancelButton: true, confirmButtonText: '确定', cancelButtonText: '取消' }).then(r => r.isConfirmed && cb())
-        };
+
 
         window.loadItems = function(page) {
             currentPage = page || 1;
@@ -245,20 +241,30 @@
         };
 
         // 搜索相关事件绑定
-        $(document).off('click', '#searchBtn').on('click', '#searchBtn', () => window.loadItems(1));
-        $(document).off('keypress', '#searchInput').on('keypress', '#searchInput', (e) => { if(e.which === 13) window.loadItems(1); });
+        // 搜索相关事件绑定
+        $('#searchBtn').off('click').on('click', () => window.loadItems(1));
+        $('#searchInput').off('keypress').on('keypress', (e) => {
+            if(e.which === 13) window.loadItems(1);
+        });
 
-        // 绑定状态下拉框改变事件，改变后重新从第一页加载
-        $(document).off('change', '#statusFilter').on('change', '#statusFilter', () => window.loadItems(1));
+// 绑定状态下拉框改变事件，改变后重新从第一页加载
+        $('#statusFilter').off('change').on('change', () => window.loadItems(1));
 
-        $(document).off('click', '#btnFirstPage').on('click', '#btnFirstPage', () => window.loadItems(1));
-        $(document).off('click', '#btnPrevPage').on('click', '#btnPrevPage', () => window.loadItems(currentPage - 1));
-        $(document).off('click', '#btnNextPage').on('click', '#btnNextPage', () => window.loadItems(currentPage + 1));
-        $(document).off('click', '#btnLastPage').on('click', '#btnLastPage', () => window.loadItems(totalPages));
-        $(document).off('change', '#selectAll').on('change', '#selectAll', function() { $('.item-checkbox').prop('checked', this.checked); });
-        $(document).off('click', '#batchOnShelfBtn').on('click', '#batchOnShelfBtn', () => batchStatus(1, '上架'));
-        $(document).off('click', '#batchOffShelfBtn').on('click', '#batchOffShelfBtn', () => batchStatus(0, '下架'));
-        $(document).off('change', '#itemImageFile').on('change', '#itemImageFile', function() {
+// 分页按钮事件绑定
+        $('#btnFirstPage').off('click').on('click', () => window.loadItems(1));
+        $('#btnPrevPage').off('click').on('click', () => window.loadItems(currentPage - 1));
+        $('#btnNextPage').off('click').on('click', () => window.loadItems(currentPage + 1));
+        $('#btnLastPage').off('click').on('click', () => window.loadItems(totalPages));
+
+// 全选/取消全选
+        $('#selectAll').off('change').on('change', function() {
+            $('.item-checkbox').prop('checked', this.checked);
+        });
+
+// 批量操作按钮
+        $('#batchOnShelfBtn').off('click').on('click', () => batchStatus(1, '上架'));
+        $('#batchOffShelfBtn').off('click').on('click', () => batchStatus(0, '下架'));
+        $('#itemImageFile').off('change').on('change',function() {
             const file = this.files[0];
             if(file) {
                 const reader = new FileReader();

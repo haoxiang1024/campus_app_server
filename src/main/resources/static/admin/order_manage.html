@@ -41,7 +41,6 @@
         <option value="">所有状态</option>
         <option value="0">待核验</option>
         <option value="1">已领取</option>
-        <option value="2">已取消</option>
       </select>
       <div class="input-group input-group-sm" style="width: 220px;">
         <input type="text" id="searchInput" class="form-control" placeholder="搜索关键词...">
@@ -110,33 +109,7 @@
 
 <script>
   (function() {
-    if (!window.Toast) {
-      window.Toast = {
-        success: (msg) => Swal.fire({ icon: 'success', title: msg, toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, width: '220px', padding: '0.5rem' }),
-        error: (msg) => Swal.fire({ icon: 'error', title: '操作失败', text: msg || '未知错误', confirmButtonColor: '#00aaff', width: '320px' }),
-        warning: (msg) => Swal.fire({ icon: 'warning', title: '提醒', text: msg, toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 }),
-        confirm: (title, text, callback) => {
-          Swal.fire({
-            title: title, text: text, icon: 'warning', showCancelButton: true,
-            confirmButtonColor: '#00aaff', cancelButtonColor: '#6c757d',
-            confirmButtonText: '确定', cancelButtonText: '取消'
-          }).then((result) => {
-            if (result.isConfirmed && typeof callback === 'function') { callback(); }
-          });
-        },
-        prompt: (title, placeholder, callback) => {
-          const promptTitle = title || '请输入信息';
-          const promptPlaceholder = placeholder || '请输入...';
-          Swal.fire({
-            title: promptTitle, input: 'text', inputPlaceholder: promptPlaceholder,
-            showCancelButton: true, confirmButtonColor: '#00aaff', confirmButtonText: '提交', cancelButtonText: '取消',
-            inputValidator: (value) => { if (!value) return '内容不能为空！'; }
-          }).then((result) => {
-            if (result.isConfirmed && typeof callback === 'function') { callback(result.value); }
-          });
-        }
-      };
-    }
+
 
     let currentPage = 1;
     let totalPages = 1;
@@ -266,15 +239,20 @@
     };
 
     // 统一解除旧事件绑定再重新绑定，防止重复触发
-    $(document).off('click', '#searchBtn').on('click', '#searchBtn', () => window.loadOrders(1));
-    $(document).off('change', '#stateFilter').on('change', '#stateFilter', () => window.loadOrders(1));
-    $(document).off('change', '#selectAll').on('change', '#selectAll', function() { $('.item-checkbox').prop('checked', this.checked); });
-    $(document).off('click', '#btnFirstPage').on('click', '#btnFirstPage', () => window.loadOrders(1));
-    $(document).off('click', '#btnLastPage').on('click', '#btnLastPage', () => window.loadOrders(totalPages));
-    $(document).off('click', '#btnPrevPage').on('click', '#btnPrevPage', () => { if(currentPage > 1) window.loadOrders(currentPage - 1); });
-    $(document).off('click', '#btnNextPage').on('click', '#btnNextPage', () => { if(currentPage < totalPages) window.loadOrders(currentPage + 1); });
-
-    $(document).off('click', '#batchDeleteBtn').on('click', '#batchDeleteBtn', function() {
+    $('#searchBtn').off('click').on('click', () => window.loadOrders(1));
+    $('#stateFilter').off('change').on('change', () => window.loadOrders(1));
+    $('#selectAll').off('change').on('change', function() {
+      $('.item-checkbox').prop('checked', this.checked);
+    });
+    $('#btnFirstPage').off('click').on('click', () => window.loadOrders(1));
+    $('#btnLastPage').off('click').on('click', () => window.loadOrders(totalPages));
+    $('#btnPrevPage').off('click').on('click', () => {
+      if(currentPage > 1) window.loadOrders(currentPage - 1);
+    });
+    $('#btnNextPage').off('click').on('click', () => {
+      if(currentPage < totalPages) window.loadOrders(currentPage + 1);
+    });
+    $('#batchDeleteBtn').off('click').on('click', function() {
       const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get();
       if (!selectedIds.length) return window.Toast.warning('请先勾选要删除的订单');
 
@@ -288,7 +266,7 @@
       });
     });
 
-    $(document).off('click', '#batchVerifyBtn').on('click', '#batchVerifyBtn', function() {
+    $('#batchVerifyBtn').off('click').on('click',function() {
       const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get();
       if (!selectedIds.length) return window.Toast.warning('请先勾选要核验的订单');
 

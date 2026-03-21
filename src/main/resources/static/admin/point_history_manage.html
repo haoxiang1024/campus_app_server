@@ -78,12 +78,7 @@
 <script src="./js/sweetalert2@11.js"></script>
 
 <script>
-    // 统一定制 Toast 提示工具
-    window.Toast = window.Toast || {
-        success: (msg) => { Swal.fire({ icon: 'success', title: msg, toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, width: '220px', padding: '0.5rem' }); },
-        error: (msg) => { Swal.fire({ icon: 'error', title: '操作失败', text: msg || '未知错误', confirmButtonColor: '#00aaff', width: '320px' }); },
-        confirm: (title, text, callback) => { Swal.fire({ title: title, text: text, icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#6c757d', confirmButtonText: '确定删除', cancelButtonText: '取消' }).then((result) => { if (result.isConfirmed && typeof callback === 'function') { callback(); } }); }
-    };
+
 
     (function() {
         let currentPage = 1;

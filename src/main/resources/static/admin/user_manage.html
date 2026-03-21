@@ -171,14 +171,7 @@
         const pageSize = 10;
         let allUsersData = [];
 
-        // 避免污染全局 Toast
-        if (!window.Toast) {
-            window.Toast = {
-                success: (msg) => { Swal.fire({ icon: 'success', title: msg, toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, width: '220px', padding: '0.5rem' }); },
-                error: (msg) => { Swal.fire({ icon: 'error', title: '操作失败', text: msg, confirmButtonColor: '#00aaff', width: '320px' }); },
-                confirm: (title, text, callback) => { Swal.fire({ title: title, text: text, icon: 'warning', showCancelButton: true, confirmButtonColor: '#00aaff', cancelButtonColor: '#6c757d', confirmButtonText: '确定', cancelButtonText: '取消' }).then((result) => { if (result.isConfirmed) callback(); }); }
-            };
-        }
+
 
         function getPhotoUrl(photo) {
             if (!photo) return './svgs/solid/circle-user.svg';
