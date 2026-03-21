@@ -93,7 +93,8 @@ public class AdminController {
             @RequestParam("sex") String sex,
             @RequestParam("phone") String phone,
             @RequestParam("email") String email,
-            @RequestParam(value = "photoFile", required = false) MultipartFile photoFile) {
+            @RequestParam(value = "photoFile", required = false) MultipartFile photoFile,
+            @RequestParam("points") int points) {
 
             // 获取现有用户信息
             User user = userService.getUserById(id);
@@ -106,6 +107,7 @@ public class AdminController {
             user.setSex(sex);
             user.setPhone(phone);
             user.setEmail(email);
+            user.setPoints(points);
             
             // 处理用户头像上传
             if(photoFile != null && !photoFile.isEmpty()){

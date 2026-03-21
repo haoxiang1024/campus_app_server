@@ -217,7 +217,7 @@
                 <td><small class="text-muted">${formatDate(u.reg_date)}</small></td>
                 <td>${u.phone || '-'}</td>
                 <td>${u.email || '-'}</td>
-                <td><span class="badge bg-warning text-dark">${u.points != null ? u.points : 0}</span></td>
+                <td>${u.points != null ? u.points : 0}</td>
                 <td>
                     <div class="form-check form-switch">
                         <input class="form-check-input status-switch" type="checkbox" data-id="${u.id}" ${isChecked}>
