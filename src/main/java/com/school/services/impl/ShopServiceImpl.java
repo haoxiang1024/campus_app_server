@@ -60,7 +60,12 @@ public class ShopServiceImpl implements ShopService {
             // 退还积分和库存
             int pointsResult = userMapper.addPoints(exchangeOrder.getUser_id(), exchangeOrder.getPoints_cost());
             shopItemMapper.addStock(exchangeOrder.getItem_id(), 1);
-
+            // 插入积分流水
+            PointHistory history = new PointHistory();
+            history.setUser_id(exchangeOrder.getUser_id());
+            history.setType(2);
+            history.setPoints_changed(-exchangeOrder.getPoints_cost());
+            pointHistoryMapper.insert(history);
             if (pointsResult <= 0) {
                 throw new RuntimeException("退还积分失败，操作中止"); // 抛异常触发表回滚
             }
@@ -117,7 +122,7 @@ public class ShopServiceImpl implements ShopService {
         //  插入积分变动流水
         PointHistory history = new PointHistory();
         history.setUser_id(userId);
-        history.setType(3); // 假设 3 代表消耗兑换
+        history.setType(3); //  3 代表消耗兑换
         history.setPoints_changed(-item.getRequired_points());
         history.setDescription("兑换了商品：" + item.getName());
         pointHistoryMapper.insert(history);
@@ -227,5 +232,28 @@ public class ShopServiceImpl implements ShopService {
         return ServerResponse.createServerResponseByFail("操作失败");
     }
 
+    // 实现分页获取所有积分流水
+    @Override
+    public ServerResponse getAllPointHistories(int page, int pageSize, String keyword, Integer type) {
+        PageHelper.startPage(page, pageSize);
+        List<PointHistory> list = pointHistoryMapper.selectAllWithSearch(keyword, type);
+        PageInfo<PointHistory> pageInfo = new PageInfo<>(list);
 
+        Map<String, Object> result = new HashMap<>();
+        result.put("list", pageInfo.getList());
+        result.put("total", pageInfo.getTotal());
+        result.put("totalPages", pageInfo.getPages());
+
+        return ServerResponse.createServerResponseBySuccess(result);
+    }
+
+    // 实现删除积分流水
+    @Override
+    public ServerResponse deletePointHistory(Integer id) {
+        int rowCount = pointHistoryMapper.deleteById(id);
+        if (rowCount > 0) {
+            return ServerResponse.createServerResponseBySuccess("删除成功");
+        }
+        return ServerResponse.createServerResponseByFail("删除失败，记录可能已不存在");
+    }
 }

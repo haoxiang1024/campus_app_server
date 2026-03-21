@@ -93,4 +93,10 @@ public interface ShopService {
 
     // 修改商品上架状态
     ServerResponse updateStatus(Integer id, Integer status);
+
+    // 分页获取所有积分流水，支持关键词和类型筛选
+    ServerResponse getAllPointHistories(int page, int pageSize, String keyword, Integer type);
+
+    // 删除积分流水
+    ServerResponse deletePointHistory(Integer id);
 }

@@ -1,0 +1,223 @@
+<link href="./css/sweetalert2.min.css" rel="stylesheet">
+<style>
+    /* 页面基础样式 */
+    .content-wrapper { background: #ffffff !important; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 25px; margin: 15px; color: #333 !important; }
+    .text-custom-blue { color: #00aaff !important; }
+    .table-light th { background-color: #f8f9fa !important; color: #666 !important; font-weight: 600; }
+    .btn-outline-custom { color: #00aaff !important; border-color: #dee2e6 !important; }
+    .btn-outline-custom:hover:not(:disabled) { background-color: #00aaff !important; color: white !important; }
+    .btn-outline-custom:disabled { cursor: not-allowed; opacity: 0.5; }
+    .btn-link { text-decoration: none !important; }
+    .form-select-sm { border-color: #dee2e6 !important; color: #666; }
+
+    /* 积分正负颜色 */
+    .text-points-gain { color: #28a745 !important; font-weight: bold; }
+    .text-points-cost { color: #dc3545 !important; font-weight: bold; }
+</style>
+
+<div class="content-wrapper">
+    <div class="d-flex justify-content-between align-items-center mb-4 gap-3 flex-wrap">
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-danger btn-sm" id="batchDeleteBtn">批量删除</button>
+        </div>
+        <div class="d-flex gap-2">
+            <select id="typeFilter" class="form-select form-select-sm" style="width: 130px;">
+                <option value="">所有类型</option>
+                <option value="1">发布招领奖励</option>
+                <option value="2">退还积分</option>
+                <option value="3">兑换商品消耗</option>
+                <option value="4">系统扣除</option>
+            </select>
+            <div class="input-group input-group-sm" style="width: 250px;">
+                <input type="text" id="searchInput" class="form-control" placeholder="搜索描述 / 用户ID...">
+                <button class="btn btn-primary" type="button" id="searchBtn">
+                    <i class="fa fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+            <tr>
+                <th style="width: 45px;"><input type="checkbox" id="selectAll" class="form-check-input"></th>
+                <th>ID</th>
+                <th>用户ID</th>
+                <th>类型</th>
+                <th>积分变动</th>
+                <th>操作描述</th>
+                <th>发生时间</th>
+                <th class="text-center">操作</th>
+            </tr>
+            </thead>
+            <tbody id="historyTableBody">
+            <tr><td colspan="8" class="text-center text-muted">正在检索数据...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex flex-column align-items-center mt-4" id="paginationWrapper">
+        <div class="d-flex align-items-center gap-3">
+            <div class="btn-group">
+                <button class="btn btn-sm btn-outline-custom px-3" id="btnFirstPage">首页</button>
+                <button class="btn btn-sm btn-outline-custom px-3" id="btnPrevPage">上一页</button>
+            </div>
+            <span id="pageInfo" class="text-custom-blue fw-bold">第 1 页 / 共 1 页</span>
+            <div class="btn-group">
+                <button class="btn btn-sm btn-outline-custom px-3" id="btnNextPage">下一页</button>
+                <button class="btn btn-sm btn-outline-custom px-3" id="btnLastPage">末页</button>
+            </div>
+        </div>
+        <div class="mt-2 text-muted small">共 <span id="totalCount">0</span> 条记录</div>
+    </div>
+</div>
+
+<script src="./js/jquery.min.js"></script>
+<script src="./js/bootstrap.bundle.min.js"></script>
+<script src="./js/sweetalert2@11.js"></script>
+
+<script>
+    // 统一定制 Toast 提示工具
+    window.Toast = window.Toast || {
+        success: (msg) => { Swal.fire({ icon: 'success', title: msg, toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, width: '220px', padding: '0.5rem' }); },
+        error: (msg) => { Swal.fire({ icon: 'error', title: '操作失败', text: msg || '未知错误', confirmButtonColor: '#00aaff', width: '320px' }); },
+        confirm: (title, text, callback) => { Swal.fire({ title: title, text: text, icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#6c757d', confirmButtonText: '确定删除', cancelButtonText: '取消' }).then((result) => { if (result.isConfirmed && typeof callback === 'function') { callback(); } }); }
+    };
+
+    (function() {
+        let currentPage = 1;
+        let totalPages = 1;
+        const pageSize = 10;
+        let allData = [];
+
+        // 格式化时间戳
+        function formatDate(ts) {
+            if (!ts) return '-';
+            const parseValue = isNaN(Number(ts)) ? ts : Number(ts);
+            const d = new Date(parseValue);
+            if (isNaN(d.getTime())) return '-';
+            return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}:${d.getSeconds().toString().padStart(2,'0')}`;
+        }
+
+        // 加载表格数据
+        function loadData(page) {
+            currentPage = page || 1;
+            const keyword = $('#searchInput').val().trim();
+            const type = $('#typeFilter').val();
+
+            $('#historyTableBody').html('<tr><td colspan="8" class="text-center text-muted">正在检索最新数据...</td></tr>');
+
+            $.get('/school/admin/pointHistory/getByPage', {
+                page: currentPage,
+                pageSize: pageSize,
+                keyword: keyword,
+                type: type
+            }, function(res) {
+                if(res && res.status === 0 && res.data) {
+                    allData = res.data.list || [];
+                    const totalItems = res.data.total || 0;
+                    totalPages = res.data.totalPages || 1;
+
+                    renderTable(allData);
+
+                    // 更新分页组件状态
+                    $('#pageInfo').text(`第 ${currentPage} 页 / 共 ${totalPages} 页`);
+                    $('#totalCount').text(totalItems);
+                    $('#btnFirstPage, #btnPrevPage').prop('disabled', currentPage <= 1);
+                    $('#btnNextPage, #btnLastPage').prop('disabled', currentPage >= totalPages);
+                    $('#selectAll').prop('checked', false);
+                } else {
+                    $('#historyTableBody').html('<tr><td colspan="8" class="text-center text-danger">数据加载失败：' + (res?.msg || '接口返回异常') + '</td></tr>');
+                }
+            }).fail(function(error) {
+                $('#historyTableBody').html('<tr><td colspan="8" class="text-center text-danger">数据加载失败：网络异常</td></tr>');
+            });
+        }
+
+        // 渲染表格 HTML
+        function renderTable(data) {
+            let html = '';
+            if (!data || !data.length) {
+                html = '<tr><td colspan="8" class="text-center text-muted">未找到匹配的流水记录</td></tr>';
+            } else {
+                data.forEach(item => {
+                    item = item || {};
+
+                    // 解析类型
+                    let typeBadge = '';
+                    if (item.type === 1) typeBadge = '<span class="badge bg-success">获取</span>';
+                    else if (item.type === 3) typeBadge = '<span class="badge bg-warning text-dark">消耗</span>';
+                    else typeBadge = `<span class="badge bg-secondary">其他(${item.type})</span>`;
+
+                    // 解析数值颜色
+                    let points = item.points_changed || 0;
+                    let pointsHtml = points > 0
+                        ? `<span class="text-points-gain">+${points}</span>`
+                        : `<span class="text-points-cost">${points}</span>`;
+
+                    // 拼接行
+                    html += `<tr>
+                        <td><input type="checkbox" class="item-checkbox form-check-input" value="${item.id || 0}"></td>
+                        <td>${item.id || 0}</td>
+                        <td class="text-center">${item.user_id || '-'}</td>
+                        <td>${typeBadge}</td>
+                        <td>${pointsHtml}</td>
+                        <td>${item.description || '-'}</td>
+                        <td><small class="text-muted">${formatDate(item.create_time)}</small></td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-link text-danger p-0" onclick="deleteItem(${item.id || 0})">删除</button>
+                        </td>
+                    </tr>`;
+                });
+            }
+            $('#historyTableBody').html(html);
+        }
+
+        // 单个删除
+        window.deleteItem = (id) => {
+            if (!id) return window.Toast.error('无效的记录ID');
+            window.Toast.confirm("删除确认", "确定永久删除此流水记录吗？（警告：通常不建议删除审计日志）", () => {
+                $.post('/school/admin/pointHistory/delete', { id: id }, (res) => {
+                    if(res && res.status === 0) {
+                        window.Toast.success("已删除");
+                        loadData(currentPage);
+                    } else {
+                        window.Toast.error(res?.msg || '删除失败');
+                    }
+                }).fail(() => window.Toast.error('网络异常，删除失败'));
+            });
+        };
+
+        // 批量删除
+        $('#batchDeleteBtn').on('click', function() {
+            const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get().filter(id => id);
+            if (!selectedIds.length) return window.Toast.error('请勾选要删除的记录');
+
+            window.Toast.confirm("批量删除", `确定永久删除选中的 ${selectedIds.length} 条流水记录吗？`, () => {
+                const promises = selectedIds.map(id => $.post('/school/admin/pointHistory/delete', { id: id }));
+                Promise.allSettled(promises).then(() => {
+                    window.Toast.success("批量删除操作完成");
+                    loadData(1);
+                }).catch(err => {
+                    window.Toast.error("部分请求失败");
+                    loadData(currentPage);
+                });
+            });
+        });
+
+        // 事件监听
+        $('#searchBtn').on('click', () => loadData(1));
+        $('#searchInput').on('keypress', e => { if(e.which === 13) loadData(1); });
+        $('#typeFilter').on('change', () => loadData(1));
+        $('#selectAll').on('change', function() { $('.item-checkbox').prop('checked', this.checked); });
+
+        $('#btnFirstPage').on('click', () => loadData(1));
+        $('#btnLastPage').on('click', () => loadData(totalPages));
+        $('#btnPrevPage').on('click', () => { if(currentPage > 1) loadData(currentPage - 1); });
+        $('#btnNextPage').on('click', () => { if(currentPage < totalPages) loadData(currentPage + 1); });
+
+        // 初始化加载数据
+        loadData(1);
+    })();
+</script>

@@ -10,4 +10,20 @@
     <select id="selectByUserId" resultType="com.school.entity.PointHistory">
         SELECT * FROM point_history WHERE user_id = #{user_id} ORDER BY create_time DESC
     </select>
+    <select id="selectAllWithSearch" resultType="com.school.entity.PointHistory">
+        SELECT * FROM point_history
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (description LIKE CONCAT('%', #{keyword}, '%') OR user_id LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="type != null">
+                AND type = #{type}
+            </if>
+        </where>
+        ORDER BY id ASC
+    </select>
+
+    <delete id="deleteById">
+        DELETE FROM point_history WHERE id = #{id}
+    </delete>
 </mapper>

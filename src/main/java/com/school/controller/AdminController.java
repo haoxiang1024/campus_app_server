@@ -360,4 +360,28 @@ public class AdminController {
                                       @RequestParam("adminId") Integer adminId) {
        return shopService.verifyOrder(verifyCode, adminId);
     }
+
+
+
+    /**
+     * 分页查询积分流水
+     */
+    @ResponseBody
+    @GetMapping("/pointHistory/getByPage")
+    public ServerResponse getByPage(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "type", required = false) Integer type) {
+        return shopService.getAllPointHistories(page, pageSize, keyword, type);
+    }
+
+    /**
+     * 删除积分流水
+     */
+    @ResponseBody
+    @PostMapping("/pointHistory/delete")
+    public ServerResponse delete(@RequestParam("id") Integer id) {
+        return shopService.deletePointHistory(id);
+    }
 }

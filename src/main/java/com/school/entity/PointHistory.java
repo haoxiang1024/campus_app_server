@@ -5,7 +5,7 @@ import java.util.Date;
 public class PointHistory {
     private Integer id;
     private Integer user_id;
-    private Integer type; // 1-获取, 3-兑换消耗等
+    private Integer type; // 变动类型：1-发布招领奖励, 2-退还积分, 3-兑换商品消耗, 4-系统扣除
     private Integer points_changed; // 变动数值(正负)
     private String description;
     private Date create_time;
