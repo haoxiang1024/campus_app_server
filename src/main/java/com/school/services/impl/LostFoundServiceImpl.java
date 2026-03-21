@@ -18,6 +18,7 @@ import com.school.utils.ServerResponse;
 import com.school.utils.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -102,6 +103,7 @@ public class LostFoundServiceImpl implements LostFoundService {
      * @return ServerResponse 操作结果响应对象
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ServerResponse addLostFound(String lostfoundJson) {
         // 将JSON字符串解析为LostFound实体对象
         LostFound lostFound = JSON.parseObject(lostfoundJson, LostFound.class);
@@ -119,7 +121,7 @@ public class LostFoundServiceImpl implements LostFoundService {
             history.setPoints_changed(-50);
             history.setDescription("发布违规信息");
             pointHistoryMapper.insert(history);
-            return ServerResponse.createServerResponseByFail("内容包含敏感词，请修改后重试");
+            return ServerResponse.createServerResponseByFail("内容包含敏感词，扣除50积分，请重新发布内容");
         }
         
         // 调用数据访问层保存失物招领信息
@@ -265,18 +267,70 @@ public class LostFoundServiceImpl implements LostFoundService {
     }
 
     /**
-     * 管理员审核失物招领信息（修改状态）
-     * @param id 信息ID
-     * @param state 目标状态
-     * @return ServerResponse 操作结果响应对象
+     * 更新失物招领状态（包含审核通过加积分逻辑）
      */
     @Override
-    public ServerResponse updateLostFoundStatus(Integer id, String state) {
-        boolean isSuccess = lostFoundMapper.updateState(id, state);
-        if (isSuccess) {
-            return ServerResponse.createServerResponseBySuccess("修改成功");
+    @Transactional(rollbackFor = Exception.class) // 开启事务
+    public ServerResponse updateLostFoundStatus(Integer lostFoundId, String state) {
+
+        // 查出数据库中原本的记录
+        LostFound lostFound = lostFoundMapper.selectByPrimaryKey(lostFoundId);
+        if (lostFound == null) {
+            return ServerResponse.createServerResponseByFail("记录不存在");
         }
-        return ServerResponse.createServerResponseByFail("修改失败");
+
+        // 保存旧状态、类型和发布人ID
+        String oldState = lostFound.getState();
+
+        // 状态未改变直接返回
+        if (state != null && state.equals(oldState)) {
+            return ServerResponse.createServerResponseBySuccess("操作成功");
+        }
+
+        String type = lostFound.getType();
+        Integer userId = lostFound.getUserId();
+
+        // 更新帖子状态
+        lostFoundMapper.updateState(lostFoundId, state);
+
+        // 只有当存在发布人时，才进行积分结算
+        if (userId != null) {
+            //  定义业务场景条件
+            boolean isApprovedFoundPost = "待审核".equals(oldState) && "待认领".equals(state) && "招领".equals(type);
+            boolean isRejectedPost = "已驳回".equals(state);
+
+            //  初始化积分变动参数
+            int pointsChange = 0;
+            int historyType = 0;
+            String historyDesc = null;
+
+            //  匹配对应的积分规则
+            if (isApprovedFoundPost) {
+                pointsChange = 10;
+                historyType = 1; // 招领奖励
+                historyDesc = "招领帖子审核通过奖励";
+            } else if (isRejectedPost) {
+                pointsChange = -50;
+                historyType = 4; // 系统扣除
+                historyDesc = "发布违规信息被驳回扣除";
+            }
+
+            //  若积分发生变动，统一执行加扣和流水入库
+            if (pointsChange != 0) {
+                // 更新用户总积分
+                userMapper.addPoints(userId, pointsChange);
+
+                // 记录流水
+                PointHistory history = new PointHistory();
+                history.setUser_id(userId);
+                history.setType(historyType);
+                history.setPoints_changed(pointsChange);
+                history.setDescription(historyDesc);
+                pointHistoryMapper.insert(history);
+            }
+        }
+
+        return ServerResponse.createServerResponseBySuccess("操作成功");
     }
 
     /**

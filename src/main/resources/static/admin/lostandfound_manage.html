@@ -177,7 +177,7 @@
 <script src="./js/sweetalert2@11.js"></script>
 
 <script>
-    // 统一定制 Toast 提示工具
+    // 统一定制 Toast 提示工具（
     window.Toast = window.Toast || {
         success: (msg) => { Swal.fire({ icon: 'success', title: msg, toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, width: '220px', padding: '0.5rem' }); },
         error: (msg) => { Swal.fire({ icon: 'error', title: '操作失败', text: msg || '未知错误', confirmButtonColor: '#00aaff', width: '320px' }); },
@@ -191,7 +191,7 @@
         const pageSize = 10;
         let allData = [];
 
-        // 获取图片地址，处理本地和网络图片
+        // 获取图片地址
         function getPhotoUrl(photo) {
             if (!photo || photo.trim() === '') return './svgs/solid/circle-user.svg';
             if (photo.startsWith('http')) return photo;
@@ -241,7 +241,6 @@
                 }
             }).fail(function(xhr, status, error) {
                 $('#lostTableBody').html('<tr><td colspan="10" class="text-center text-danger">数据加载失败：网络异常</td></tr>');
-                console.error('加载数据失败：', error);
             });
         }
 
@@ -253,12 +252,10 @@
             } else {
                 data.forEach(item => {
                     item = item || {};
-                    // 类型徽章
                     let typeBadge = item.type === '招领'
                         ? '<span class="badge border text-success border-success">招领</span>'
                         : '<span class="badge border text-danger border-danger">失物</span>';
 
-                    // 状态徽章
                     let badgeClass = 'bg-secondary';
                     if(item.state === '待审核') badgeClass = 'bg-info';
                     else if(item.state === '寻找中') badgeClass = 'bg-primary';
@@ -273,17 +270,13 @@
                     }
                     btns += `<button class="btn btn-sm btn-link text-danger p-0" onclick="deleteItem(${item.id || 0})">删除</button>`;
 
-                    // 拼接行
                     html += `<tr>
                         <td><input type="checkbox" class="item-checkbox form-check-input" value="${item.id || 0}"></td>
                         <td>${item.id || 0}</td>
                         <td>${typeBadge}</td>
                         <td>
                             <div class="form-check form-switch">
-                                <input class="form-check-input stick-switch"
-                                       type="checkbox"
-                                       data-id="${item.id || 0}"
-                                       ${item.stick == 1 ? 'checked' : ''}>
+                                <input class="form-check-input stick-switch" type="checkbox" data-id="${item.id || 0}" ${item.stick == 1 ? 'checked' : ''}>
                             </div>
                         </td>
                         <td class="fw-bold">${item.title || '未命名'}</td>
@@ -302,17 +295,13 @@
                 const $this = $(this);
                 if ($this.data('processing')) return;
                 $this.data('processing', true);
-
                 const id = $this.data('id');
                 const isChecked = this.checked ? 1 : 0;
-
-                updateStickStatus(id, isChecked).finally(() => {
-                    $this.data('processing', false);
-                });
+                updateStickStatus(id, isChecked).finally(() => $this.data('processing', false));
             });
         }
 
-        // 发送更新置顶状态请求
+        // 更新置顶状态
         function updateStickStatus(id, stick) {
             return $.post('/school/admin/updateStickStatus', { id: id, stick: stick })
                 .done(function(res) {
@@ -347,15 +336,10 @@
 
                 Promise.allSettled(promises).then(results => {
                     const successCount = results.filter(res => res.status === 'fulfilled' && res.value?.status === 0).length;
-                    if (successCount === targetItems.length) {
-                        window.Toast.success(`批量操作成功，共处理 ${successCount} 条记录`);
-                    } else {
-                        window.Toast.success(`操作完成：${successCount} 条成功，${targetItems.length - successCount} 条失败`);
-                    }
+                    window.Toast.success(`操作完成：成功 ${successCount} 条`);
                     loadData(currentLostPage);
-                }).catch(err => {
-                    window.Toast.error("网络异常，批量请求未能全部完成");
-                });
+                    $('.item-checkbox').prop('checked', false);
+                }).catch(() => { window.Toast.error("网络异常，部分请求失败"); });
             });
         });
 
@@ -372,20 +356,24 @@
                 else skipCount++;
             });
 
-            if (!targetIds.length) return window.Toast.error('选中项中没有符合驳回条件');
+            if (!targetIds.length) return window.Toast.error('选中项中没有符合驳回条件的记录');
 
-            const title = skipCount > 0 ? `批量驳回 跳过已审核项` : '批量驳回';
-            window.Toast.prompt(title, '请输入统一的驳回原因', (reason) => {
+            const confirmMsg = skipCount > 0
+                ? `确认批量驳回 ${targetIds.length} 条记录吗？(已跳过 ${skipCount} 条非待审核项)`
+                : `确认批量驳回选中的 ${targetIds.length} 条记录吗？`;
+
+            window.Toast.confirm('批量驳回', confirmMsg, () => {
                 const promises = targetIds.map(id => {
-                    return $.post('/school/admin/updateLostFoundStatus', { lostFoundId: id, state: '已驳回', reason: reason });
+                    return $.post('/school/admin/updateLostFoundStatus', { lostFoundId: id, state: '已驳回' });
                 });
 
                 Promise.allSettled(promises).then(results => {
-                    const successCount = results.filter(res => res.status === 'fulfilled' && res.value?.status === 0).length;
-                    window.Toast.success(`操作完成：成功驳回 ${successCount} 条记录`);
+                    const successCount = results.filter(res => res.status === 'fulfilled' && res.value && res.value.status === 0).length;
+                    window.Toast.success(`成功驳回 ${successCount} 条记录，已扣除积分`);
                     loadData(currentLostPage);
-                }).catch(err => {
-                    window.Toast.error("部分请求失败，请检查网络");
+                    $('.item-checkbox').prop('checked', false);
+                }).catch(() => {
+                    window.Toast.error("部分请求处理异常");
                     loadData(currentLostPage);
                 });
             });
@@ -401,10 +389,8 @@
                 Promise.allSettled(promises).then(() => {
                     window.Toast.success("删除操作完成");
                     loadData(1);
-                }).catch(err => {
-                    window.Toast.error("部分请求失败");
-                    loadData(currentLostPage);
-                });
+                    $('.item-checkbox').prop('checked', false);
+                }).catch(() => { window.Toast.error("部分请求失败"); });
             });
         });
 
@@ -412,32 +398,17 @@
         $('#batchStickBtn').on('click', function() {
             const targetIds = [];
             let skipCount = 0;
-
             $('.item-checkbox:checked').each(function() {
-                const $row = $(this).closest('tr');
-                const $stickSwitch = $row.find('.stick-switch');
                 const id = $(this).val();
-
-                if (id && !$stickSwitch.prop('checked')) targetIds.push(id);
+                if (id && !$(this).closest('tr').find('.stick-switch').prop('checked')) targetIds.push(id);
                 else skipCount++;
             });
 
-            if (targetIds.length === 0) {
-                return skipCount > 0 ? window.Toast.error('选中的项目已全部处于置顶状态') : window.Toast.error('请先勾选项目');
-            }
+            if (targetIds.length === 0) return window.Toast.error(skipCount > 0 ? '选中的项目已全部处于置顶状态' : '请先勾选项目');
 
-            const confirmMsg = skipCount > 0 ? `确定要置顶选中的记录吗 跳过已置顶记录` : `确定要置顶选中的 ${targetIds.length} 条记录吗？`;
-
-            window.Toast.confirm('批量置顶', confirmMsg, () => {
+            window.Toast.confirm('批量置顶', skipCount > 0 ? `确定置顶选中项吗？(跳过已置顶)` : `确定置顶选中的 ${targetIds.length} 条记录吗？`, () => {
                 const promises = targetIds.map(id => $.post('/school/admin/updateStickStatus', { id: id, stick: 1 }));
-                Promise.allSettled(promises).then(results => {
-                    const successCount = results.filter(res => res.status === 'fulfilled' && res.value?.status === 0).length;
-                    window.Toast.success(`操作完成：${successCount} 条成功`);
-                    loadData(currentLostPage);
-                }).catch(err => {
-                    window.Toast.error("部分请求失败");
-                    loadData(currentLostPage);
-                });
+                Promise.allSettled(promises).then(() => { window.Toast.success("批量置顶完成"); loadData(currentLostPage); });
             });
         });
 
@@ -445,32 +416,17 @@
         $('#batchCancleStickBtn').on('click', function() {
             const targetIds = [];
             let skipCount = 0;
-
             $('.item-checkbox:checked').each(function() {
-                const $row = $(this).closest('tr');
-                const $stickSwitch = $row.find('.stick-switch');
                 const id = $(this).val();
-
-                if (id && $stickSwitch.prop('checked')) targetIds.push(id);
+                if (id && $(this).closest('tr').find('.stick-switch').prop('checked')) targetIds.push(id);
                 else skipCount++;
             });
 
-            if (targetIds.length === 0) {
-                return skipCount > 0 ? window.Toast.error('选中的项目本就未置顶，无需取消') : window.Toast.error('请先勾选项目');
-            }
+            if (targetIds.length === 0) return window.Toast.error(skipCount > 0 ? '选中项本就未置顶' : '请先勾选项目');
 
-            const confirmMsg = skipCount > 0 ? `确定要取消选中的记录置顶吗 跳过本就未置顶记录` : `确定要取消选中的 ${targetIds.length} 条记录的置顶吗？`;
-
-            window.Toast.confirm('取消置顶', confirmMsg, () => {
+            window.Toast.confirm('取消置顶', skipCount > 0 ? `确定取消选中项的置顶吗？(跳过未置顶)` : `确定取消选中的 ${targetIds.length} 条记录置顶吗？`, () => {
                 const promises = targetIds.map(id => $.post('/school/admin/updateStickStatus', { id: id, stick: 0 }));
-                Promise.allSettled(promises).then(results => {
-                    const successCount = results.filter(res => res.status === 'fulfilled' && res.value?.status === 0).length;
-                    window.Toast.success(`操作完成：成功取消 ${successCount} 条置顶`);
-                    loadData(currentLostPage);
-                }).catch(err => {
-                    window.Toast.error("部分请求失败");
-                    loadData(currentLostPage);
-                });
+                Promise.allSettled(promises).then(() => { window.Toast.success("批量取消置顶完成"); loadData(currentLostPage); });
             });
         });
 
@@ -481,15 +437,10 @@
             if (!item) return window.Toast.error('记录不存在');
 
             const targetState = item.type === '失物' ? '寻找中' : '待认领';
-
             window.Toast.confirm('审核通过', `确认将该信息发布为 ${targetState} 吗？`, () => {
                 $.post('/school/admin/updateLostFoundStatus', { lostFoundId: id, state: targetState }, (res) => {
-                    if(res && res.status === 0) {
-                        window.Toast.success("已发布");
-                        loadData(currentLostPage);
-                    } else {
-                        window.Toast.error(res?.msg || '操作失败');
-                    }
+                    if(res && res.status === 0) { window.Toast.success("已发布"); loadData(currentLostPage); }
+                    else window.Toast.error(res?.msg || '操作失败');
                 }).fail(() => window.Toast.error('网络异常，操作失败'));
             });
         };
@@ -497,10 +448,10 @@
         // 单个驳回
         window.rejectSingle = (id) => {
             if (!id) return window.Toast.error('无效的记录ID');
-            window.Toast.prompt('审核驳回', '请输入驳回理由', (reason) => {
-                $.post('/school/admin/updateLostFoundStatus', { lostFoundId: id, state: '已驳回', reason: reason }, (res) => {
+            window.Toast.confirm('驳回确认', '确定要驳回该记录吗？', () => {
+                $.post('/school/admin/updateLostFoundStatus', { lostFoundId: id, state: '已驳回' }, (res) => {
                     if(res && res.status === 0) {
-                        window.Toast.success("已驳回");
+                        window.Toast.success("已驳回并扣除积分");
                         loadData(currentLostPage);
                     } else {
                         window.Toast.error(res?.msg || '操作失败');
@@ -509,18 +460,24 @@
             });
         };
 
-        // 查看详情弹窗内容构建
+        // 单个删除
+        window.deleteItem = (id) => {
+            if (!id) return window.Toast.error('无效的记录ID');
+            window.Toast.confirm("删除确认", "确定永久删除此信息吗？", () => {
+                $.post('/school/admin/deleteLostFoundById', { lostFoundId: id }, (res) => {
+                    if(res && res.status === 0) { window.Toast.success("已删除"); loadData(currentLostPage); }
+                    else window.Toast.error(res?.msg || '删除失败');
+                }).fail(() => window.Toast.error('网络异常，删除失败'));
+            });
+        };
+
+        // 查看详情
         window.showLostDetail = (id) => {
             if (!id) return window.Toast.error('无效的记录ID');
-
-            $.get('/school/admin/getLostFoundById', {
-                lostFoundId: id,
-                _t: new Date().getTime()
-            }, function(res) {
+            $.get('/school/admin/getLostFoundById', { lostFoundId: id, _t: new Date().getTime() }, function(res) {
                 if(res && res.status === 0 && res.data) {
                     const item = res.data;
                     const typeLabel = item.type === '招领' ? '招领' : '失物';
-                    // 在此处新增了 ID 字段展示
                     const content = `
                         <div class="mb-2"><strong>ID：</strong>${item.id || id}</div>
                         <div class="mb-2"><strong>类型：</strong>${typeLabel}</div>
@@ -532,25 +489,8 @@
                         </div>`;
                     $('#detailContent').html(content);
                     new bootstrap.Modal('#detailModal').show();
-                } else {
-                    window.Toast.error('获取详情失败');
-                }
+                } else window.Toast.error('获取详情失败');
             }).fail(() => window.Toast.error('网络异常，无法获取详情'));
-        };
-
-        // 单个删除
-        window.deleteItem = (id) => {
-            if (!id) return window.Toast.error('无效的记录ID');
-            window.Toast.confirm("删除确认", "确定永久删除此信息吗？", () => {
-                $.post('/school/admin/deleteLostFoundById', { lostFoundId: id }, (res) => {
-                    if(res && res.status === 0) {
-                        window.Toast.success("已删除");
-                        loadData(currentLostPage);
-                    } else {
-                        window.Toast.error(res?.msg || '删除失败');
-                    }
-                }).fail(() => window.Toast.error('网络异常，删除失败'));
-            });
         };
 
         // 事件监听
@@ -558,16 +498,15 @@
         $('#searchInput').on('keypress', e => { if(e.which === 13) loadData(1); });
         $('#stateFilter, #typeFilter').on('change', () => loadData(1));
         $('#selectAll').on('change', function() { $('.item-checkbox').prop('checked', this.checked); });
-
         $('#btnLostFirstPage').on('click', () => loadData(1));
         $('#btnLostLastPage').on('click', () => loadData(totalLostPages));
         $('#btnLostPrevPage').on('click', () => { if(currentLostPage > 1) loadData(currentLostPage - 1); });
         $('#btnLostNextPage').on('click', () => { if(currentLostPage < totalLostPages) loadData(currentLostPage + 1); });
 
-        // 初始化加载数据
+        // 初始化
         loadData(1);
 
-        // 打开新增弹窗
+        // 新增弹窗与提交
         window.openAddModal = () => {
             $('#addForm')[0].reset();
             const now = new Date();
@@ -576,21 +515,12 @@
             new bootstrap.Modal('#addModal').show();
         };
 
-        // 提交登记
         window.submitRegistration = () => {
             const addForm = $('#addForm')[0];
-            if (!addForm.checkValidity()) {
-                addForm.reportValidity();
-                return;
-            }
+            if (!addForm.checkValidity()) return addForm.reportValidity();
 
             const op = $('#addOp').val();
             const file = $('#upload_file')[0].files[0];
-            const lostfoundtype_id = $('#addCategory').val();
-            const type = op;
-            const timeVal = $('#addTime').val();
-            const stick = $('#addIsTop').val();
-
             if (!file) return window.Toast.error("请选择物品图片");
 
             const itemData = {
@@ -600,23 +530,17 @@
                 content: $('#addForm [name="content"]').val().trim(),
                 state: '待审核',
                 user_id: 1,
-                lostfoundtype_id: lostfoundtype_id,
-                type: type,
-                pub_date: timeVal ? new Date(timeVal).getTime() : new Date().getTime(),
-                stick: stick
+                lostfoundtype_id: $('#addCategory').val(),
+                type: op,
+                pub_date: $('#addTime').val() ? new Date($('#addTime').val()).getTime() : new Date().getTime(),
+                stick: $('#addIsTop').val()
             };
 
             const formData = new FormData();
             formData.append('upload_file', file);
             formData.append('op', op);
-
-            if (op === '失物') {
-                formData.append('lostJson', JSON.stringify(itemData));
-                formData.append('foundJson', "");
-            } else {
-                formData.append('foundJson', JSON.stringify(itemData));
-                formData.append('lostJson', "");
-            }
+            formData.append(op === '失物' ? 'lostJson' : 'foundJson', JSON.stringify(itemData));
+            formData.append(op === '失物' ? 'foundJson' : 'lostJson', "");
 
             $.ajax({
                 url: '/school/addLostFound',
@@ -629,11 +553,9 @@
                         window.Toast.success("发布成功！请等待审核");
                         bootstrap.Modal.getInstance('#addModal').hide();
                         loadData(1);
-                    } else {
-                        window.Toast.error(res?.msg || "发布失败");
-                    }
+                    } else window.Toast.error(res?.msg || "发布失败");
                 },
-                error: function() { window.Toast.error("服务器响应异常"); }
+                error: () => window.Toast.error("服务器响应异常")
             });
         };
     })();

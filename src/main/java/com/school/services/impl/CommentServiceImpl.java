@@ -1,13 +1,17 @@
 package com.school.services.impl;
 
 import com.school.entity.Comment;
+import com.school.entity.PointHistory;
 import com.school.mapper.CommentMapper;
+import com.school.mapper.PointHistoryMapper;
+import com.school.mapper.UserMapper;
 import com.school.services.api.CommentService;
 import com.school.utils.SensitiveWordUtil;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +30,10 @@ public class CommentServiceImpl implements CommentService {
     private SensitiveWordUtil sensitiveWordUtil;
     @Autowired
     private Util util;
+    @Autowired
+    private PointHistoryMapper pointHistoryMapper;
+    @Autowired
+    private UserMapper userMapper;
     /**
      * 添加评论
      * 包含敏感词检测和过滤功能，自动识别并处理敏感内容
@@ -37,6 +45,7 @@ public class CommentServiceImpl implements CommentService {
      * @return ServerResponse 操作结果响应对象
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ServerResponse addComment(int lostfound_id, int user_id, String content, int parent_id, int reply_user_id) {
         // 初始化评论状态变量
         int status;
@@ -48,7 +57,16 @@ public class CommentServiceImpl implements CommentService {
             //finalContent = sensitiveWordUtil.replaceSensitiveWord(content, "*");
             status = 2; // 驳回状态
             commentMapper.addComment(lostfound_id, user_id, finalContent, status,parent_id,reply_user_id);
-            return ServerResponse.createServerResponseByFail("内容包含敏感词，请修改后重试");
+            //扣除积分
+            userMapper.deductPoints(user_id,50 );
+            //记录积分流水
+            PointHistory history = new PointHistory();
+            history.setUser_id(user_id);
+            history.setType(4); //系统扣除
+            history.setPoints_changed(-50);
+            history.setDescription("发布违规评论");
+            pointHistoryMapper.insert(history);
+            return ServerResponse.createServerResponseByFail("评论包含敏感词，扣除50积分，请重新发布内容");
         } else {
             // 正常内容：直接发布 (status = 1)
             status = 1; // 已发布状态

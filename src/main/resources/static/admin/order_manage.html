@@ -109,20 +109,39 @@
 <script src="./js/sweetalert2@11.js"></script>
 
 <script>
-  // 使用立即执行函数 (IIFE) 解决动态加载页面时，作用域污染和重复绑定的问题
   (function() {
-    // 统一定制提示弹窗
-    window.Toast = window.Toast || {
-      success: (msg) => Swal.fire({ icon: 'success', title: msg, toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, width: '220px' }),
-      error: (msg) => Swal.fire({ icon: 'error', title: '操作失败', text: msg || '未知错误', confirmButtonColor: '#00aaff' }),
-      warning: (msg) => Swal.fire({ icon: 'warning', title: msg, toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 }),
-      confirm: (title, text, callback) => Swal.fire({ title: title, text: text, icon: 'warning', showCancelButton: true, confirmButtonColor: '#00aaff', cancelButtonColor: '#6c757d', confirmButtonText: '确定', cancelButtonText: '取消' }).then(res => { if (res.isConfirmed) callback(); })
-    };
+    if (!window.Toast) {
+      window.Toast = {
+        success: (msg) => Swal.fire({ icon: 'success', title: msg, toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, width: '220px', padding: '0.5rem' }),
+        error: (msg) => Swal.fire({ icon: 'error', title: '操作失败', text: msg || '未知错误', confirmButtonColor: '#00aaff', width: '320px' }),
+        warning: (msg) => Swal.fire({ icon: 'warning', title: '提醒', text: msg, toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 }),
+        confirm: (title, text, callback) => {
+          Swal.fire({
+            title: title, text: text, icon: 'warning', showCancelButton: true,
+            confirmButtonColor: '#00aaff', cancelButtonColor: '#6c757d',
+            confirmButtonText: '确定', cancelButtonText: '取消'
+          }).then((result) => {
+            if (result.isConfirmed && typeof callback === 'function') { callback(); }
+          });
+        },
+        prompt: (title, placeholder, callback) => {
+          const promptTitle = title || '请输入信息';
+          const promptPlaceholder = placeholder || '请输入...';
+          Swal.fire({
+            title: promptTitle, input: 'text', inputPlaceholder: promptPlaceholder,
+            showCancelButton: true, confirmButtonColor: '#00aaff', confirmButtonText: '提交', cancelButtonText: '取消',
+            inputValidator: (value) => { if (!value) return '内容不能为空！'; }
+          }).then((result) => {
+            if (result.isConfirmed && typeof callback === 'function') { callback(result.value); }
+          });
+        }
+      };
+    }
 
     let currentPage = 1;
     let totalPages = 1;
     const pageSize = 10;
-    let allOrders = []; // 新增：保存当前页面的订单数据用于详情展示
+    let allOrders = [];
 
     // 挂载到 window，保证 HTML 上的 onclick 能够调用
     window.loadOrders = function(page) {
@@ -139,13 +158,12 @@
         status: status || null
       }, function(res) {
         if(res.status === 0 && res.data) {
-          allOrders = res.data.list || res.data || []; // 缓存当前页数据
+          allOrders = res.data.list || res.data || [];
           const totalItems = res.data.total || allOrders.length || 0;
           totalPages = res.data.pages || res.data.totalPages || Math.ceil(totalItems / pageSize) || 1;
 
           renderTable(allOrders);
 
-          // 更新分页信息状态
           $('#pageInfo').text(`第 ${currentPage} 页 / 共 ${totalPages} 页`);
           $('#totalCount').text(totalItems);
           $('#btnFirstPage, #btnPrevPage').prop('disabled', currentPage <= 1);
@@ -155,7 +173,7 @@
           $('#orderList').html(`<tr><td colspan="9" class="text-center text-danger">数据加载失败：${res.msg || '未知错误'}</td></tr>`);
         }
       }).fail(function() {
-        $('#orderList').html('<tr><td colspan="9" class="text-center text-danger">接口请求失败，请检查网络或后端服务</td></tr>');
+        $('#orderList').html('<tr><td colspan="9" class="text-center text-danger">接口请求失败</td></tr>');
       });
     };
 
@@ -170,7 +188,6 @@
                 order.status === 1 ? '<span class="badge bg-success">已领取</span>' :
                         '<span class="badge bg-secondary">已取消</span>';
 
-        // 新增：详情按钮
         let actionHtml = `<button class="btn btn-sm btn-link text-decoration-none text-custom-blue p-0 me-3 " onclick="showOrderDetail(${order.id})">详情</button>`;
 
         if(order.status === 0) {
@@ -194,11 +211,9 @@
             <td class="text-center">${actionHtml}</td>
           </tr>`;
       }).join('');
-
       $('#orderList').html(html);
     }
 
-    // 新增：打开详情弹窗
     window.showOrderDetail = function(id) {
       const order = allOrders.find(o => o.id === id);
       if(!order) return window.Toast.error('未找到该订单信息');
@@ -206,8 +221,6 @@
       const statusText = order.status === 0 ? '<span class="text-info">待核验</span>' :
               order.status === 1 ? '<span class="text-success">已领取</span>' :
                       '<span class="text-secondary">已取消</span>';
-
-      const dateStr = order.create_time ? new Date(order.create_time).toLocaleString() : '-';
 
       const content = `
           <div class="mt-3 mb-2"><strong>订单编号：</strong>${order.order_no || '-'}</div>
@@ -218,11 +231,8 @@
           <hr>
           <div class="mb-2"><strong>下单用户：</strong>${order.nickname || '未知用户'}</div>
           <div class="mb-2"><strong>联系电话：</strong>${order.phone || '-'}</div>
-          <div class="mb-2"><strong>下单时间：</strong>${dateStr}</div>
       `;
       $('#detailContent').html(content);
-
-      // 兼容直接调用的方式打开弹窗
       new bootstrap.Modal(document.getElementById('detailModal')).show();
     };
 
@@ -231,20 +241,14 @@
       if(!code) return window.Toast.warning('请输入核验码');
 
       const adminId = sessionStorage.getItem('adminId') || localStorage.getItem('userId') || 1;
-
-      $.post('/school/admin/verifyOrder', {
-        verifyCode: code,
-        adminId: adminId
-      }, function(res) {
+      $.post('/school/admin/verifyOrder', { verifyCode: code, adminId: adminId }, function(res) {
         if(res.status === 0) {
-          window.Toast.success('核验成功，商品已发放');
+          window.Toast.success('核验成功');
           $('#verifyInput').val('');
           window.loadOrders(currentPage);
         } else {
           window.Toast.error(res.msg || '核验失败');
         }
-      }).fail(function() {
-        window.Toast.error('网络异常，请确保接口连接正常');
       });
     };
 
@@ -257,22 +261,20 @@
           } else {
             window.Toast.error(res.msg || '删除失败');
           }
-        }).fail(() => window.Toast.error('删除请求失败'));
+        });
       });
     };
 
-    // 事件绑定区域
-    $(document)
-            .off('click', '#searchBtn').on('click', '#searchBtn', () => window.loadOrders(1))
-            .off('keypress', '#searchInput').on('keypress', '#searchInput', (e) => { if(e.which === 13) window.loadOrders(1); })
-            .off('change', '#stateFilter').on('change', '#stateFilter', () => window.loadOrders(1))
-            .off('change', '#selectAll').on('change', '#selectAll', function() { $('.item-checkbox').prop('checked', this.checked); })
-            .off('click', '#btnFirstPage').on('click', '#btnFirstPage', () => window.loadOrders(1))
-            .off('click', '#btnLastPage').on('click', '#btnLastPage', () => window.loadOrders(totalPages))
-            .off('click', '#btnPrevPage').on('click', '#btnPrevPage', () => { if(currentPage > 1) window.loadOrders(currentPage - 1); })
-            .off('click', '#btnNextPage').on('click', '#btnNextPage', () => { if(currentPage < totalPages) window.loadOrders(currentPage + 1); })
-            // 原有批量删除
-            .off('click', '#batchDeleteBtn').on('click', '#batchDeleteBtn', function() {
+    // 统一解除旧事件绑定再重新绑定，防止重复触发
+    $(document).off('click', '#searchBtn').on('click', '#searchBtn', () => window.loadOrders(1));
+    $(document).off('change', '#stateFilter').on('change', '#stateFilter', () => window.loadOrders(1));
+    $(document).off('change', '#selectAll').on('change', '#selectAll', function() { $('.item-checkbox').prop('checked', this.checked); });
+    $(document).off('click', '#btnFirstPage').on('click', '#btnFirstPage', () => window.loadOrders(1));
+    $(document).off('click', '#btnLastPage').on('click', '#btnLastPage', () => window.loadOrders(totalPages));
+    $(document).off('click', '#btnPrevPage').on('click', '#btnPrevPage', () => { if(currentPage > 1) window.loadOrders(currentPage - 1); });
+    $(document).off('click', '#btnNextPage').on('click', '#btnNextPage', () => { if(currentPage < totalPages) window.loadOrders(currentPage + 1); });
+
+    $(document).off('click', '#batchDeleteBtn').on('click', '#batchDeleteBtn', function() {
       const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get();
       if (!selectedIds.length) return window.Toast.warning('请先勾选要删除的订单');
 
@@ -284,44 +286,27 @@
           window.loadOrders(currentPage);
         });
       });
-    })
-            // 新增：批量核验事件绑定
-            .off('click', '#batchVerifyBtn').on('click', '#batchVerifyBtn', function() {
+    });
+
+    $(document).off('click', '#batchVerifyBtn').on('click', '#batchVerifyBtn', function() {
       const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get();
       if (!selectedIds.length) return window.Toast.warning('请先勾选要核验的订单');
 
-      // 过滤出勾选项中状态为待核验（0）的订单
       const targetOrders = allOrders.filter(o => selectedIds.includes(o.id.toString()) && o.status === 0);
-
-      if (targetOrders.length === 0) {
-        return window.Toast.warning('勾选的订单中没有处于【待核验】状态的记录');
-      }
+      if (targetOrders.length === 0) return window.Toast.warning('没有可核验的【待核验】订单');
 
       const adminId = sessionStorage.getItem('adminId') || localStorage.getItem('userId') || 1;
-      const msg = targetOrders.length < selectedIds.length ?
-              `勾选中含有非待核验订单，将自动跳过。确定核验剩余的 ${targetOrders.length} 个订单吗？` :
-              `确定要批量核验这 ${targetOrders.length} 个订单吗？`;
-
-      window.Toast.confirm("批量核验", msg, () => {
-        const promises = targetOrders.map(order =>
-                $.post('/school/admin/verifyOrder', { verifyCode: order.verify_code, adminId: adminId })
-        );
-
+      window.Toast.confirm("批量核验", `确定批量核验这 ${targetOrders.length} 个订单吗？`, () => {
+        const promises = targetOrders.map(order => $.post('/school/admin/verifyOrder', { verifyCode: order.verify_code, adminId: adminId }));
         Promise.allSettled(promises).then(results => {
           const successCount = results.filter(res => res.status === 'fulfilled' && res.value?.status === 0).length;
-          if(successCount === targetOrders.length) {
-            window.Toast.success(`批量核验成功，共处理 ${successCount} 个订单`);
-          } else {
-            window.Toast.success(`操作完成：${successCount} 成功，${targetOrders.length - successCount} 失败`);
-          }
+          window.Toast.success(`核验完成：成功 ${successCount} 条`);
           $('#selectAll').prop('checked', false);
           window.loadOrders(currentPage);
         });
       });
     });
 
-    // 页面代码注入后立即请求第一页数据
     window.loadOrders(1);
-
   })();
 </script>

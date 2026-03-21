@@ -148,6 +148,10 @@
                         <label class="form-label">Email</label>
                         <input type="email" class="form-control form-control-sm" name="email" id="editEmail">
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">积分</label>
+                        <input type="number" class="form-control form-control-sm" name="points" id="editPoints">
+                    </div>
                 </form>
             </div>
             <div class="modal-footer border-top-0">
@@ -167,17 +171,14 @@
         const pageSize = 10;
         let allUsersData = [];
 
-        window.Toast = window.Toast || {
-            success: (msg) => {
-                Swal.fire({ icon: 'success', title: msg, toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, width: '220px', padding: '0.5rem' });
-            },
-            error: (msg) => {
-                Swal.fire({ icon: 'error', title: '操作失败', text: msg, confirmButtonColor: '#00aaff', width: '320px' });
-            },
-            confirm: (title, text, callback) => {
-                Swal.fire({ title: title, text: text, icon: 'warning', showCancelButton: true, confirmButtonColor: '#00aaff', cancelButtonColor: '#6c757d', confirmButtonText: '确定', cancelButtonText: '取消' }).then((result) => { if (result.isConfirmed) callback(); });
-            }
-        };
+        // 避免污染全局 Toast
+        if (!window.Toast) {
+            window.Toast = {
+                success: (msg) => { Swal.fire({ icon: 'success', title: msg, toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, width: '220px', padding: '0.5rem' }); },
+                error: (msg) => { Swal.fire({ icon: 'error', title: '操作失败', text: msg, confirmButtonColor: '#00aaff', width: '320px' }); },
+                confirm: (title, text, callback) => { Swal.fire({ title: title, text: text, icon: 'warning', showCancelButton: true, confirmButtonColor: '#00aaff', cancelButtonColor: '#6c757d', confirmButtonText: '确定', cancelButtonText: '取消' }).then((result) => { if (result.isConfirmed) callback(); }); }
+            };
+        }
 
         function getPhotoUrl(photo) {
             if (!photo) return './svgs/solid/circle-user.svg';
@@ -195,7 +196,6 @@
             allUsersData = list;
             const $tbody = $('#userTableBody');
             if (!list || list.length === 0) {
-                // 修改 colspan 为 11
                 $tbody.html('<tr><td colspan="11" class="text-center text-muted">未找到匹配的用户数据</td></tr>');
                 return;
             }
@@ -217,7 +217,7 @@
                 <td><small class="text-muted">${formatDate(u.reg_date)}</small></td>
                 <td>${u.phone || '-'}</td>
                 <td>${u.email || '-'}</td>
-                <td>${u.points != null ? u.points : 0}</td>
+                <td><span class="badge bg-warning text-dark">${u.points != null ? u.points : 0}</span></td>
                 <td>
                     <div class="form-check form-switch">
                         <input class="form-check-input status-switch" type="checkbox" data-id="${u.id}" ${isChecked}>
@@ -235,6 +235,7 @@
                 updateUserStatus([$(this).data('id')], this.checked ? 1 : 0);
             });
 
+            // 编辑按钮点击事件，回显所有数据
             $('.btn-edit-user').off('click').on('click', function() {
                 const user = allUsersData.find(item => item.id == $(this).data('id'));
                 if (user) {
@@ -243,6 +244,7 @@
                     $('#editSex').val(user.sex || '男');
                     $('#editPhone').val(user.phone || '');
                     $('#editEmail').val(user.email || '');
+                    $('#editPoints').val(user.points != null ? user.points : 0); // 新增积分回显
                     $('#avatarPreview').attr('src', getPhotoUrl(user.photo));
                     $('#editUserModal').modal('show');
                 }
@@ -257,41 +259,34 @@
         function loadUsers(page) {
             currentPage = page;
             const kw = $('#userKeyword').val().trim();
-            const state = $('#userState').val(); // 获取最新状态参数
+            const state = $('#userState').val();
 
-            // 修改 colspan 为 11
             $('#userTableBody').html('<tr><td colspan="11" class="text-center text-muted">正在检索数据...</td></tr>');
 
-            const apiUrl = `/school/admin/searchList`;
-
-            $.get(apiUrl, {
+            $.get('/school/admin/searchList', {
                 page: currentPage,
                 pageSize: pageSize,
                 keyword: kw,
-                state: state // 传递状态参数到后端
+                state: state
             }, function(res) {
                 if (res.status === 0 && res.data) {
                     const list = res.data.list || [];
-                    const total = res.data.total || 0;
-                    const listSize=res.data.listSize||0;
-                    const total_if=res.data.total_if||0;
+                    const total_if = res.data.total_if || 0;
 
-                    totalPages = Math.max(1, Math.ceil(total_if / pageSize)); // 确保分页正确计算
+                    totalPages = Math.max(1, Math.ceil(total_if / pageSize));
 
                     renderUserTable(list);
 
                     $('#pageInfo').text(`第 ${currentPage} 页 / 共 ${totalPages} 页`);
-                    $('#TotalCount').text(total_if); // 显示总检索记录数
+                    $('#TotalCount').text(total_if);
 
                     $('#btnFirstPage, #btnPrevPage').prop('disabled', currentPage <= 1);
                     $('#btnNextPage, #btnLastPage').prop('disabled', currentPage >= totalPages);
                     $('#selectAll').prop('checked', false);
                 } else {
-                    // 修改 colspan 为 11
                     $('#userTableBody').html(`<tr><td colspan="11" class="text-center text-danger">加载失败: ${res.msg || '空数据'}</td></tr>`);
                 }
             }).fail(function(xhr) {
-                // 修改 colspan 为 11
                 $('#userTableBody').html(`<tr><td colspan="11" class="text-center text-danger">请求失败 (HTTP ${xhr.status})，请检查网络</td></tr>`);
             });
         }
@@ -315,7 +310,7 @@
         // 搜索及筛选事件
         $('#btnSearchUser').on('click', () => loadUsers(1));
         $('#userKeyword').on('keypress', e => { if(e.which === 13) loadUsers(1); });
-        $('#userState').on('change', () => loadUsers(1)); // 状态改变时自动触发搜索
+        $('#userState').on('change', () => loadUsers(1));
 
         // 分页按钮绑定
         $('#btnFirstPage').on('click', () => loadUsers(1));
@@ -325,6 +320,7 @@
 
         $('#selectAll').on('change', function() { $('.user-checkbox').prop('checked', this.checked); });
 
+        // 提交编辑信息
         $('#btnSubmitEdit').on('click', function() {
             const formData = new FormData(document.getElementById('editUserForm'));
             $.ajax({
@@ -355,11 +351,8 @@
 
             selectedIds.forEach(id => {
                 const user = allUsersData.find(u => u.id == id);
-                if (user && user.state === 0) {
-                    targetIds.push(id);
-                } else {
-                    skipCount++;
-                }
+                if (user && user.state === 0) targetIds.push(id);
+                else skipCount++;
             });
 
             if (targetIds.length === 0) return window.Toast.error(`选中的用户已全部处于启用状态，无需操作`);
@@ -381,11 +374,8 @@
 
             selectedIds.forEach(id => {
                 const user = allUsersData.find(u => u.id == id);
-                if (user && user.state === 1) {
-                    targetIds.push(id);
-                } else {
-                    skipCount++;
-                }
+                if (user && user.state === 1) targetIds.push(id);
+                else skipCount++;
             });
 
             if (targetIds.length === 0) return window.Toast.error(`选中的用户已全部处于禁用状态，无需操作`);

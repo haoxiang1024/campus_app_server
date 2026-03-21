@@ -18,7 +18,7 @@
 <div class="content-wrapper">
     <div class="d-flex justify-content-between align-items-center mb-4 gap-3 flex-wrap">
         <div class="d-flex gap-2">
-            <button class="btn btn-outline-danger btn-sm" id="batchDeleteBtn">批量删除</button>
+            <button class="btn btn-outline-danger btn-sm" id="batchDeleteBtn">删除</button>
         </div>
         <div class="d-flex gap-2">
             <select id="typeFilter" class="form-select form-select-sm" style="width: 130px;">
@@ -146,9 +146,18 @@
 
                     // 解析类型
                     let typeBadge = '';
-                    if (item.type === 1) typeBadge = '<span class="badge bg-success">获取</span>';
-                    else if (item.type === 3) typeBadge = '<span class="badge bg-warning text-dark">消耗</span>';
-                    else typeBadge = `<span class="badge bg-secondary">系统扣除</span>`;
+
+                    if (item.type === 1) {
+                        typeBadge = '<span class="badge bg-success">发布招领奖励</span>';
+                    } else if (item.type === 2) {
+                        typeBadge = '<span class="badge bg-info text-dark">退还积分</span>';
+                    } else if (item.type === 3) {
+                        typeBadge = '<span class="badge bg-warning text-dark">兑换商品消耗</span>';
+                    } else if (item.type === 4) {
+                        typeBadge = '<span class="badge bg-danger">系统扣除</span>';
+                    } else {
+                        typeBadge = '<span class="badge bg-secondary">未知类型</span>';
+                    }
 
                     // 解析数值颜色
                     let points = item.points_changed || 0;

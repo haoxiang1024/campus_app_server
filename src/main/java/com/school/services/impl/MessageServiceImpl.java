@@ -2,7 +2,10 @@ package com.school.services.impl;
 
 import com.school.entity.Message;
 import com.school.entity.MessageVO;
+import com.school.entity.PointHistory;
 import com.school.mapper.MessageMapper;
+import com.school.mapper.PointHistoryMapper;
+import com.school.mapper.UserMapper;
 import com.school.services.api.MessageService;
 import com.school.utils.DateUtil;
 import com.school.utils.SensitiveWordUtil;
@@ -10,6 +13,7 @@ import com.school.utils.ServerResponse;
 import com.school.utils.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,7 +27,11 @@ public class MessageServiceImpl implements MessageService {
     private SensitiveWordUtil sensitiveWordUtil;
     @Autowired
     private Util util;
-
+    @Autowired
+    private UserMapper userMapper;
+    @Autowired
+    private PointHistoryMapper pointHistoryMapper;
+    @Transactional(rollbackFor = Exception.class)
     public ServerResponse addMessage(Integer userId, String content, Integer parentId, Integer replyUserId) {
         if (content == null || content.trim().isEmpty()) {
             return ServerResponse.createServerResponseByFail("留言内容不能为空");
@@ -37,9 +45,17 @@ public class MessageServiceImpl implements MessageService {
         if(sensitiveWordUtil.contains(content)){
             Message msg = new Message(userId, content, now, 2, pId, replyUserId);//驳回
             messageMapper.insertMessage(msg);
-            //扣除用户积分
+            //扣除积分
+            userMapper.deductPoints(msg.getUserId(),50 );
+            //记录积分流水
+            PointHistory history = new PointHistory();
+            history.setUser_id(userId);
+            history.setType(4); //系统扣除
+            history.setPoints_changed(-50);
+            history.setDescription("发布违规留言");
+            pointHistoryMapper.insert(history);
 
-            return ServerResponse.createServerResponseByFail("留言含敏感词！请修改后再次留言!");
+            return ServerResponse.createServerResponseByFail("留言包含敏感词，扣除50积分，请重新发布内容");
         }
         Message msg = new Message(userId, content, now, 1, pId, replyUserId);//审核
         int result = messageMapper.insertMessage(msg);
