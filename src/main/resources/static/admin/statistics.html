@@ -1,45 +1,140 @@
-<div class="animation-fadeIn">
-    <h4 class="mb-4 text-dark fw-bold"><i class="fa fa-chart-line me-2"></i>概览</h4>
+<script src="./js/echarts.min.js"></script>
 
-    <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100">
+<style>
+    /* 自定义微动效与排版样式 */
+    .stat-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 0.75rem;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+    /* 统一图标容器大小，防止不同图标宽度导致文本对齐不一致 */
+    .icon-box {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+
+<div class="animation-fadeIn">
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="card stat-card border-0 shadow-sm h-100">
                 <div class="card-body d-flex align-items-center">
-                    <div class="flex-shrink-0 bg-primary bg-opacity-10 p-3 rounded-3 me-3">
+                    <div class="icon-box flex-shrink-0 bg-primary bg-opacity-10 rounded-3 me-3">
                         <i class="fa fa-users fa-2x text-primary"></i>
                     </div>
                     <div>
                         <div class="text-muted small fw-bold text-uppercase">总用户数</div>
-                        <h2 class="mb-0 fw-bold" id="s_totalUsers">0</h2>
+                        <h3 class="mb-0 fw-bold" id="s_totalUsers">0</h3>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100">
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="card stat-card border-0 shadow-sm h-100">
                 <div class="card-body d-flex align-items-center">
-                    <div class="flex-shrink-0 bg-warning bg-opacity-10 p-3 rounded-3 me-3">
+                    <div class="icon-box flex-shrink-0 bg-warning bg-opacity-10 rounded-3 me-3">
                         <i class="fa fa-box-open fa-2x text-warning"></i>
                     </div>
                     <div>
-                        <div class="text-muted small fw-bold text-uppercase">累计丢失物品</div>
-                        <h2 class="mb-0 fw-bold text-warning" id="s_totalLost">0</h2>
+                        <div class="text-muted small fw-bold text-uppercase">累计丢失</div>
+                        <h3 class="mb-0 fw-bold text-warning" id="s_totalLost">0</h3>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100">
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="card stat-card border-0 shadow-sm h-100">
                 <div class="card-body d-flex align-items-center">
-                    <div class="flex-shrink-0 bg-success bg-opacity-10 p-3 rounded-3 me-3">
+                    <div class="icon-box flex-shrink-0 bg-success bg-opacity-10 rounded-3 me-3">
                         <i class="fa fa-check-circle fa-2x text-success"></i>
                     </div>
                     <div>
-                        <div class="text-muted small fw-bold text-uppercase">成功找回件数</div>
-                        <h2 class="mb-0 fw-bold text-success" id="s_totalFound">0</h2>
+                        <div class="text-muted small fw-bold text-uppercase">成功找回</div>
+                        <h3 class="mb-0 fw-bold text-success" id="s_totalFound">0</h3>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="card stat-card border-0 shadow-sm h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="icon-box flex-shrink-0 bg-info bg-opacity-10 rounded-3 me-3">
+                        <i class="fa fa-shopping-bag fa-2x text-info"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase">积分商品数</div>
+                        <h3 class="mb-0 fw-bold text-info" id="s_totalItems">0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="card stat-card border-0 shadow-sm h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="icon-box flex-shrink-0 bg-danger bg-opacity-10 rounded-3 me-3">
+                        <i class="fa fa-file-invoice fa-2x text-danger"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase">兑换订单数</div>
+                        <h3 class="mb-0 fw-bold text-danger" id="s_totalOrders">0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="card stat-card border-0 shadow-sm h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="icon-box flex-shrink-0 bg-secondary bg-opacity-10 rounded-3 me-3">
+                        <i class="fa fa-envelope fa-2x text-secondary"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase">系统留言数</div>
+                        <h3 class="mb-0 fw-bold text-secondary" id="s_totalMessages">0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="card stat-card border-0 shadow-sm h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="icon-box flex-shrink-0 bg-dark bg-opacity-10 rounded-3 me-3">
+                        <i class="fa fa-comments fa-2x text-dark"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase">帖子评论数</div>
+                        <h3 class="mb-0 fw-bold text-dark" id="s_totalComments">0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12 col-lg-5">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 0.75rem;">
+                <div class="card-body">
+                    <h6 class="fw-bold text-muted mb-3"><i class="fa fa-chart-pie me-2"></i>失物与找回占比分析</h6>
+                    <div id="lostFoundChart" style="height: 320px; width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-7">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 0.75rem;">
+                <div class="card-body">
+                    <h6 class="fw-bold text-muted mb-3"><i class="fa fa-chart-bar me-2"></i>平台业务活跃度数据</h6>
+                    <div id="activityChart" style="height: 320px; width: 100%;"></div>
                 </div>
             </div>
         </div>
@@ -48,28 +143,109 @@
 
 <script>
     (function() {
-        // 获取总用户数
-        $.get('/school/admin/getAllUser', function(res) {
-            if(res.status === 0) {
-                // 如果 res.data 是数组，则用 .length；如果是直接返回的数字，则直接填入
-                const count = Array.isArray(res.data) ? res.data.length : res.data;
-                $('#s_totalUsers').text(count);
-            }
+        // 定义数据字典存放结果
+        let dataMap = { users: 0, lost: 0, found: 0, items: 0, orders: 0, messages: 0, comments: 0 };
+
+        // 封装所有的请求为 Promise，带有基础的容错处理
+        const reqUsers = $.get('/school/admin/getAllUser').then(res => { if(res?.status === 0) dataMap.users = Array.isArray(res.data) ? res.data.length : (res.data || 0); }).catch(()=>console.error('获取用户数失败'));
+        const reqLost = $.get('/school/admin/getAllLostFoundCount', { type: '失物' }).then(res => { if(res?.status === 0) dataMap.lost = res.data || 0; }).catch(()=>console.error('获取失物数失败'));
+        const reqFound = $.get('/school/admin/getAllLostFoundCount', { type: '招领' }).then(res => { if(res?.status === 0) dataMap.found = res.data || 0; }).catch(()=>console.error('获取招领数失败'));
+        const reqItems = $.get('/school/shop/items/all', { page: 1, pageSize: 1 }).then(res => { if(res?.status === 0 && res.data) dataMap.items = res.data.total ?? (res.data.length || 0); }).catch(()=>console.error('获取商品数失败'));
+        const reqOrders = $.get('/school/shop/orders', { page: 1, pageSize: 1 }).then(res => { if(res?.status === 0 && res.data) dataMap.orders = res.data.total ?? (res.data.length || 0); }).catch(()=>console.error('获取订单数失败'));
+        const reqMsg = $.get('/school/admin/getMessageByPage', { page: 1, pageSize: 1 }).then(res => { if(res?.status === 0 && res.data) dataMap.messages = res.data.total || 0; }).catch(()=>console.error('获取留言数失败'));
+        const reqComments = $.get('/school/admin/getCommentsByPage', { page: 1, pageSize: 1 }).then(res => { if(res?.status === 0 && res.data) dataMap.comments = res.data.total || 0; }).catch(()=>console.error('获取评论数失败'));
+
+        // 等待所有接口请求完毕后统一渲染
+        Promise.allSettled([reqUsers, reqLost, reqFound, reqItems, reqOrders, reqMsg, reqComments]).then(() => {
+            $('#s_totalUsers').text(dataMap.users);
+            $('#s_totalLost').text(dataMap.lost);
+            $('#s_totalFound').text(dataMap.found);
+            $('#s_totalItems').text(dataMap.items);
+            $('#s_totalOrders').text(dataMap.orders);
+            $('#s_totalMessages').text(dataMap.messages);
+            $('#s_totalComments').text(dataMap.comments);
+
+            initCharts(dataMap);
         });
 
-        // 获取丢失物品总数
-        $.get('/school/admin/getAllLostFoundCount', { type: '失物' }, function(res) {
-            if(res.status === 0) {
-                // res.data
-                $('#s_totalLost').text(res.data);
-            }
-        });
+        // ECharts 初始化与渲染函数
+        function initCharts(data) {
+            const chartPie = echarts.init(document.getElementById('lostFoundChart'));
+            const pieOption = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b}: <br/> {c} 件 ({d}%)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    borderColor: '#ccc',
+                    textStyle: { color: '#333' }
+                },
+                legend: { top: '0%', left: 'center', icon: 'circle' },
+                color: ['#ffc107', '#198754'],
+                series: [{
+                    name: '物品数量',
+                    type: 'pie',
+                    radius: ['45%', '75%'],
+                    center: ['50%', '55%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: { borderRadius: 8, borderColor: '#fff', borderWidth: 3 },
+                    label: { show: false, position: 'center' },
+                    emphasis: {
+                        label: { show: true, fontSize: '18', fontWeight: 'bold' },
+                        itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0, 0, 0, 0.2)' }
+                    },
+                    labelLine: { show: false },
+                    data: [
+                        { value: data.lost, name: '累计丢失' },
+                        { value: data.found, name: '成功找回' }
+                    ]
+                }]
+            };
+            chartPie.setOption(pieOption);
 
-// 获取找回物品总数
-        $.get('/school/admin/getAllLostFoundCount', { type: '招领' }, function(res) {
-            if(res.status === 0) {
-                $('#s_totalFound').text(res.data);
-            }
-        });
+            const chartBar = echarts.init(document.getElementById('activityChart'));
+            const barOption = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'shadow' },
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    textStyle: { color: '#333' }
+                },
+                grid: { left: '3%', right: '4%', bottom: '5%', top: '12%', containLabel: true },
+                xAxis: {
+                    type: 'category',
+                    data: ['商城商品', '兑换订单', '系统留言', '帖子评论'],
+                    axisTick: { alignWithLabel: true, show: false },
+                    axisLine: { lineStyle: { color: '#ddd' } },
+                    axisLabel: { color: '#666' }
+                },
+                yAxis: {
+                    type: 'value',
+                    minInterval: 1,
+                    splitLine: { lineStyle: { type: 'dashed', color: '#eee' } },
+                    axisLabel: { color: '#666' }
+                },
+                series: [{
+                    name: '数据量',
+                    type: 'bar',
+                    barWidth: '35%',
+                    itemStyle: {
+                        borderRadius: [6, 6, 0, 0]
+                    },
+                    data: [
+                        { value: data.items, itemStyle: { color: '#0dcaf0' } },
+                        { value: data.orders, itemStyle: { color: '#dc3545' } },
+                        { value: data.messages, itemStyle: { color: '#6c757d' } },
+                        { value: data.comments, itemStyle: { color: '#212529' } }
+                    ]
+                }]
+            };
+            chartBar.setOption(barOption);
+
+            // 监听窗口大小变化，让图表自适应缩放
+            window.addEventListener('resize', function() {
+                chartPie.resize();
+                chartBar.resize();
+            });
+        }
     })();
 </script>
