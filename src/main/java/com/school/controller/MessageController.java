@@ -14,14 +14,14 @@ public class MessageController {
 
     /**
      * 发布留言
-     * 假设前端传参格式：{ "userId": 1, "content": "今天天气真好！" }
+     *
      */
     @PostMapping("/add")
     public ServerResponse addMessage(@RequestBody java.util.Map<String, Object> params) {
         Integer userId = (Integer) params.get("userId");
         String content = (String) params.get("content");
         Integer parentId = (Integer) params.get("parentId");
-        Integer replyUserId = (Integer) params.get("replyUserId"); // 新增接收参数
+        Integer replyUserId = (Integer) params.get("replyUserId");
 
         return messageService.addMessage(userId, content, parentId, replyUserId);
     }
@@ -36,7 +36,7 @@ public class MessageController {
 
     /**
      * 根据用户ID获取留言列表
-     * GET /message/userList?userId=1
+     *
      */
     @GetMapping("/userList")
     public ServerResponse getMessagesByUserId(@RequestParam("userId") Integer userId) {
@@ -45,12 +45,11 @@ public class MessageController {
 
     /**
      * 删除留言
-     * DELETE /deleteMessage/{id}
+     *
      */
     @ResponseBody
     @PostMapping("/deleteMessage")
     public ServerResponse deleteMessage(@RequestParam("id") Integer id) {
-        // 直接调用已经写好的删除服务逻辑
         return messageService.deleteCommentById(id);
     }
 }

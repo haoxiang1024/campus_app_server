@@ -7,7 +7,7 @@ public class ExchangeOrder {
     private String order_no;       // 订单号
     private Integer user_id;       // 用户ID
     private Integer item_id;       // 商品ID
-    private String item_name;      // 商品名称(快照)
+    private String item_name;      // 商品名称
     private Integer points_cost;   // 消耗积分
     private String verify_code;    // 8位提货核验码
     private Integer status;       // 状态：0-待核验, 1-已核验, 2-已取消

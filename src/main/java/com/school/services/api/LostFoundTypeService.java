@@ -16,7 +16,7 @@ public interface LostFoundTypeService {
 
     /**
      * 根据分类名称获取分类ID
-     * @param name 分类名称（支持中英文）
+     * @param name 分类名称
      * @return ServerResponse 包含分类ID的响应对象
      */
     ServerResponse getIdByName(String name);

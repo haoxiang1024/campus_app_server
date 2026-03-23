@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 public class Util {
     @Value("${file.upload.path}")
     private  String uploadPath;
-    // 工作因子（推荐 10-14）
+    // 工作因子
     private static final int WORK_FACTOR = 12;
     private static RongCloudApi staticRongCloudApi;
     @Autowired
@@ -78,7 +78,7 @@ public class Util {
      * @return 新图地址
      */
     public String updatePic(String oldPic) {
-        Pattern pattern = Pattern.compile(".*http.*"); // 此处使用的正则表达式是".*world.*"，匹配包含"http"的任何字符串。
+        Pattern pattern = Pattern.compile(".*http.*");
         Matcher matcher = pattern.matcher(oldPic); // 将正则表达式应用到输入字符串上
         String savePath = "http://"+Ip.getIp()+":8081/school/upload/";
         //String savePath = "http://123.207.51.104:8081/school/upload/";
@@ -164,7 +164,8 @@ public class Util {
         try {
             return staticRongCloudApi.getToken(uid, nickname, avatarUrl);
         } catch (Exception e) {
-            e.printStackTrace();        }
+            e.printStackTrace();
+        }
         return null;
     }
 }

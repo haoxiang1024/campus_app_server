@@ -82,14 +82,7 @@ public interface LostFoundService {
      * @return ServerResponse 操作结果响应对象
      */
     ServerResponse updateLostFoundStatus(Integer id, String state);
-    
-    /**
-     * 分页查询失物招领信息列表
-     * @param page 页码
-     * @param size 每页大小
-     * @return ServerResponse 包含信息列表和分页信息的响应对象
-     */
-    ServerResponse getLostListByPage(int page, int size);
+
     
     /**
      * 根据分类标题获取该分类下的信息

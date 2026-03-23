@@ -227,7 +227,6 @@
                 }
             });
 
-            // 如果筛选后没有需要操作的商品，直接拦截并提示
             if (targetIds.length === 0) {
                 return window.Toast.error(skipCount > 0 ? `选中的商品已全部处于【${txt}】状态，无需操作` : '没有可操作的商品');
             }

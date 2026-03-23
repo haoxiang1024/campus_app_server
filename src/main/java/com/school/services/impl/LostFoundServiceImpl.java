@@ -12,7 +12,7 @@ import com.school.mapper.PointHistoryMapper;
 import com.school.mapper.UserMapper;
 import com.school.services.api.LostFoundService;
 import com.school.services.api.LostFoundTypeService;
-import com.school.utils.ResponseCode;
+
 import com.school.utils.SensitiveWordUtil;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
@@ -60,7 +60,7 @@ public class LostFoundServiceImpl implements LostFoundService {
         
         // 检查查询结果是否为空
         if (lostFoundList == null) {
-            return ServerResponse.createServerResponseByFail(ResponseCode.DATA_EMPTY.getCode(), ResponseCode.DATA_EMPTY.getMsg());
+            return ServerResponse.createServerResponseByFail( "数据为空");
         }
         
         // 为每个失物招领信息补充关联的用户信息和完整图片路径
@@ -91,7 +91,7 @@ public class LostFoundServiceImpl implements LostFoundService {
     public ServerResponse getUserName(int id) {
         String userName = lostFoundMapper.searchUserNameId(id);
         if (userName == null) {
-            return ServerResponse.createServerResponseByFail(ResponseCode.DATA_EMPTY.getCode(), ResponseCode.DATA_EMPTY.getMsg());
+            return ServerResponse.createServerResponseByFail( "数据为空");
         }
         return ServerResponse.createServerResponseBySuccess(userName);
     }
@@ -188,7 +188,6 @@ public class LostFoundServiceImpl implements LostFoundService {
     @Override
     public ServerResponse updateState(int id, String state, int user_id) {
         if (lostFoundMapper.updateState(id, state)) {
-           // List<LostFound> allByIdLostFoundList = lostFoundMapper.getLostFoundListById(user_id);
             return ServerResponse.createServerResponseBySuccess( "状态已更改");
         }
         return ServerResponse.createServerResponseByFail("状态更改失败");
@@ -295,7 +294,6 @@ public class LostFoundServiceImpl implements LostFoundService {
 
         // 只有当存在发布人时，才进行积分结算
         if (userId != null) {
-            //  定义业务场景条件
             boolean isApprovedFoundPost = "待审核".equals(oldState) && "待认领".equals(state) && "招领".equals(type);
             boolean isRejectedPost = "已驳回".equals(state);
 
@@ -333,27 +331,7 @@ public class LostFoundServiceImpl implements LostFoundService {
         return ServerResponse.createServerResponseBySuccess("操作成功");
     }
 
-    /**
-     * 分页查询失物招领信息列表
-     * 使用PageHelper实现分页功能
-     * @param page 页码
-     * @param size 每页大小
-     * @return ServerResponse 包含信息列表和分页信息的响应对象
-     */
-    @Override
-    public ServerResponse getLostListByPage(int page, int size) {
-        // 开启分页
-        PageHelper.startPage(page, size);
-        // 执行查询
-        List<com.school.entity.LostFound> list = lostFoundMapper.selectByPage();
-        //  封装 PageInfo
-        PageInfo<com.school.entity.LostFound> pageInfo = new PageInfo<>(list);
-        // 封装返回结果
-        Map<String, Object> resultMap = new HashMap<>();
-        resultMap.put("list", pageInfo.getList());
-        resultMap.put("total", pageInfo.getTotal());
-        return ServerResponse.createServerResponseBySuccess(resultMap);
-    }
+
 
     /**
      * 根据分类标题获取该分类下的信息

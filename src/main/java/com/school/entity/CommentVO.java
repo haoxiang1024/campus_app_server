@@ -13,8 +13,8 @@ public class CommentVO {
     private String rejectReason;
 
     // 联表查询出的额外字段
-    private String nickname; // 评论人昵称 (来自 user 表)
-    private String title;  // 帖子标题 (来自 lost_found 表)
+    private String nickname; // 评论人昵称
+    private String title;  // 帖子标题
 
     public CommentVO() {
     }

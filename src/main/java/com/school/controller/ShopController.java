@@ -33,7 +33,7 @@ public class ShopController {
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
             @RequestParam(value = "keyword", required = false) String keyword,
-            @RequestParam(value = "status", required = false) Integer status) { // 新增状态筛选参数
+            @RequestParam(value = "status", required = false) Integer status) {
         return shopService.getAllItems(page, pageSize, keyword, status);
     }
 
@@ -88,7 +88,6 @@ public class ShopController {
         try {
             return shopService.exchangeItem(userId, itemId);
         } catch (RuntimeException e) {
-            // 捕获 Service 层抛出的积分不足、库存不足等异常，友好提示
             return ServerResponse.createServerResponseByFail(e.getMessage());
         }
     }
@@ -105,7 +104,6 @@ public class ShopController {
         }
 
         try {
-            // 解析 UserId
             return shopService.getPointHistory(userId);
         } catch (Exception e) {
             return ServerResponse.createServerResponseByFail("查询失败，请稍后再试");

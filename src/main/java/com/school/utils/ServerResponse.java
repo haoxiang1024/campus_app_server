@@ -44,9 +44,7 @@ public class ServerResponse<T> {
         return new ServerResponse(0);
     }
 
-    /**
-     * <T>后跟方法名表示泛型方法
-     */
+
     public static <T> ServerResponse createServerResponseBySuccess(T data) {
         return new ServerResponse(0, data);
     }

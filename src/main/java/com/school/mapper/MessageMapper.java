@@ -21,11 +21,11 @@ public interface MessageMapper {
     int insertMessage(@Param("msg") Message message);
 
     /**
-     * 获取留言列表（关联用户信息，按时间倒序）
+     * 获取留言列表
      * @return 留言视图对象列表
      */
     List<MessageVO> getMessageList();
-    //  查询总数（用于分页）
+    //  查询总数
     int countAdminMessages(@Param("keyword") String keyword, @Param("state") Integer state);
 
     //  分页获取留言列表

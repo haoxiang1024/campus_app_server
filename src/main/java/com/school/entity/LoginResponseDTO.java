@@ -8,7 +8,7 @@ public class LoginResponseDTO {
     // JWT Token
     private String token;
 
-    // 构造方法
+
     public LoginResponseDTO(User userInfo, String token) {
         this.userInfo = userInfo;
         this.token = token;

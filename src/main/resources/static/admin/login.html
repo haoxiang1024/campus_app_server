@@ -42,10 +42,10 @@
         pwdInput.attr('type', type);
     }
 
-    // 防抖标识（防止重复提交）
+    // 防抖标识
     let isSubmitting = false;
 
-    // 统一提示工具类（提前定义，避免作用域问题）
+    // 统一提示工具类
     const Toast = {
         success: (msg) => {
             Swal.fire({
@@ -136,12 +136,10 @@
                     const loginData = res.data;
                     const userInfo = loginData.userInfo; // 用户信息
                     const token = loginData.token;       // Token
-                    // 存储用户信息（供权限检查函数使用）
+                    // 存储用户信息
                     sessionStorage.setItem("adminUser", JSON.stringify(userInfo));
-                    // 可选：存储Token（如果后续请求需要）
                     sessionStorage.setItem("token", token);
                     Toast.success('登录成功');
-                    // 延迟跳转，保证提示能显示
                     setTimeout(() => {
                          window.location.href = 'index.html';
                     }, 1000);
@@ -160,10 +158,8 @@
                 Toast.error(errorMsg);
             },
             complete: function() {
-                // 无论成功/失败，恢复按钮状态
                 isSubmitting = false;
                 $('#loginBtn').text('登录').prop('disabled', false);
-                // 清空密码框（安全）
                 $('input[name="password"]').val('');
             }
         });

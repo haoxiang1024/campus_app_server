@@ -29,7 +29,6 @@ public class SendMailController {
      */
     @Value("${mail.smtp.password}")
     public void setSmtpPassword(String password) {
-        // 将注入的值赋给本类的静态变量
         SendMailController.SMTP_PASSWORD = password;
     }
     
@@ -80,10 +79,10 @@ public class SendMailController {
         props.put("mail.smtp.host", host);
         props.put("mail.smtp.port", port);
         props.put("mail.smtp.auth", "true"); // 开启认证
-        props.put("mail.smtp.starttls.enable", "true"); // 开启TLS加密（适配QQ邮箱）
-        props.put("mail.smtp.ssl.protocols", "TLSv1.2"); // 强制TLS 1.2，避免JDK 17加密协议兼容问题
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.ssl.protocols", "TLSv1.2");
         props.put("mail.smtp.ssl.trust", host); // 信任SMTP服务器
-        props.put("mail.debug", "false"); // 关闭调试（生产环境建议false）
+        props.put("mail.debug", "false");
 
         // 创建认证器
         Authenticator authenticator = new Authenticator() {
@@ -100,7 +99,7 @@ public class SendMailController {
         MimeMessage message = new MimeMessage(session);
         message.setFrom(new InternetAddress(username)); // 发件人
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to)); // 收件人
-        message.setSubject(subject, "UTF-8"); // 主题指定UTF-8，避免乱码
+        message.setSubject(subject, "UTF-8");
         message.setText(text, "UTF-8"); // 内容指定UTF-8
 
         // 发送邮件

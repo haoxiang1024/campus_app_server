@@ -16,7 +16,7 @@ public class MessageVO {
     private Integer parentId; // 标识是否是子评论
     private List<MessageVO> replies; // 用于存放该留言下的所有二级评论
     private Integer replyUserId;    // 被回复人ID
-    private String replyNickname;   // 被回复人昵称（通过联表查询获得）
+    private String replyNickname;   // 被回复人昵称
     private String rejectReason;
     private Integer state;
 

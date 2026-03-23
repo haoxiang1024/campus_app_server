@@ -54,7 +54,6 @@ public class CommentServiceImpl implements CommentService {
         // 敏感词检测逻辑
         if (sensitiveWordUtil.contains(content)) {
             // 命中敏感词：直接驳回
-            //finalContent = sensitiveWordUtil.replaceSensitiveWord(content, "*");
             status = 2; // 驳回状态
             commentMapper.addComment(lostfound_id, user_id, finalContent, status,parent_id,reply_user_id);
             //扣除积分
@@ -68,7 +67,7 @@ public class CommentServiceImpl implements CommentService {
             pointHistoryMapper.insert(history);
             return ServerResponse.createServerResponseByFail("评论包含敏感词，扣除50积分，请重新发布内容");
         } else {
-            // 正常内容：直接发布 (status = 1)
+            // 未命中敏感词
             status = 1; // 已发布状态
         }
         
@@ -145,7 +144,7 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     public ServerResponse getReceivedComments(int userId) {
-        // 查询该用户收到的所有评论 (按时间倒序)
+        // 查询该用户收到的所有评论
         List<Comment> receivedComments = commentMapper.getReceivedComments(userId);
 
         if (receivedComments == null || receivedComments.isEmpty()) {
@@ -157,7 +156,7 @@ public class CommentServiceImpl implements CommentService {
             comment.setPhoto(util.updatePic(comment.getPhoto()));
         }
 
-        // 直接返回平铺的列表给前端 RecyclerView 渲染即可。
+        // 直接返回平铺的列表给前端
         return ServerResponse.createServerResponseBySuccess(receivedComments);
     }
 

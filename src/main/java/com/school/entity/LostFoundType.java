@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 /**
  * 失物招领类型实体类
- * 用于表示失物招领信息的分类类型，如书籍、电子产品、衣物等
+ * 用于表示失物招领信息的分类类型
  * 
  * @author campus_app_server
  * @version 1.0

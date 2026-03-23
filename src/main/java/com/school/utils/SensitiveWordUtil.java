@@ -10,9 +10,9 @@ import java.util.Set;
 public class SensitiveWordUtil {
     // 敏感词库树
     private static Map<Object, Object> sensitiveWordMap;
-    // 最小匹配规则（如：匹配“敏感”，文本为“敏感词”，匹配到“敏感”即返回）
+    // 最小匹配规则（匹配“敏感”，文本为“敏感词”，匹配到“敏感”即返回）
     public static final int MIN_MATCH_TYPE = 1;
-    // 最大匹配规则（如：匹配“敏感词”，文本为“敏感词”，匹配到“敏感词”才返回）
+    // 最大匹配规则（匹配“敏感词”，文本为“敏感词”，匹配到“敏感词”才返回）
     public static final int MAX_MATCH_TYPE = 2;
 
     /**

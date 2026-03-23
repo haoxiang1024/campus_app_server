@@ -3,7 +3,7 @@ package com.school.services.impl;
 import com.school.entity.LostFoundType;
 import com.school.mapper.LostFoundTypeMapper;
 import com.school.services.api.LostFoundTypeService;
-import com.school.utils.ResponseCode;
+
 import com.school.utils.ServerResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,6 @@ import java.util.Map;
  */
 @Service
 public class LostFoundTypeServiceImpl implements LostFoundTypeService {
-    String key = "typeList";//key值用于redsi存储
     @Autowired
     private LostFoundTypeMapper lostFoundTypeMapper;
 
@@ -33,7 +32,7 @@ public class LostFoundTypeServiceImpl implements LostFoundTypeService {
         List<LostFoundType> lostfoundtypeList = lostFoundTypeMapper.GetAll();
         if (lostfoundtypeList == null) {
             //数据为空
-            return ServerResponse.createServerResponseByFail(ResponseCode.DATA_EMPTY.getCode(), ResponseCode.DATA_EMPTY.getMsg());
+            return ServerResponse.createServerResponseByFail("数据为空");
         } else {
             //返回数据
             return ServerResponse.createServerResponseBySuccess(lostfoundtypeList);
@@ -45,33 +44,20 @@ public class LostFoundTypeServiceImpl implements LostFoundTypeService {
     /**
      * 根据分类名称获取分类ID
      * 支持中英文分类名称的双向查找
-     * @param name 分类名称（支持中英文）
+     * @param name 分类名称
      * @return ServerResponse 包含分类ID的响应对象
      */
     @Override
     public ServerResponse getIdByName(String name) {
-        //中英文转换
-        String[] en = {"Digital Devices", "Certificates", "Daily Necessities", "Clothing and Apparel", "Other"};
-        String[] cn = {"数码设备", "证件", "日用品", "服饰", "其他"};
-        Map<String, String> map = new HashMap<>();//建立关系
-        for (int i = 0; i < en.length; i++) {
-            map.put(en[i], cn[i]);
-        }
-        //获取标题id
-        int id = 0;
+        // 获取所有分类类型
         List<LostFoundType> lostFoundTypes = lostFoundTypeMapper.GetAll();
+        int id = 0;
         for (LostFoundType lostfoundtype : lostFoundTypes) {
             if (lostfoundtype.getName().equals(name)) {
-                //中文
                 id = lostfoundtype.getId();
-            } else {
-                //英文
-                String cnValue = map.get(name);
-                if (lostfoundtype.getName().equals(cnValue)) {
-                    id = lostfoundtype.getId();
-                }
+                break; // 匹配到后直接 break，提高效率
             }
         }
-        return ServerResponse.createServerResponseBySuccess(0,id, ResponseCode.GET_DATA_SUCCESS.getMsg());
+        return ServerResponse.createServerResponseBySuccess(0, id, "获取数据成功");
     }
 }

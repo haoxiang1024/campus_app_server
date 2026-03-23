@@ -109,7 +109,7 @@ public class UserStatusInterceptor implements HandlerInterceptor {
             token = authHeader.trim();
         }
 
-        // 校验 Token 非空及格式正确性（标准 JWT 包含 3 段，用.分隔）
+        // 校验 Token 非空及格式正确性
         if (StringUtils.isEmpty(token)) {
             return null;
         }

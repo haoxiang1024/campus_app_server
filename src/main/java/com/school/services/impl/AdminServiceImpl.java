@@ -72,7 +72,7 @@ public class AdminServiceImpl implements AdminService {
         // 构建返回结果Map，包含分页数据
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("list", pageInfo.getList()); // 当前页数据
-        resultMap.put("total", pageInfo.getTotal()); // 总记录数，例如 102
+        resultMap.put("total", pageInfo.getTotal()); // 总记录数
 
         return ServerResponse.createServerResponseBySuccess(resultMap);
     }
@@ -264,7 +264,7 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public ServerResponse addType(String name) {
-        // 参数校验：检查名称是否为空
+        // 参数校验
         if (name == null || name.trim().isEmpty()) {
             return ServerResponse.createServerResponseByFail("分类名称不能为空");
         }
@@ -284,7 +284,7 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public ServerResponse updateType(Integer id, String name) {
-        // 参数校验：检查 ID 和名称是否为空
+        // 参数校验
         if (id == null || name == null || name.trim().isEmpty()) {
             return ServerResponse.createServerResponseByFail("参数错误");
         }
@@ -325,7 +325,7 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public ServerResponse deleteTypeBatch(String ids) {
-        // 参数校验：检查 ID 字符串是否为空
+        // 参数校验
         if (ids == null || ids.isEmpty()) {
             return ServerResponse.createServerResponseByFail("参数不能为空");
         }

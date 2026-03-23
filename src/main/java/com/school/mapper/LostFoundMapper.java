@@ -75,7 +75,7 @@ public interface LostFoundMapper {
             "   OR content LIKE CONCAT('%', #{keyword}, '%') " +
             "   OR place LIKE CONCAT('%', #{keyword}, '%') " +
             "   OR phone LIKE CONCAT('%', #{keyword}, '%')) " +
-            "ORDER BY pub_date DESC") // 建议加上按发布时间降序排序
+            "ORDER BY pub_date DESC")
     List<LostFound> selectAllInfo(@Param("keyword") String keyword);
     /**
      * 根据ID删除失物招领信息
@@ -101,7 +101,7 @@ public interface LostFoundMapper {
     /**
      * 智能匹配失物招领信息
      * 根据类型、分类ID和关键字进行智能筛选匹配
-     * @param type 类型标识（lost/found）
+     * @param type 类型标识
      * @param lostfoundtype_id 失物招领分类ID
      * @param keyword 搜索关键字
      * @return 匹配的失物招领信息列表

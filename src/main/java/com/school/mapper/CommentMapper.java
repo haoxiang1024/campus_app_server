@@ -42,11 +42,11 @@ public interface CommentMapper {
      */
     @Select("SELECT " +
             "c.id, c.lostfound_id, c.user_id, c.content, c.state, c.create_time, " +
-            "c.parentId, " +          // 数据库叫 parentId
-            "c.replyUserId, " +       // 数据库叫 replyUserId
+            "c.parentId, " +
+            "c.replyUserId, " +
             "u1.nickname AS nickname, " +
             "u1.photo AS photo, " +
-            "u2.nickname AS replyNickname " + // 从 u2 表取回被回复人的昵称
+            "u2.nickname AS replyNickname " +
             "FROM comment c " +
             "LEFT JOIN user u1 ON c.user_id = u1.id " +
             "LEFT JOIN user u2 ON c.replyUserId = u2.id " +

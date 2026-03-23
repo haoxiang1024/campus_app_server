@@ -24,7 +24,7 @@ public class EmailVerificationUtils {
         // 将注入的值赋给本类的静态变量
         EmailVerificationUtils.SMTP_PASSWORD = password;
     }
-    // 验证码存储（线程安全）：key=邮箱，value=验证码+过期时间
+    // 验证码存储 key=邮箱，value=验证码+过期时间
     private static final Map<String, VerificationCode> CODE_STORE = new ConcurrentHashMap<>();
     // 验证码有效期（默认5分钟）
     private static final long CODE_EXPIRE_MINUTES = 5;
@@ -76,7 +76,7 @@ public class EmailVerificationUtils {
         //  生成验证码
         String verificationCode = generateVerificationCode();
 
-        //  计算过期时间（当前时间 + 5分钟）
+        //  计算过期时间
         long expireTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(CODE_EXPIRE_MINUTES);
 
         // 存储验证码
@@ -111,7 +111,7 @@ public class EmailVerificationUtils {
         // 邮件主题
         message.setSubject("【验证码】您的邮箱验证请求", "UTF-8");
 
-        // 邮件内容（HTML格式，更友好）
+        // 邮件内容
         String emailContent = String.format(
                 "<div style='font-family: Arial, sans-serif;'>" +
                         "<h3>您好！</h3>" +
@@ -161,7 +161,7 @@ public class EmailVerificationUtils {
     }
 
     /**
-     * 清理过期的验证码（建议定时执行）
+     * 清理过期的验证码
      */
     public static void cleanExpiredCodes() {
         Iterator<Map.Entry<String, VerificationCode>> iterator = CODE_STORE.entrySet().iterator();

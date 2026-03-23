@@ -15,7 +15,6 @@ public class Json {
      * @version V1.0
      */
     public static Object getJsonValueByKey(String jsonStr, String key) {
-        // 此处引入的是 com.alibaba.fastjson.JSONObject; 对象
         JSONObject jsonObject = JSONObject.parseObject(jsonStr);
         // 获取到 key 对应的值
         return jsonObject.get(key);
@@ -34,10 +33,7 @@ public class Json {
         return JSONObject.toJSONString(oldValue);
     }
 
-    public static void main(String[] args) {
-        String json = "{'status':0,'data':['数码设备','证件','日用品','服饰','其他']}";
-        System.err.println(getJsonValueByKey(json, "data"));
-    }
+
 
 
 }

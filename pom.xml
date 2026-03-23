@@ -175,14 +175,12 @@
             <artifactId>io.swagger.parser</artifactId>
             <version>1.0.47_1</version>
         </dependency>
-        <!-- JavaMail 核心依赖（替换JDK内置） -->
         <dependency>
             <groupId>com.sun.mail</groupId>
             <artifactId>javax.mail</artifactId>
-            <version>1.6.2</version> <!-- 兼容JDK17的稳定版本 -->
+            <version>1.6.2</version>
             <scope>compile</scope>
         </dependency>
-        <!-- Javax Activation（JavaMail 依赖） -->
         <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
@@ -247,7 +245,6 @@
             </plugin>
         </plugins>
         <resources>
-            <!-- 打包resource里的项目配置文件 -->
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>

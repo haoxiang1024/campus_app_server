@@ -162,7 +162,7 @@
                     let badgeClass = 'bg-secondary';
                     let stateText = '未知状态';
 
-                    // 状态判断 (0待审核 1通过 2驳回)
+                    // 状态判断
                     if(item.state == 0) { badgeClass = 'bg-info'; stateText = '待审核'; }
                     else if(item.state == 1) { badgeClass = 'bg-success'; stateText = '已通过'; }
                     else if(item.state == 2) { badgeClass = 'bg-danger'; stateText = '已驳回'; }
@@ -180,7 +180,7 @@
                         ? `<span class="text-primary fw-bold">主留言</span>`
                         : `<span class="text-muted">楼层回复</span>`;
 
-                    // 新增 <td>${item.id}</td>
+
                     html += `<tr>
                         <td><input type="checkbox" class="item-checkbox form-check-input" value="${item.id}"></td>
                         <td>${item.id}</td>
@@ -306,7 +306,7 @@
 
             let levelText = (!item.parentId || item.parentId === 0) ? '主留言' : '楼层回复';
 
-            // 新增 ID 显示
+
             const content = `
                 <div class="mb-2"><strong>留言 ID：</strong>${item.id}</div>
                 <div class="mb-2"><strong>留言人：</strong>${item.nickname || '未知用户'}</div>

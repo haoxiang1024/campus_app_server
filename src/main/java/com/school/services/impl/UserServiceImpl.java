@@ -143,7 +143,6 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public ServerResponse resetPwd(String phone, String newPwd) {
-        //判断新密码与旧密码是否相同如果相同则提示用户，不同则修改密码
         //获取用户信息
         Integer userId = userMapper.findUserByPhone(phone);
         if (userId == null) {
@@ -219,16 +218,7 @@ public class UserServiceImpl implements UserService {
         return ServerResponse.createServerResponseBySuccess("修改失败!");
     }
 
-    /**
-     * 根据ID查询用户信息
-     * @param id 用户ID
-     * @return ServerResponse 包含用户信息的响应对象
-     */
-    @Override
-    public ServerResponse getUser(int id) {
-        User userInfo = userMapper.userInfo(id);
-        return ServerResponse.createServerResponseBySuccess(userInfo, "查询成功");
-    }
+
 
     /**
      * 管理员更新用户信息
@@ -278,7 +268,6 @@ public class UserServiceImpl implements UserService {
         }
 
         try {
-            // 将前端传来的 "1,2,3" 字符串转为 List<Integer>
             List<Integer> idList = Arrays.stream(ids.split(","))
                     .map(Integer::parseInt)
                     .collect(Collectors.toList());
@@ -295,28 +284,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    /**
-     * 分页查询用户列表
-     * 支持关键字搜索和分页展示
-     * @param page 页码
-     * @param pageSize 每页大小
-     * @param keyword 搜索关键字
-     * @return ServerResponse 包含用户列表和分页信息的响应对象
-     */
-    @Override
-    public ServerResponse getUserList(int page, int pageSize, String keyword) {
-        int offset = (page - 1) * pageSize;
-        List<User> list = userMapper.getUserPage(offset, pageSize, keyword);
-        int total = userMapper.getUserCount(keyword);
-        int listSize=userMapper.getUserCount(null);//获取所有用户数量
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("list", list);
-        result.put("total", (int) Math.ceil((double) total / pageSize));
-        result.put("listSize", listSize);
-        result.put("total_if", total);//查询了之后的所有记录
-        return ServerResponse.createServerResponseBySuccess(result);
-    }
 
     /**
      * 获取IM用户Token
@@ -328,7 +296,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ServerResponse getIMUserToken(int uid, String nickname) {
         User user = userMapper.userInfo(uid);
-        //判断是否是非首次连接（数据库已有 Token）
+        //判断是否是非首次连接
         if (user.getIm_token() != null && !user.getIm_token().isEmpty()) {
             return ServerResponse.createServerResponseBySuccess(user.getIm_token(),"token获取成功");
         }

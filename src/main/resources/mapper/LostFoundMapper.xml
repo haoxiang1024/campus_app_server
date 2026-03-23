@@ -5,14 +5,14 @@
         insert into lostFound (
             title, img, pub_date, content, place, phone,
             state, stick, lostfoundtype_id, user_id, type,
-            longitude, latitude  -- 添加这两个字段
+            longitude, latitude
         )
         VALUES (
                    #{lostFound.title}, #{lostFound.img}, #{lostFound.pub_date},
                    #{lostFound.content}, #{lostFound.place}, #{lostFound.phone},
                    #{lostFound.state}, #{lostFound.stick}, #{lostFound.lostfoundtypeId},
                    #{lostFound.user_id}, #{lostFound.type},
-                   #{lostFound.longitude}, #{lostFound.latitude} -- 对应实体类中的属性
+                   #{lostFound.longitude}, #{lostFound.latitude}
                )
 
     </insert>
@@ -72,10 +72,8 @@
         SELECT * FROM lostFound
         WHERE type = #{type}
           AND lostfoundtype_id = #{lostfoundtype_id}
-      -- 使用 AND 连接，确保排除掉所有已完成的状态
           AND state != '已找到'
   AND state != '已认领'
-  -- 关键词搜索务必用括号包裹，否则会破坏 type 的过滤
   AND (
     title LIKE CONCAT('%', #{keyword}, '%')
            OR content LIKE CONCAT('%', #{keyword}, '%')

@@ -166,7 +166,6 @@
             if (!selectedIds.length) return window.Toast.error('请勾选要删除的分类');
 
             window.Toast.confirm("批量删除", `确定永久删除选中的 ${selectedIds.length} 个分类吗？该操作可能导致已关联此分类的物品信息显示异常！`, () => {
-                // 注意：需要后端配合提供对应的批量删除接口 (例如用逗号拼接ID)
                 $.post('/school/admin/deleteTypeBatch', { ids: selectedIds.join(',') }, (res) => {
                     if(res && res.status === 0) {
                         window.Toast.success("批量删除完成");
@@ -198,7 +197,6 @@
             });
         };
 
-        // 打开新增/编辑模态框 (复用同一个模态框)
         window.openTypeModal = (id) => {
             const form = $('#typeForm')[0];
             form.reset();
@@ -212,14 +210,12 @@
                     $('#typeName').val(item.name);
                 }
             } else {
-                // 新增模式
                 $('#modalTitle').text('新增分类');
                 $('#typeId').val('');
             }
             new bootstrap.Modal('#typeModal').show();
         };
 
-        // 提交表单 (新增或编辑)
         window.submitType = () => {
             const form = $('#typeForm')[0];
             if (!form.checkValidity()) {
@@ -230,7 +226,6 @@
             const id = $('#typeId').val();
             const name = $('#typeName').val().trim();
 
-            // 判断是走新增接口还是编辑接口
             const url = id ? '/school/admin/updateType' : '/school/admin/addType';
             const data = id ? { id: id, name: name } : { name: name };
 

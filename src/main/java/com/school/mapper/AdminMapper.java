@@ -33,7 +33,7 @@ public interface AdminMapper {
     int getAllUserCount();
     /**
      * 获取失物招领信息总数
-     * @param type 类型筛选："lost"-丢失物品，"found"-拾到物品，null-全部
+     * @param type 类型筛选
      * @return 符合条件的记录总数
      */
     int getAllLostFoundCount(@Param("type") String type);

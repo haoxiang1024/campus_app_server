@@ -50,14 +50,7 @@ public interface UserService {
      * @return ServerResponse 包含更新后用户信息的响应对象
      */
     ServerResponse updateAc(String nickname,String sex,int id);
-    
-    /**
-     * 根据ID查询用户信息
-     * @param id 用户ID
-     * @return ServerResponse 包含用户信息的响应对象
-     */
-    ServerResponse getUser(int id);
-    
+
     /**
      * 管理员更新用户信息
      * @param user 用户对象
@@ -80,15 +73,7 @@ public interface UserService {
      */
     ServerResponse updateUserStatus(String ids, Integer status);
     
-    /**
-     * 分页查询用户列表
-     * @param page 页码
-     * @param pageSize 每页大小
-     * @param keyword 搜索关键字
-     * @return ServerResponse 包含用户列表和分页信息的响应对象
-     */
-    ServerResponse getUserList(int page, int pageSize, String keyword);
-    
+
     /**
      * 获取IM用户Token
      * @param uid 用户ID
