@@ -2,7 +2,6 @@ package com.school.utils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.school.entity.User;
 import lombok.Data;
 
 /**

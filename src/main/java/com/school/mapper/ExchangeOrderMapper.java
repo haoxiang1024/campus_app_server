@@ -1,7 +1,6 @@
 package com.school.mapper;
 
 import com.school.entity.ExchangeOrder;
-import com.school.entity.ShopItem;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;

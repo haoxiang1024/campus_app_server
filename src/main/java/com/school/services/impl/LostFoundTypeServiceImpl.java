@@ -3,14 +3,11 @@ package com.school.services.impl;
 import com.school.entity.LostFoundType;
 import com.school.mapper.LostFoundTypeMapper;
 import com.school.services.api.LostFoundTypeService;
-
 import com.school.utils.ServerResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 失物招领分类服务实现类

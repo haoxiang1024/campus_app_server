@@ -1,8 +1,6 @@
 package com.school.services.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.school.entity.LostFound;
 import com.school.entity.LostFoundType;
 import com.school.entity.PointHistory;
@@ -12,7 +10,6 @@ import com.school.mapper.PointHistoryMapper;
 import com.school.mapper.UserMapper;
 import com.school.services.api.LostFoundService;
 import com.school.services.api.LostFoundTypeService;
-
 import com.school.utils.SensitiveWordUtil;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
@@ -20,9 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**

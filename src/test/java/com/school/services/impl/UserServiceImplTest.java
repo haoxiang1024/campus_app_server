@@ -1,15 +1,10 @@
 package com.school.services.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.school.entity.User;
 import com.school.mapper.UserMapper;
 import com.school.services.api.RongCloudApi;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.List;
 
 @SpringBootTest
 
