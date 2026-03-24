@@ -109,7 +109,7 @@ public class LostFoundController {
      */
     @ResponseBody
     @RequestMapping("/showTopList")
-    public ServerResponse showTopList(int stick) {
+    public ServerResponse showTopList(Integer stick) {
         return lostFoundService.showTopList(stick);
     }
 

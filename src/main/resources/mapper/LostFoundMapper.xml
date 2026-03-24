@@ -63,10 +63,15 @@
         where state = '未找到'
     </select>
     <select id="showTopList" resultType="com.school.entity.LostFound">
-        select *
-        from lostFound
-        where stick = #{stick}
-          and state = '寻找中' or state='待认领'
+        SELECT *
+        FROM lostFound
+        <where>
+            <if test="stick != null and stick != ''">
+                AND stick = #{stick}
+            </if>
+
+            AND (state = '寻找中' OR state = '待认领')
+        </where>
     </select>
     <select id="smartMatch" resultType="com.school.entity.LostFound">
         SELECT * FROM lostFound

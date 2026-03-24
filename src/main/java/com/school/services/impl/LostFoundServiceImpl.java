@@ -195,7 +195,7 @@ public class LostFoundServiceImpl implements LostFoundService {
      * @return ServerResponse 包含置顶信息列表的响应对象
      */
     @Override
-    public ServerResponse showTopList(int stick) {
+    public ServerResponse showTopList(Integer stick) {
         List<LostFound> lists = lostFoundMapper.showTopList(stick);
         if (lists.isEmpty()) {
             return ServerResponse.createServerResponseBySuccess("无置顶信息");

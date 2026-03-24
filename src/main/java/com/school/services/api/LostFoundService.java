@@ -52,7 +52,7 @@ public interface LostFoundService {
      * @param stick 置顶标识（1表示置顶）
      * @return ServerResponse 包含置顶信息列表的响应对象
      */
-    ServerResponse showTopList(@Param("stick")int stick);
+    ServerResponse showTopList(@Param("stick")Integer stick);
     
     /**
      * 根据关键字模糊查询失物招领信息

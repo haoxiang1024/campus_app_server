@@ -61,7 +61,7 @@ public interface LostFoundMapper {
      * @param stick 置顶标识（1为置顶）
      * @return 置顶的失物招领信息列表
      */
-    List<LostFound> showTopList(@Param("stick")int stick);
+    List<LostFound> showTopList(@Param("stick")Integer stick);
 
     /**
      * 获取所有失物招领信息（支持关键字搜索）

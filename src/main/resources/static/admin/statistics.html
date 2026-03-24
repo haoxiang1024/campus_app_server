@@ -1,24 +1,17 @@
 <script src="./js/echarts.min.js"></script>
-<script type="text/javascript" src="https://api.map.baidu.com/api?v=3.0&ak=您的AK"></script>
+<script src="./js/config.js"></script>
 
 <style>
-    /* 自定义微动效与排版样式 */
-    .stat-card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        border-radius: 0.75rem;
-    }
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-    }
-    /* 统一图标容器大小，防止不同图标宽度导致文本对齐不一致 */
-    .icon-box {
-        width: 60px;
-        height: 60px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+    .stat-card { transition: transform 0.3s ease, box-shadow 0.3s ease; border-radius: 0.75rem; }
+    .stat-card:hover { transform: translateY(-5px); box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important; }
+    .icon-box { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
+    /* 解决GL地图缩放按钮可能被遮挡的问题 */
+    .BMap_cpyCtrl, .anchorBL { display: none !important; }
+
+    /* 自定义百度地图信息窗体滚动条样式 */
+    .custom-info-window::-webkit-scrollbar { width: 6px; }
+    .custom-info-window::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+    .custom-info-window::-webkit-scrollbar-track { background: transparent; }
 </style>
 
 <div class="animation-fadeIn">
@@ -36,7 +29,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-12 col-sm-6 col-md-4 col-lg-3">
             <div class="card stat-card border-0 shadow-sm h-100">
                 <div class="card-body d-flex align-items-center">
@@ -50,7 +42,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-12 col-sm-6 col-md-4 col-lg-3">
             <div class="card stat-card border-0 shadow-sm h-100">
                 <div class="card-body d-flex align-items-center">
@@ -64,7 +55,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-12 col-sm-6 col-md-4 col-lg-3">
             <div class="card stat-card border-0 shadow-sm h-100">
                 <div class="card-body d-flex align-items-center">
@@ -78,7 +68,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-12 col-sm-6 col-md-4 col-lg-3">
             <div class="card stat-card border-0 shadow-sm h-100">
                 <div class="card-body d-flex align-items-center">
@@ -92,7 +81,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-12 col-sm-6 col-md-4 col-lg-3">
             <div class="card stat-card border-0 shadow-sm h-100">
                 <div class="card-body d-flex align-items-center">
@@ -106,7 +94,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-12 col-sm-6 col-md-4 col-lg-3">
             <div class="card stat-card border-0 shadow-sm h-100">
                 <div class="card-body d-flex align-items-center">
@@ -120,7 +107,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-12 col-sm-6 col-md-4 col-lg-3">
             <div class="card stat-card border-0 shadow-sm h-100">
                 <div class="card-body d-flex align-items-center">
@@ -137,6 +123,17 @@
     </div>
 
     <div class="row g-3 mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 0.75rem;">
+                <div class="card-body">
+                    <h6 class="fw-bold text-muted mb-3"><i class="fa fa-map-marker-alt me-2"></i>校园失物招领物品分布图</h6>
+                    <div id="lostFoundMap" style="height: 480px; width: 100%; border-radius: 0.5rem; overflow: hidden; position: relative;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
         <div class="col-12 col-lg-5">
             <div class="card border-0 shadow-sm h-100" style="border-radius: 0.75rem;">
                 <div class="card-body">
@@ -154,38 +151,24 @@
             </div>
         </div>
     </div>
-
-    <div class="row g-3">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm h-100" style="border-radius: 0.75rem;">
-                <div class="card-body">
-                    <h6 class="fw-bold text-muted mb-3"><i class="fa fa-map-marker-alt me-2"></i>校园失物招领物品分布图</h6>
-                    <div id="lostFoundMap" style="height: 500px; width: 100%; border-radius: 0.5rem; overflow: hidden;"></div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <script>
-    // 使用 jQuery 的 document ready 确保所有 DOM 元素加载完毕后再执行脚本
     $(function() {
-
-
         let dataMap = { users: 0, lost: 0, found: 0, items: 0, orders: 0, messages: 0, comments: 0, types: 0 };
 
-        const reqUsers = $.get('/school/admin/getAllUser').then(res => { if(res?.status === 0) dataMap.users = Array.isArray(res.data) ? res.data.length : (res.data || 0); }).catch(()=>console.error('获取用户数失败'));
-        const reqLost = $.get('/school/admin/getAllLostFoundCount', { type: '失物' }).then(res => { if(res?.status === 0) dataMap.lost = res.data || 0; }).catch(()=>console.error('获取失物数失败'));
-        const reqFound = $.get('/school/admin/getAllLostFoundCount', { type: '招领' }).then(res => { if(res?.status === 0) dataMap.found = res.data || 0; }).catch(()=>console.error('获取招领数失败'));
-        const reqItems = $.get('/school/shop/items/all', { page: 1, pageSize: 1 }).then(res => { if(res?.status === 0 && res.data) dataMap.items = res.data.total ?? (res.data.length || 0); }).catch(()=>console.error('获取商品数失败'));
-        const reqOrders = $.get('/school/shop/orders', { page: 1, pageSize: 1 }).then(res => { if(res?.status === 0 && res.data) dataMap.orders = res.data.total ?? (res.data.length || 0); }).catch(()=>console.error('获取订单数失败'));
-        const reqMsg = $.get('/school/admin/getMessageByPage', { page: 1, pageSize: 1 }).then(res => { if(res?.status === 0 && res.data) dataMap.messages = res.data.total || 0; }).catch(()=>console.error('获取留言数失败'));
-        const reqComments = $.get('/school/admin/getCommentsByPage', { page: 1, pageSize: 1 }).then(res => { if(res?.status === 0 && res.data) dataMap.comments = res.data.total || 0; }).catch(()=>console.error('获取评论数失败'));
-        // 自动解析 List size 的类型总数请求
-        const reqTypes = $.get('/school/admin/getAllType').then(res => { if(res?.status === 0) dataMap.types = Array.isArray(res.data) ? res.data.length : (res.data || 0); }).catch(()=>console.error('获取类型数失败'));
+        const reqs = [
+            $.get('/school/admin/getAllUser').then(res => { if(res?.status === 0) dataMap.users = Array.isArray(res.data) ? res.data.length : (res.data || 0); }),
+            $.get('/school/admin/getAllLostFoundCount', { type: '失物' }).then(res => { if(res?.status === 0) dataMap.lost = res.data || 0; }),
+            $.get('/school/admin/getAllLostFoundCount', { type: '招领' }).then(res => { if(res?.status === 0) dataMap.found = res.data || 0; }),
+            $.get('/school/shop/items/all', { page: 1, pageSize: 1 }).then(res => { if(res?.status === 0 && res.data) dataMap.items = res.data.total ?? (res.data.length || 0); }),
+            $.get('/school/shop/orders', { page: 1, pageSize: 1 }).then(res => { if(res?.status === 0 && res.data) dataMap.orders = res.data.total ?? (res.data.length || 0); }),
+            $.get('/school/admin/getMessageByPage', { page: 1, pageSize: 1 }).then(res => { if(res?.status === 0 && res.data) dataMap.messages = res.data.total || 0; }),
+            $.get('/school/admin/getCommentsByPage', { page: 1, pageSize: 1 }).then(res => { if(res?.status === 0 && res.data) dataMap.comments = res.data.total || 0; }),
+            $.get('/school/getAllType').then(res => { if(res?.status === 0) dataMap.types = Array.isArray(res.data) ? res.data.length : (res.data || 0); })
+        ];
 
-        Promise.allSettled([reqUsers, reqLost, reqFound, reqItems, reqOrders, reqMsg, reqComments, reqTypes]).then(() => {
-            // 渲染数字到卡片
+        Promise.allSettled(reqs).then(() => {
             $('#s_totalUsers').text(dataMap.users);
             $('#s_totalLost').text(dataMap.lost);
             $('#s_totalFound').text(dataMap.found);
@@ -194,34 +177,29 @@
             $('#s_totalMessages').text(dataMap.messages);
             $('#s_totalComments').text(dataMap.comments);
             $('#s_totalTypes').text(dataMap.types);
-
             initCharts(dataMap);
         });
 
         function initCharts(data) {
             const chartPie = echarts.init(document.getElementById('lostFoundChart'));
-            const pieOption = {
-                tooltip: { trigger: 'item', formatter: '{b}: <br/> {c} 件 ({d}%)', backgroundColor: 'rgba(255, 255, 255, 0.9)', textStyle: { color: '#333' } },
-                legend: { top: '0%', left: 'center', icon: 'circle' },
+            chartPie.setOption({
+                tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+                legend: { top: '0%', icon: 'circle' },
                 color: ['#ffc107', '#198754'],
                 series: [{
-                    name: '物品数量', type: 'pie', radius: ['45%', '75%'], center: ['50%', '55%'],
+                    type: 'pie', radius: ['45%', '75%'], center: ['50%', '55%'],
                     itemStyle: { borderRadius: 8, borderColor: '#fff', borderWidth: 3 },
-                    label: { show: false, position: 'center' },
-                    emphasis: { label: { show: true, fontSize: '18', fontWeight: 'bold' }, itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.2)' } },
-                    data: [ { value: data.lost, name: '累计丢失' }, { value: data.found, name: '成功找回' } ]
+                    data: [{ value: data.lost, name: '累计丢失' }, { value: data.found, name: '成功找回' }]
                 }]
-            };
-            chartPie.setOption(pieOption);
+            });
 
             const chartBar = echarts.init(document.getElementById('activityChart'));
-            const barOption = {
-                tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, backgroundColor: 'rgba(255, 255, 255, 0.9)' },
-                grid: { left: '3%', right: '4%', bottom: '5%', top: '12%', containLabel: true },
-                xAxis: { type: 'category', data: ['商城商品', '兑换订单', '系统留言', '帖子评论'], axisTick: { show: false }, axisLine: { lineStyle: { color: '#ddd' } } },
-                yAxis: { type: 'value', minInterval: 1, splitLine: { lineStyle: { type: 'dashed', color: '#eee' } } },
+            chartBar.setOption({
+                tooltip: { trigger: 'axis' },
+                xAxis: { type: 'category', data: ['商城商品', '兑换订单', '系统留言', '帖子评论'] },
+                yAxis: { type: 'value' },
                 series: [{
-                    name: '数据量', type: 'bar', barWidth: '35%', itemStyle: { borderRadius: [6, 6, 0, 0] },
+                    type: 'bar', barWidth: '35%',
                     data: [
                         { value: data.items, itemStyle: { color: '#0dcaf0' } },
                         { value: data.orders, itemStyle: { color: '#dc3545' } },
@@ -229,62 +207,153 @@
                         { value: data.comments, itemStyle: { color: '#212529' } }
                     ]
                 }]
-            };
-            chartBar.setOption(barOption);
-
-            window.addEventListener('resize', function() { chartPie.resize(); chartBar.resize(); });
+            });
+            window.addEventListener('resize', () => { chartPie.resize(); chartBar.resize(); });
         }
 
+        window.initMap = function() {
+            const map = new BMapGL.Map("lostFoundMap");
+            const point = new BMapGL.Point(104.701646, 31.540942); // 校园中心点
+            map.centerAndZoom(point, 17);
+            map.enableScrollWheelZoom(true);
+            map.setTilt(0);
 
-
-        //  初始化地图实例
-        var map = new BMap.Map("lostFoundMap");
-
-        // 设置地图中心点
-        var centerPoint = new BMap.Point(118.723, 32.205);
-        map.centerAndZoom(centerPoint, 16);
-        map.enableScrollWheelZoom(true); // 开启鼠标滚轮缩放
-        map.addControl(new BMap.NavigationControl()); // 添加平移缩放控件
-
-        // 请求物品经纬度数据并在地图上打点
-
-        $.get('/school/item/getAllItems').then(res => {
-            if(res && res.status === 0 && res.data) {
-                let items = res.data;
-
-                items.forEach(item => {
-                    // 确保字段名与你数据库实体类中的经纬度字段一致
-                    if(item.longitude && item.latitude) {
-                        var point = new BMap.Point(item.longitude, item.latitude);
-                        var marker = new BMap.Marker(point);
-                        map.addOverlay(marker);
-
-                        // 配置点击 marker 后的信息弹窗内容
-                        var content = `
-                            <div style="padding: 5px;">
-                                <h6 style="margin: 0 0 5px 0; font-weight: bold; color: #333;">${item.itemName || '未知物品'}</h6>
-                                <p style="margin: 0; font-size: 13px; color: #666;">
-                                    <span class="badge ${item.type === '失物' ? 'bg-warning' : 'bg-success'}">${item.type || '类型'}</span>
-                                    <br>
-                                    位置描述：${item.locationDesc || '暂无详细描述'}
-                                </p>
-                            </div>
-                        `;
-                        var infoWindow = new BMap.InfoWindow(content, {
-                            width: 220,
-                            height: 80,
-                            title: ""
-                        });
-
-                        marker.addEventListener("click", function() {
-                            map.openInfoWindow(infoWindow, point);
-                        });
-                    }
-                });
+            // 添加左上角图例控件
+            function LegendControl() {
+                this.defaultAnchor = BMAP_ANCHOR_TOP_LEFT;
+                this.defaultOffset = new BMapGL.Size(15, 15);
             }
-        }).catch(() => {
-            console.error('获取地图物品位置数据失败');
-        });
+            LegendControl.prototype = new BMapGL.Control();
+            LegendControl.prototype.initialize = function(map) {
+                var div = document.createElement("div");
+                div.style.backgroundColor = "rgba(255, 255, 255, 0.95)";
+                div.style.padding = "10px 15px";
+                div.style.borderRadius = "8px";
+                div.style.boxShadow = "0 2px 10px rgba(0,0,0,0.15)";
+                div.style.fontSize = "14px";
+                div.style.zIndex = "999";
+                div.innerHTML = `
+                    <div style="margin-bottom: 8px; display: flex; align-items: center;">
+                        <i class="fa fa-map-marker-alt" style="color: #0d6efd; width: 20px; text-align: center; font-size: 18px;"></i>
+                        <span style="color: #333; font-weight: bold; margin-left: 5px;">招领标记点</span>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <i class="fa fa-map-marker-alt" style="color: #dc3545; width: 20px; text-align: center; font-size: 18px;"></i>
+                        <span style="color: #333; font-weight: bold; margin-left: 5px;">失物标记点</span>
+                    </div>
+                `;
+                map.getContainer().appendChild(div);
+                return div;
+            };
+            map.addControl(new LegendControl());
 
+            // SVG 图标
+            const blueIconSvg = "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 384 512'%3E%3Cpath fill='%230d6efd' d='M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0z'/%3E%3Ccircle cx='192' cy='192' r='70' fill='white'/%3E%3C/svg%3E";
+            const redIconSvg = "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 384 512'%3E%3Cpath fill='%23dc3545' d='M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0z'/%3E%3Ccircle cx='192' cy='192' r='70' fill='white'/%3E%3C/svg%3E";
+
+            const addMarkerGroup = (items, typeName, lng, lat, iconSvg) => {
+                if(items.length === 0) return;
+
+                let markerPoint = new BMapGL.Point(lng, lat);
+                let customIcon = new BMapGL.Icon(iconSvg, new BMapGL.Size(30, 42), {
+                    imageSize: new BMapGL.Size(30, 42),
+                    anchor: new BMapGL.Size(15, 42)
+                });
+
+                let marker = new BMapGL.Marker(markerPoint, { icon: customIcon });
+                map.addOverlay(marker);
+
+                let listHtml = items.map(i => {
+                    let mediaHtml = '';
+                    if (i.img) {
+                        mediaHtml = `<img src="${i.img}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 8px; margin-right: 12px; flex-shrink: 0; border: 1px solid #eee;" alt="物品图片" />`;
+                    } else {
+                        let iconColorClass = i.type === '失物' ? 'text-danger fa-search' : 'text-primary fa-hand-holding-heart';
+                        mediaHtml = `
+                            <div style="background-color: #f8f9fa; border-radius: 8px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0; border: 1px solid #eee;">
+                                <i class="fa ${iconColorClass}" style="font-size: 18px;"></i>
+                            </div>`;
+                    }
+
+                    return `
+                        <div style="display: flex; align-items: center; border-bottom: 1px solid #f0f0f0; padding: 10px 0;">
+                            ${mediaHtml}
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-weight: bold; font-size: 14px; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    [${i.type || '未知'}] ${i.title || '未知物品'}
+                                </div>
+                                <div style="color: #888; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">
+                                    <i class="fa fa-map-pin me-1"></i>${i.place || '暂无详细位置描述'}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                let contentHtml = `
+                    <div style="padding-right: 5px;">
+                        <h6 style="font-weight: bold; margin: 0 0 5px 0; font-size: 16px; color: #333;">📍 位置：${typeName}列表</h6>
+                        <div style="color: #666; font-size: 13px; margin-bottom: 8px;">该地点共有 <strong class="text-primary">${items.length}</strong> 件${typeName}：</div>
+                        <div class="custom-info-window" style="max-height: 220px; overflow-y: auto;">
+                            ${listHtml}
+                        </div>
+                    </div>
+                `;
+
+                let infoWindow = new BMapGL.InfoWindow(contentHtml, { width: 300, height: 0, title: "" });
+                marker.addEventListener("click", () => map.openInfoWindow(infoWindow, markerPoint));
+            };
+
+            // 获取数据，处理重叠逻辑
+            $.get('/school/showTopList').then(res => {
+                if(res?.status === 0 && res.data) {
+                    let locationMap = {};
+
+                    // 按基础坐标分组
+                    res.data.forEach(item => {
+                        if(item.longitude && item.latitude) {
+                            let key = `${item.longitude}_${item.latitude}`;
+                            if(!locationMap[key]) locationMap[key] = [];
+                            locationMap[key].push(item);
+                        }
+                    });
+
+                    // 遍历每个地点
+                    for (let key in locationMap) {
+                        let itemsGroup = locationMap[key];
+                        let baseLng = parseFloat(itemsGroup[0].longitude);
+                        let baseLat = parseFloat(itemsGroup[0].latitude);
+
+                        // 把该地点的物品分离：失物 和 招领
+                        let lostItems = itemsGroup.filter(i => i.type === '失物');
+                        let foundItems = itemsGroup.filter(i => i.type !== '失物');
+
+                        // 重叠处理逻辑
+                        if (lostItems.length > 0 && foundItems.length > 0) {
+                            // 同一个地点既有失物又有招领
+                            // 添加微小偏移量 让它们肩并肩显示
+                            addMarkerGroup(lostItems, '失物', baseLng, baseLat, redIconSvg);
+                            addMarkerGroup(foundItems, '招领', baseLng + 0.00030, baseLat, blueIconSvg);
+                        } else if (lostItems.length > 0) {
+                            // 只有失物，正常原位置显示
+                            addMarkerGroup(lostItems, '失物', baseLng, baseLat, redIconSvg);
+                        } else if (foundItems.length > 0) {
+                            // 只有招领，正常原位置显示
+                            addMarkerGroup(foundItems, '招领', baseLng, baseLat, blueIconSvg);
+                        }
+                    }
+                }
+            });
+        };
+
+        function loadBaiduMap() {
+            const ak = (typeof MAP_CONFIG !== 'undefined') ? MAP_CONFIG.baiduAK : "YOUR_FALLBACK_AK";
+            const script = document.createElement("script");
+            script.type = "text/javascript";
+            script.src = `https://api.map.baidu.com/api?type=webgl&v=1.0&ak=${ak}&callback=initMap`;
+            document.body.appendChild(script);
+        }
+
+        loadBaiduMap();
     });
 </script>
