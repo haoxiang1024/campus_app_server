@@ -1,4 +1,5 @@
 <script src="./js/echarts.min.js"></script>
+<script type="text/javascript" src="https://api.map.baidu.com/api?v=3.0&ak=您的AK"></script>
 
 <style>
     /* 自定义微动效与排版样式 */
@@ -119,9 +120,23 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="card stat-card border-0 shadow-sm h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="icon-box flex-shrink-0 rounded-3 me-3" style="background-color: rgba(111, 66, 193, 0.1);">
+                        <i class="fa fa-tags fa-2x" style="color: #6f42c1;"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase">类型总数</div>
+                        <h3 class="mb-0 fw-bold" style="color: #6f42c1;" id="s_totalTypes">0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="row g-3">
+    <div class="row g-3 mb-4">
         <div class="col-12 col-lg-5">
             <div class="card border-0 shadow-sm h-100" style="border-radius: 0.75rem;">
                 <div class="card-body">
@@ -139,12 +154,25 @@
             </div>
         </div>
     </div>
+
+    <div class="row g-3">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 0.75rem;">
+                <div class="card-body">
+                    <h6 class="fw-bold text-muted mb-3"><i class="fa fa-map-marker-alt me-2"></i>校园失物招领物品分布图</h6>
+                    <div id="lostFoundMap" style="height: 500px; width: 100%; border-radius: 0.5rem; overflow: hidden;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-    (function() {
-        // 定义数据字典存放结果
-        let dataMap = { users: 0, lost: 0, found: 0, items: 0, orders: 0, messages: 0, comments: 0 };
+    // 使用 jQuery 的 document ready 确保所有 DOM 元素加载完毕后再执行脚本
+    $(function() {
+
+
+        let dataMap = { users: 0, lost: 0, found: 0, items: 0, orders: 0, messages: 0, comments: 0, types: 0 };
 
         const reqUsers = $.get('/school/admin/getAllUser').then(res => { if(res?.status === 0) dataMap.users = Array.isArray(res.data) ? res.data.length : (res.data || 0); }).catch(()=>console.error('获取用户数失败'));
         const reqLost = $.get('/school/admin/getAllLostFoundCount', { type: '失物' }).then(res => { if(res?.status === 0) dataMap.lost = res.data || 0; }).catch(()=>console.error('获取失物数失败'));
@@ -153,9 +181,11 @@
         const reqOrders = $.get('/school/shop/orders', { page: 1, pageSize: 1 }).then(res => { if(res?.status === 0 && res.data) dataMap.orders = res.data.total ?? (res.data.length || 0); }).catch(()=>console.error('获取订单数失败'));
         const reqMsg = $.get('/school/admin/getMessageByPage', { page: 1, pageSize: 1 }).then(res => { if(res?.status === 0 && res.data) dataMap.messages = res.data.total || 0; }).catch(()=>console.error('获取留言数失败'));
         const reqComments = $.get('/school/admin/getCommentsByPage', { page: 1, pageSize: 1 }).then(res => { if(res?.status === 0 && res.data) dataMap.comments = res.data.total || 0; }).catch(()=>console.error('获取评论数失败'));
+        // 自动解析 List size 的类型总数请求
+        const reqTypes = $.get('/school/admin/getAllType').then(res => { if(res?.status === 0) dataMap.types = Array.isArray(res.data) ? res.data.length : (res.data || 0); }).catch(()=>console.error('获取类型数失败'));
 
-        // 等待所有接口请求完毕后统一渲染
-        Promise.allSettled([reqUsers, reqLost, reqFound, reqItems, reqOrders, reqMsg, reqComments]).then(() => {
+        Promise.allSettled([reqUsers, reqLost, reqFound, reqItems, reqOrders, reqMsg, reqComments, reqTypes]).then(() => {
+            // 渲染数字到卡片
             $('#s_totalUsers').text(dataMap.users);
             $('#s_totalLost').text(dataMap.lost);
             $('#s_totalFound').text(dataMap.found);
@@ -163,73 +193,35 @@
             $('#s_totalOrders').text(dataMap.orders);
             $('#s_totalMessages').text(dataMap.messages);
             $('#s_totalComments').text(dataMap.comments);
+            $('#s_totalTypes').text(dataMap.types);
 
             initCharts(dataMap);
         });
 
-        // ECharts 初始化与渲染函数
         function initCharts(data) {
             const chartPie = echarts.init(document.getElementById('lostFoundChart'));
             const pieOption = {
-                tooltip: {
-                    trigger: 'item',
-                    formatter: '{b}: <br/> {c} 件 ({d}%)',
-                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                    borderColor: '#ccc',
-                    textStyle: { color: '#333' }
-                },
+                tooltip: { trigger: 'item', formatter: '{b}: <br/> {c} 件 ({d}%)', backgroundColor: 'rgba(255, 255, 255, 0.9)', textStyle: { color: '#333' } },
                 legend: { top: '0%', left: 'center', icon: 'circle' },
                 color: ['#ffc107', '#198754'],
                 series: [{
-                    name: '物品数量',
-                    type: 'pie',
-                    radius: ['45%', '75%'],
-                    center: ['50%', '55%'],
-                    avoidLabelOverlap: false,
+                    name: '物品数量', type: 'pie', radius: ['45%', '75%'], center: ['50%', '55%'],
                     itemStyle: { borderRadius: 8, borderColor: '#fff', borderWidth: 3 },
                     label: { show: false, position: 'center' },
-                    emphasis: {
-                        label: { show: true, fontSize: '18', fontWeight: 'bold' },
-                        itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0, 0, 0, 0.2)' }
-                    },
-                    labelLine: { show: false },
-                    data: [
-                        { value: data.lost, name: '累计丢失' },
-                        { value: data.found, name: '成功找回' }
-                    ]
+                    emphasis: { label: { show: true, fontSize: '18', fontWeight: 'bold' }, itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.2)' } },
+                    data: [ { value: data.lost, name: '累计丢失' }, { value: data.found, name: '成功找回' } ]
                 }]
             };
             chartPie.setOption(pieOption);
 
             const chartBar = echarts.init(document.getElementById('activityChart'));
             const barOption = {
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: { type: 'shadow' },
-                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                    textStyle: { color: '#333' }
-                },
+                tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, backgroundColor: 'rgba(255, 255, 255, 0.9)' },
                 grid: { left: '3%', right: '4%', bottom: '5%', top: '12%', containLabel: true },
-                xAxis: {
-                    type: 'category',
-                    data: ['商城商品', '兑换订单', '系统留言', '帖子评论'],
-                    axisTick: { alignWithLabel: true, show: false },
-                    axisLine: { lineStyle: { color: '#ddd' } },
-                    axisLabel: { color: '#666' }
-                },
-                yAxis: {
-                    type: 'value',
-                    minInterval: 1,
-                    splitLine: { lineStyle: { type: 'dashed', color: '#eee' } },
-                    axisLabel: { color: '#666' }
-                },
+                xAxis: { type: 'category', data: ['商城商品', '兑换订单', '系统留言', '帖子评论'], axisTick: { show: false }, axisLine: { lineStyle: { color: '#ddd' } } },
+                yAxis: { type: 'value', minInterval: 1, splitLine: { lineStyle: { type: 'dashed', color: '#eee' } } },
                 series: [{
-                    name: '数据量',
-                    type: 'bar',
-                    barWidth: '35%',
-                    itemStyle: {
-                        borderRadius: [6, 6, 0, 0]
-                    },
+                    name: '数据量', type: 'bar', barWidth: '35%', itemStyle: { borderRadius: [6, 6, 0, 0] },
                     data: [
                         { value: data.items, itemStyle: { color: '#0dcaf0' } },
                         { value: data.orders, itemStyle: { color: '#dc3545' } },
@@ -240,11 +232,59 @@
             };
             chartBar.setOption(barOption);
 
-            // 监听窗口大小变化，让图表自适应缩放
-            window.addEventListener('resize', function() {
-                chartPie.resize();
-                chartBar.resize();
-            });
+            window.addEventListener('resize', function() { chartPie.resize(); chartBar.resize(); });
         }
-    })();
+
+
+
+        //  初始化地图实例
+        var map = new BMap.Map("lostFoundMap");
+
+        // 设置地图中心点
+        var centerPoint = new BMap.Point(118.723, 32.205);
+        map.centerAndZoom(centerPoint, 16);
+        map.enableScrollWheelZoom(true); // 开启鼠标滚轮缩放
+        map.addControl(new BMap.NavigationControl()); // 添加平移缩放控件
+
+        // 请求物品经纬度数据并在地图上打点
+
+        $.get('/school/item/getAllItems').then(res => {
+            if(res && res.status === 0 && res.data) {
+                let items = res.data;
+
+                items.forEach(item => {
+                    // 确保字段名与你数据库实体类中的经纬度字段一致
+                    if(item.longitude && item.latitude) {
+                        var point = new BMap.Point(item.longitude, item.latitude);
+                        var marker = new BMap.Marker(point);
+                        map.addOverlay(marker);
+
+                        // 配置点击 marker 后的信息弹窗内容
+                        var content = `
+                            <div style="padding: 5px;">
+                                <h6 style="margin: 0 0 5px 0; font-weight: bold; color: #333;">${item.itemName || '未知物品'}</h6>
+                                <p style="margin: 0; font-size: 13px; color: #666;">
+                                    <span class="badge ${item.type === '失物' ? 'bg-warning' : 'bg-success'}">${item.type || '类型'}</span>
+                                    <br>
+                                    位置描述：${item.locationDesc || '暂无详细描述'}
+                                </p>
+                            </div>
+                        `;
+                        var infoWindow = new BMap.InfoWindow(content, {
+                            width: 220,
+                            height: 80,
+                            title: ""
+                        });
+
+                        marker.addEventListener("click", function() {
+                            map.openInfoWindow(infoWindow, point);
+                        });
+                    }
+                });
+            }
+        }).catch(() => {
+            console.error('获取地图物品位置数据失败');
+        });
+
+    });
 </script>
