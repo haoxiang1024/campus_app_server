@@ -1,6 +1,7 @@
 package com.school.controller;
 
 
+import com.school.entity.LostFound;
 import com.school.services.api.LostFoundService;
 import com.school.services.api.LostFoundTypeService;
 import com.school.utils.Json;
@@ -116,29 +117,18 @@ public class LostFoundController {
     /**
      * 发布失物或招领信息
      * @param upload_file 上传的文件
-     * @param lostJson 丢失物品json数据
-     * @param foundJson 招领物品json数据
-     * @param op 操作类型，"失物"表示发布丢失物品，其他值表示发布招领物品
+     * @param lostFoundJson 丢失物品 招领json数据
      * @return 返回ServerResponse对象，包含发布结果信息
      */
     @ResponseBody
     @PostMapping("/addLostFound")
-    public ServerResponse addLostFound(MultipartFile upload_file, String lostJson, String foundJson, String op) {
+    public ServerResponse addLostFound(MultipartFile upload_file, String lostFoundJson) {
         String filename = util.getFileName(upload_file);
-        // 判断是发布丢失物品还是招领物品
-        if (op != null && !op.equals("")) {
-            ServerResponse serviceResponse = null;
-            if (op.equals("失物")) {
-                // 处理丢失物品发布
-                String newLostJson = Json.updateByKey(lostJson, "img", filename);
-                serviceResponse = lostFoundService.addLostFound(newLostJson);            }
-            else {
-                // 处理招领物品发布
-                String newFoundJson = Json.updateByKey(foundJson, "img", filename);
-                serviceResponse = lostFoundService.addLostFound(newFoundJson);
-            }
-                return serviceResponse;
-
+        String type = Json.getJsonValueByKey(lostFoundJson, "type").toString();
+        // 判断类型
+        if (type != null && !type.isEmpty()) {
+            String newLostFoundJson = Json.updateByKey(lostFoundJson, "img", filename);
+            return lostFoundService.addLostFound(newLostFoundJson);
         } else {
             return ServerResponse.createServerResponseBySuccess("未选择失物或者招领");
         }
