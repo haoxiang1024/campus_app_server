@@ -24,7 +24,7 @@ public interface AdminMapper {
      * @param state 用户状态
      * @return 用户列表
      */
-    List<User> getUserListByCondition(@Param("keyword") String keyword, @Param("state") Integer state);
+    List<User> getUserListByCondition(@Param("keyword") String keyword, @Param("state") Integer state,@Param("role")Integer  role);
     /**
      * 获取系统总用户数
      * @return 用户总数

@@ -35,8 +35,8 @@ public class UserController {
      */
     @ResponseBody
     @RequestMapping("/register")
-    public ServerResponse register(String phone,String email,String password) {
-        return userService.register(phone,email,password);
+    public ServerResponse register(String phone,String email,String password,int role ) {
+        return userService.register(phone,email,password, role);
     }
     
     /**
@@ -55,13 +55,11 @@ public class UserController {
      * 重置用户密码接口
      * @param phone 用户手机号
      * @param newPwd 新密码
-     * @param email 用户邮箱
-     * @param email_code 邮箱验证码
      * @return 返回ServerResponse对象，包含密码重置结果信息
      */
     @ResponseBody
     @RequestMapping("/resetPwd")
-    public ServerResponse resetPwd(String phone,String newPwd,String email,String email_code){
+    public ServerResponse resetPwd(String phone, String newPwd){
         return userService.resetPwd(phone, newPwd);
     }
     

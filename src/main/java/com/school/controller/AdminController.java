@@ -94,30 +94,26 @@ public class AdminController {
             @RequestParam("phone") String phone,
             @RequestParam("email") String email,
             @RequestParam(value = "photoFile", required = false) MultipartFile photoFile,
-            @RequestParam("points") int points) {
+            @RequestParam("points") int points,
+            @RequestParam("role") Integer role) {
+        User user = userService.getUserById(id);
+        if (user == null) {
+            return ServerResponse.createServerResponseByFail(500, "用户不存在");
+        }
 
-            // 获取现有用户信息
-            User user = userService.getUserById(id);
-            if (user == null) {
-                return ServerResponse.createServerResponseByFail(500, "用户不存在");
-            }
+        user.setNickname(nickname);
+        user.setSex(sex);
+        user.setPhone(phone);
+        user.setEmail(email);
+        user.setPoints(points);
+        user.setRole(role);
 
-            // 更新用户基本信息字段
-            user.setNickname(nickname);
-            user.setSex(sex);
-            user.setPhone(phone);
-            user.setEmail(email);
-            user.setPoints(points);
-            
-            // 处理用户头像上传
-            if(photoFile != null && !photoFile.isEmpty()){
-                String fileName = util.getFileName(photoFile);
-                // 数据库只存储文件名
-                user.setPhoto(fileName);
-            }
+        if(photoFile != null && !photoFile.isEmpty()){
+            String fileName = util.getFileName(photoFile);
+            user.setPhoto(fileName);
+        }
         return userService.updateUserInfo(user);
     }
-    
     /**
      * 更新用户状态接口
      * @param ids 需要更新的用户ID字符串，可能包含多个ID，用逗号分隔
@@ -213,18 +209,22 @@ public class AdminController {
      * @param pageSize 每页大小，默认为10
      * @param keyword 搜索关键字（可选）
      * @param state 状态筛选（可选）
+     * @param role 角色筛选（可选）
      * @return 返回ServerResponse对象，包含分页的用户搜索结果
+     */
+    /**
+     * 分页搜索用户列表 (带关键字、状态和角色筛选)
      */
     @ResponseBody
     @GetMapping("/searchList")
     public ServerResponse searchList(@RequestParam(defaultValue = "1") int page,
                                      @RequestParam(defaultValue = "10") int pageSize,
                                      @RequestParam(required = false) String keyword,
-                                     @RequestParam(required = false) Integer state) {
-        // 调用 AdminService 处理包含状态的多条件查询
-        return adminService.getUserListByPage(page, pageSize, keyword, state);
+                                     @RequestParam(required = false) Integer state,
+                                     @RequestParam(required = false) Integer role) {
+
+        return adminService.getUserListByPage(page, pageSize, keyword, state, role);
     }
-    
     /**
      * 更新失物招领置顶状态
      * @param id 失物招领ID

@@ -40,15 +40,14 @@ public class UserServiceImpl implements UserService {
      * @return ServerResponse 包含注册用户信息和操作结果的响应对象
      */
     @Override
-    public ServerResponse register(String phone,String email,String password) {
+    public ServerResponse register(String phone,String email,String password,int role) {
         // 初始化用户基本属性
         Date time = DateUtil.getTime();//获取时间
-        int points=0;//初始积分
+        int points=100;//初始积分
         String sex=Util.SexRandom(); // 随机性别
         String nickname = Util.NickNameRandom();//随机获取昵称
         String photo; // 头像URL
-        int state=1;//状态：1启用 0禁用
-        int role=0;//0：普通用户 1：管理员用户
+        int state=1;//状态：1启用 0禁用 role:0普通用户 1管理员
         
         // 密码加密处理
         String hashedPwd=Util.encryptPwd(password);
@@ -78,7 +77,9 @@ public class UserServiceImpl implements UserService {
             JSONObject jsonObject = JSON.parseObject(response);
             //imtoken
             String token = jsonObject.getString("token");
-            
+            //存入数据库
+            user.setIm_token(token);
+            userMapper.updateUserInfo(user);
             // 验证IM注册是否成功
             if(token != null && !token.isEmpty()){
                 //token

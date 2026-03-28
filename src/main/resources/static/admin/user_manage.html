@@ -1,13 +1,13 @@
 <link href="./css/sweetalert2.min.css" rel="stylesheet">
 
 <style>
-    /* 核心变量与基础样式 */
-    .text-custom-blue { color: #00aaff !important; }
-    /* 表格头像放大镜效果 */
-    .table-avatar-zoom {
-        transition: transform 0.2s ease;
-    }
+    /* 状态开关及禁用按钮样式 */
+    .form-check-input.status-switch:checked { background-color: #00aaff; border-color: #00aaff; }
+    .btn-outline-custom:disabled { cursor: not-allowed; opacity: 0.5; }
 
+    /* 页面基础样式 */
+    .text-custom-blue { color: #00aaff !important; }
+    .table-avatar-zoom { transition: transform 0.2s ease; }
     .table-avatar-zoom:hover {
         cursor: zoom-in;
         transform: scale(1.2);
@@ -23,13 +23,11 @@
         margin: 15px;
         color: #333 !important;
     }
-
     .table-light th {
         background-color: #f8f9fa !important;
         color: #666 !important;
         font-weight: 600;
     }
-
     .btn-outline-custom {
         color: #00aaff !important;
         border-color: #dee2e6 !important;
@@ -38,6 +36,7 @@
         background-color: #00aaff !important;
         color: white !important;
     }
+    .form-select-sm { border-color: #dee2e6 !important; color: #666; }
 
     #avatarPreview {
         width: 80px;
@@ -51,27 +50,34 @@
         background-color: #00aaff;
         border-color: #00aaff;
     }
-    .modal-content { border-radius: 12px; border: none; }
 </style>
 
 <div class="content-wrapper">
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <div class="d-flex justify-content-between align-items-center mb-4 gap-3 flex-wrap">
         <div class="d-flex gap-2">
             <button class="btn btn-outline-success btn-sm" id="btnBatchEnable">启用</button>
             <button class="btn btn-outline-warning btn-sm" id="btnBatchDisable">禁用</button>
             <button class="btn btn-outline-danger btn-sm" id="btnBatchReset">重置密码</button>
+            <button class="btn btn-primary btn-sm text-white px-3" onclick="openAddModal()">+ 新增用户</button>
         </div>
 
-        <div class="input-group input-group-sm" style="width: 340px;">
-            <select id="userState" class="form-select" style="max-width: 120px; border-color: #dee2e6;">
+        <div class="d-flex gap-2">
+            <select id="userRole" class="form-select form-select-sm" style="width: 100px;">
+                <option value="">所有角色</option>
+                <option value="0">普通用户</option>
+                <option value="1">管理员</option>
+            </select>
+            <select id="userState" class="form-select form-select-sm" style="width: 100px;">
                 <option value="">所有状态</option>
                 <option value="1">已启用</option>
                 <option value="0">已禁用</option>
             </select>
-            <input type="text" id="userKeyword" class="form-control" placeholder="搜索昵称/手机号/Email...">
-            <button class="btn btn-primary" type="button" id="btnSearchUser">
-                <i class="fa fa-search"></i>
-            </button>
+            <div class="input-group input-group-sm" style="width: 220px;">
+                <input type="text" id="userKeyword" class="form-control" placeholder="搜索昵称/手机号/Email...">
+                <button class="btn btn-primary" type="button" id="btnSearchUser">
+                    <i class="fa fa-search"></i>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -83,6 +89,7 @@
                 <th>ID</th>
                 <th>头像</th>
                 <th>昵称</th>
+                <th>角色</th>
                 <th class="text-center">性别</th>
                 <th>注册时间</th>
                 <th>手机号码</th>
@@ -93,7 +100,7 @@
             </tr>
             </thead>
             <tbody id="userTableBody">
-            <tr><td colspan="11" class="text-center text-muted">正在检索数据...</td></tr>
+            <tr><td colspan="12" class="text-center text-muted">正在检索数据...</td></tr>
             </tbody>
         </table>
     </div>
@@ -114,20 +121,66 @@
     </div>
 </div>
 
+<div class="modal fade" id="addUserModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold text-custom-blue">新增用户</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <form id="addUserForm">
+                    <div class="mb-3 mt-3">
+                        <label class="form-label">账号角色 <span class="text-danger">*</span></label>
+                        <select class="form-select form-select-sm" name="role" required>
+                            <option value="0">普通用户</option>
+                            <option value="1">管理员</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">手机号码 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control form-control-sm" name="phone" required maxlength="11">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control form-control-sm" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">初始密码 <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control form-control-sm" name="password" required value="a12345678">
+                        <div class="form-text">默认初始密码为 a12345678</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary btn-sm px-3" id="btnSubmitAdd" style="background-color: #00aaff; border: none;">确认添加</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="editUserModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
-        <div class="modal-content shadow-lg">
+        <div class="modal-content shadow-lg border-0">
             <div class="modal-header">
                 <h5 class="modal-title fw-bold text-custom-blue">编辑用户信息</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body pt-0">
                 <form id="editUserForm" enctype="multipart/form-data">
                     <input type="hidden" name="id" id="editUserId">
-                    <div class="mb-3 text-center">
+                    <div class="mb-3 text-center mt-3">
                         <div><img src="" id="avatarPreview" onerror="this.src='./svgs/solid/circle-user.svg'"></div>
-                        <label for="editPhoto" class="btn btn-sm btn-outline-secondary">更换头像</label>
+                        <label for="editPhoto" class="btn btn-sm btn-outline-secondary mt-2">更换头像</label>
                         <input type="file" id="editPhoto" name="photoFile" accept="image/*" style="display: none;">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">账号角色</label>
+                        <select class="form-select form-select-sm" name="role" id="editRole">
+                            <option value="0">普通用户</option>
+                            <option value="1">管理员</option>
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">昵称</label>
@@ -162,6 +215,8 @@
     </div>
 </div>
 
+<script src="./js/jquery.min.js"></script>
+<script src="./js/bootstrap.bundle.min.js"></script>
 <script src="./js/sweetalert2@11.js"></script>
 
 <script>
@@ -171,30 +226,35 @@
         const pageSize = 10;
         let allUsersData = [];
 
-
-
+        // 格式化图片地址
         function getPhotoUrl(photo) {
             if (!photo) return './svgs/solid/circle-user.svg';
             if (photo.startsWith('http')) return photo;
             return '/school/upload/' + photo;
         }
 
+        // 格式化时间戳
         function formatDate(ts) {
             if (!ts) return '未设置';
             const d = new Date(ts);
             return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
         }
 
+        // 渲染表格数据
         function renderUserTable(list) {
             allUsersData = list;
             const $tbody = $('#userTableBody');
             if (!list || list.length === 0) {
-                $tbody.html('<tr><td colspan="11" class="text-center text-muted">未找到匹配的用户数据</td></tr>');
+                $tbody.html('<tr><td colspan="12" class="text-center text-muted">未找到匹配的用户数据</td></tr>');
                 return;
             }
             let html = '';
             list.forEach(u => {
-                const isChecked = u.state === 1 ? 'checked' : '';
+                const isChecked = u.state == 1 ? 'checked' : '';
+                const roleBadge = u.role == 1
+                    ? '<span class="badge border text-danger border-danger">管理员</span>'
+                    : '<span class="badge border text-success border-success">普通用户</span>';
+
                 html += `<tr>
                 <td><input type="checkbox" class="form-check-input user-checkbox" value="${u.id}"></td>
                 <td>${u.id}</td>
@@ -206,6 +266,7 @@
                          onclick="window.open(this.src)">
                 </td>
                 <td class="fw-bold">${u.nickname || '-'}</td>
+                <td>${roleBadge}</td>
                 <td class="text-center">${u.sex || '-'}</td>
                 <td><small class="text-muted">${formatDate(u.reg_date)}</small></td>
                 <td>${u.phone || '-'}</td>
@@ -224,44 +285,53 @@
             });
             $tbody.html(html);
 
+            // 绑定状态切换事件
             $('.status-switch').off('change').on('change', function() {
                 updateUserStatus([$(this).data('id')], this.checked ? 1 : 0);
             });
 
-            // 编辑按钮点击事件，回显所有数据
+            // 绑定编辑回显事件
             $('.btn-edit-user').off('click').on('click', function() {
                 const user = allUsersData.find(item => item.id == $(this).data('id'));
                 if (user) {
                     $('#editUserId').val(user.id);
+                    $('#editRole').val(user.role != null ? user.role : 0);
                     $('#editNickname').val(user.nickname || '');
                     $('#editSex').val(user.sex || '男');
                     $('#editPhone').val(user.phone || '');
                     $('#editEmail').val(user.email || '');
-                    $('#editPoints').val(user.points != null ? user.points : 0); // 新增积分回显
+                    $('#editPoints').val(user.points != null ? user.points : 0);
                     $('#avatarPreview').attr('src', getPhotoUrl(user.photo));
                     $('#editUserModal').modal('show');
                 }
             });
 
+            // 绑定重置密码事件
             $('.btn-reset-pwd').off('click').on('click', function() {
                 const id = $(this).data('id');
                 window.Toast.confirm('重置确认', '确定要将该用户的密码重置为 a12345678 吗？', () => resetPassword([id]));
             });
         }
 
+        // 加载用户列表
         function loadUsers(page) {
             currentPage = page;
             const kw = $('#userKeyword').val().trim();
             const state = $('#userState').val();
+            const role = $('#userRole').val();
 
-            $('#userTableBody').html('<tr><td colspan="11" class="text-center text-muted">正在检索数据...</td></tr>');
+            $('#userTableBody').html('<tr><td colspan="12" class="text-center text-muted">正在检索数据...</td></tr>');
 
-            $.get('/school/admin/searchList', {
+            const requestParams = {
                 page: currentPage,
-                pageSize: pageSize,
-                keyword: kw,
-                state: state
-            }, function(res) {
+                pageSize: pageSize
+            };
+
+            if (kw !== '') requestParams.keyword = kw;
+            if (state !== '') requestParams.state = state;
+            if (role !== '') requestParams.role = role;
+
+            $.get('/school/admin/searchList', requestParams, function(res) {
                 if (res.status === 0 && res.data) {
                     const list = res.data.list || [];
                     const total_if = res.data.total_if || 0;
@@ -277,13 +347,14 @@
                     $('#btnNextPage, #btnLastPage').prop('disabled', currentPage >= totalPages);
                     $('#selectAll').prop('checked', false);
                 } else {
-                    $('#userTableBody').html(`<tr><td colspan="11" class="text-center text-danger">加载失败: ${res.msg || '空数据'}</td></tr>`);
+                    $('#userTableBody').html(`<tr><td colspan="12" class="text-center text-danger">加载失败: ${res.msg || '空数据'}</td></tr>`);
                 }
             }).fail(function(xhr) {
-                $('#userTableBody').html(`<tr><td colspan="11" class="text-center text-danger">请求失败 (HTTP ${xhr.status})，请检查网络</td></tr>`);
+                $('#userTableBody').html(`<tr><td colspan="12" class="text-center text-danger">请求失败 (HTTP ${xhr.status})，请检查网络</td></tr>`);
             });
         }
 
+        // 提交状态更新
         function updateUserStatus(ids, state) {
             $.post('/school/admin/updateUserStatus', { ids: ids.join(','), state: state }, function(res) {
                 if (res.status === 0) window.Toast.success('状态更新成功');
@@ -292,6 +363,7 @@
             });
         }
 
+        // 提交重置密码
         function resetPassword(ids) {
             $.post('/school/admin/resetPassword', { ids: ids.join(',') }, function(res) {
                 if (res.status === 0) window.Toast.success('密码已成功重置');
@@ -300,20 +372,58 @@
             });
         }
 
-        // 搜索及筛选事件
+        // 打开新增弹窗
+        window.openAddModal = function() {
+            $('#addUserForm')[0].reset();
+            $('#addUserModal').modal('show');
+        };
+
+        // 提交新增用户
+        $('#btnSubmitAdd').on('click', function() {
+            const form = $('#addUserForm')[0];
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const formData = new FormData(form);
+            $.ajax({
+                url: '/school/register',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(res) {
+                    if (res.status === 0) {
+                        $('#addUserModal').modal('hide');
+                        window.Toast.success('操作成功');
+                        loadUsers(1);
+                    } else {
+                        window.Toast.error(res.msg || '操作失败');
+                    }
+                },
+                error: function() {
+                    window.Toast.error('服务器响应异常，请重试');
+                }
+            });
+        });
+
+        // 绑定过滤事件
         $('#btnSearchUser').on('click', () => loadUsers(1));
         $('#userKeyword').on('keypress', e => { if(e.which === 13) loadUsers(1); });
         $('#userState').on('change', () => loadUsers(1));
+        $('#userRole').on('change', () => loadUsers(1));
 
-        // 分页按钮绑定
+        // 绑定分页事件
         $('#btnFirstPage').on('click', () => loadUsers(1));
         $('#btnLastPage').on('click', () => loadUsers(totalPages));
         $('#btnPrevPage').on('click', () => { if(currentPage > 1) loadUsers(currentPage - 1); });
         $('#btnNextPage').on('click', () => { if(currentPage < totalPages) loadUsers(currentPage + 1); });
 
+        // 绑定全选事件
         $('#selectAll').on('change', function() { $('.user-checkbox').prop('checked', this.checked); });
 
-        // 提交编辑信息
+        // 提交编辑表单数据
         $('#btnSubmitEdit').on('click', function() {
             const formData = new FormData(document.getElementById('editUserForm'));
             $.ajax({
@@ -344,7 +454,7 @@
 
             selectedIds.forEach(id => {
                 const user = allUsersData.find(u => u.id == id);
-                if (user && user.state === 0) targetIds.push(id);
+                if (user && user.state == 0) targetIds.push(id);
                 else skipCount++;
             });
 
@@ -367,7 +477,7 @@
 
             selectedIds.forEach(id => {
                 const user = allUsersData.find(u => u.id == id);
-                if (user && user.state === 1) targetIds.push(id);
+                if (user && user.state == 1) targetIds.push(id);
                 else skipCount++;
             });
 
@@ -380,13 +490,14 @@
             window.Toast.confirm('确认批量禁用', msg, () => updateUserStatus(targetIds, 0));
         });
 
+        // 批量重置
         $('#btnBatchReset').click(function() {
             const ids = $('.user-checkbox:checked').map((i, el) => el.value).get();
             if (!ids.length) return window.Toast.error('请选择用户');
             window.Toast.confirm('重置确认', `确认重置选中用户的密码吗？`, () => resetPassword(ids));
         });
 
-        // 实时更新预览图
+        // 预览头像
         $('#editPhoto').on('change', function() {
             const file = this.files[0];
             if (file) {
@@ -398,7 +509,6 @@
             }
         });
 
-        // 首次加载
         loadUsers(1);
     })();
 </script>

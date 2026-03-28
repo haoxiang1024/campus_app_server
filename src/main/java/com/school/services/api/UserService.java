@@ -16,7 +16,7 @@ public interface UserService {
      * @param password 密码
      * @return ServerResponse 包含注册用户信息和操作结果的响应对象
      */
-    ServerResponse register(String phone,String email,String password);
+    ServerResponse register(String phone,String email,String password,int role);
     
     /**
      * 用户登录

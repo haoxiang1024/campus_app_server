@@ -122,6 +122,6 @@ public interface AdminService {
      * @param state 用户状态 (1:启用, 0:禁用)
      * @return ServerResponse
      */
-    ServerResponse getUserListByPage(int page, int pageSize, String keyword, Integer state);
+    ServerResponse getUserListByPage(int page, int pageSize, String keyword, Integer state, Integer role);
 }
 

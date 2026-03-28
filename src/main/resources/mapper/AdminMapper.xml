@@ -99,6 +99,9 @@
             <if test="state != null">
                 AND state = #{state}
             </if>
+            <if test="role != null">
+                AND role = #{role}
+            </if>
         </where>
         ORDER BY id ASC
     </select>

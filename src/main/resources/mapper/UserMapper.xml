@@ -55,6 +55,9 @@
         <if test="points != null">
             points =  #{points},
         </if>
+            <if test="role != null">
+                role = #{role},
+            </if>
 
         </set>
         WHERE id = #{id}

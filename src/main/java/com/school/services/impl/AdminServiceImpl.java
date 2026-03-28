@@ -357,12 +357,12 @@ public class AdminServiceImpl implements AdminService {
      * 分页获取用户列表 (包含关键字和状态筛选)
      */
     @Override
-    public ServerResponse getUserListByPage(int page, int pageSize, String keyword, Integer state) {
+    public ServerResponse getUserListByPage(int page, int pageSize, String keyword, Integer state, Integer role) {
         // 开启分页插件
         PageHelper.startPage(page, pageSize);
 
         // 执行多条件联合查询
-        List<User> list = adminMapper.getUserListByCondition(keyword, state);
+        List<User> list = adminMapper.getUserListByCondition(keyword, state, role);
 
         // 封装分页信息
         PageInfo<User> pageInfo = new PageInfo<>(list);
