@@ -6,12 +6,11 @@
     <link href="./css/bootstrap.min.css" rel="stylesheet">
     <link href="./css/sweetalert2.min.css" rel="stylesheet">
     <link rel="icon" href="./svgs/favicon/favicon.svg" type="image/x-icon" >
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         body { background-color: #f8f9fa; display: flex; align-items: center; height: 100vh; }
         .login-card { width: 100%; max-width: 400px; margin: auto; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); background: #fff; border-radius: 10px; }
-        .password-toggle { position: relative; }
-        .password-toggle .toggle-icon { position: absolute; right: 10px; top: 70%; transform: translateY(-50%); cursor: pointer; color: #6c757d; }
     </style>
 </head>
 <body>
@@ -23,10 +22,14 @@
             <label class="form-label">用户名</label>
             <input type="text" name="username" class="form-control" required placeholder="请输入管理员账号">
         </div>
-        <div class="mb-3 password-toggle">
+        <div class="mb-3">
             <label class="form-label">密码</label>
-            <input type="password" name="password" class="form-control" required placeholder="请输入密码">
-            <span class="toggle-icon" onclick="togglePassword()">👁️</span>
+            <div class="input-group">
+                <input type="password" name="password" id="passwordInput" class="form-control" required placeholder="请输入密码">
+                <button class="btn btn-outline-secondary" type="button" id="togglePasswordBtn">
+                    <i class="fa fa-eye"></i>
+                </button>
+            </div>
         </div>
         <button type="submit" class="btn btn-primary w-100" id="loginBtn">登录</button>
     </form>
@@ -36,11 +39,17 @@
 <script src="./js/jquery.min.js"></script>
 <script>
     // 密码显示/隐藏切换
-    function togglePassword() {
-        const pwdInput = $('input[name="password"]');
-        const type = pwdInput.attr('type') === 'password' ? 'text' : 'password';
-        pwdInput.attr('type', type);
-    }
+    $('#togglePasswordBtn').on('click', function() {
+        const pwdInput = $('#passwordInput');
+        const icon = $(this).find('i');
+        if (pwdInput.attr('type') === 'password') {
+            pwdInput.attr('type', 'text');
+            icon.removeClass('fa-eye').addClass('fa-eye-slash');
+        } else {
+            pwdInput.attr('type', 'password');
+            icon.removeClass('fa-eye-slash').addClass('fa-eye');
+        }
+    });
 
     // 防抖标识
     let isSubmitting = false;
@@ -92,7 +101,6 @@
     $('#loginForm').on('submit', function(e) {
         e.preventDefault();
 
-
         const username = $.trim($('input[name="username"]').val());
         const password = $.trim($('input[name="password"]').val());
 
@@ -110,17 +118,14 @@
             return;
         }
 
-
         if (isSubmitting) return;
         isSubmitting = true;
         $('#loginBtn').text('登录中...').prop('disabled', true);
-
 
         const loginData = {
             phone: username,
             pwd: password
         };
-
 
         $.ajax({
             url: '/school/login',
@@ -141,7 +146,7 @@
                     sessionStorage.setItem("token", token);
                     Toast.success('登录成功');
                     setTimeout(() => {
-                         window.location.href = 'index.html';
+                        window.location.href = 'index.html';
                     }, 1000);
                 } else {
                     Toast.error(res.msg || '用户名或密码不正确');

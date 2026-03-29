@@ -68,8 +68,9 @@ public interface CommentMapper {
      * @return 该用户发表的评论列表
      */
     @Select("SELECT c.id, c.lostfound_id, c.user_id, c.content, c.state, c.parentId AS parentId, c.replyUserId AS replyUserId, c.create_time, u.nickname, u.photo " +
-            "FROM comment c LEFT JOIN user u ON c.user_id = u.id WHERE c.state = 1  " +
-            "ORDER BY c.create_time DESC; ")
+            "FROM comment c LEFT JOIN user u ON c.user_id = u.id " +
+            "WHERE c.state = 1 AND c.user_id = #{user_id} " +
+            "ORDER BY c.create_time DESC")
     List<Comment> getComments(@Param("user_id") int userId);
 
 }

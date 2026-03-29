@@ -147,7 +147,12 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">初始密码 <span class="text-danger">*</span></label>
-                        <input type="password" class="form-control form-control-sm" name="password" required value="a12345678">
+                        <div class="input-group input-group-sm">
+                            <input type="password" class="form-control" name="password" id="addPasswordInput" required value="a12345678">
+                            <button class="btn btn-outline-secondary" type="button" id="toggleAddPassword">
+                                <i class="fa fa-eye"></i>
+                            </button>
+                        </div>
                         <div class="form-text">默认初始密码为 a12345678</div>
                     </div>
                 </form>
@@ -375,8 +380,24 @@
         // 打开新增弹窗
         window.openAddModal = function() {
             $('#addUserForm')[0].reset();
+            // 重置密码输入框类型为 password 并恢复图标
+            $('#addPasswordInput').attr('type', 'password');
+            $('#toggleAddPassword i').removeClass('fa-eye-slash').addClass('fa-eye');
             $('#addUserModal').modal('show');
         };
+
+        // 切换密码显示隐藏状态
+        $('#toggleAddPassword').on('click', function() {
+            const pwdInput = $('#addPasswordInput');
+            const icon = $(this).find('i');
+            if (pwdInput.attr('type') === 'password') {
+                pwdInput.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                pwdInput.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        });
 
         // 提交新增用户
         $('#btnSubmitAdd').on('click', function() {
