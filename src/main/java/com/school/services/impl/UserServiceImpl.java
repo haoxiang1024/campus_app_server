@@ -12,9 +12,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -47,20 +55,34 @@ public class UserServiceImpl implements UserService {
         String sex=Util.SexRandom(); // 随机性别
         String nickname = Util.NickNameRandom();//随机获取昵称
         String photo; // 头像URL
+        String fileName;//文件名
         int state=1;//状态：1启用 0禁用 role:0普通用户 1管理员
-        
         // 密码加密处理
         String hashedPwd=Util.encryptPwd(password);
         
         // 获取随机头像
         try {
             photo = Util.ImageSearch("头像");//随机获取头像
+            // 定义本地保存目录变量
+            String saveDirectory = "./upload/";
+            // 生成UUID文件名
+            fileName = UUID.randomUUID() + ".jpg";
+            // 构建本地目标文件路径
+            Path targetPath = Paths.get(saveDirectory, fileName);
+            // 确保目标目录及其父目录存在
+            Files.createDirectories(targetPath.getParent());
+            // 解析URL对象
+            URL url = new URI(photo).toURL();
+            // 打开输入流并拷贝至本地文件
+            try (InputStream in = url.openStream()) {
+                Files.copy(in, targetPath, StandardCopyOption.REPLACE_EXISTING);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         
         // 创建用户对象
-        User user = new User(photo,phone,sex,points,time,email,state,role,nickname,hashedPwd);
+        User user = new User(fileName,phone,sex,points,time,email,state,role,nickname,hashedPwd);
         
         // 验证手机号是否已经注册过
         List<User> userList = userMapper.getalll();

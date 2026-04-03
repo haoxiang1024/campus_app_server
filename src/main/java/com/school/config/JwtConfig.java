@@ -13,16 +13,16 @@ public class JwtConfig {
     @Value("${jwt.secret}")
     private String secret;
 
-    // 从配置文件读取Token过期时间（可选）
+    // 从配置文件读取Token过期时间
     @Value("${jwt.expire}")
     private long expire;
 
-    // 获取密钥（对外提供）
+    // 获取密钥
     public String getSecret() {
         return secret;
     }
 
-    // 获取过期时间（对外提供）
+    // 获取过期时间
     public long getExpire() {
         return expire;
     }
