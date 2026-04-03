@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
         try {
             photo = Util.ImageSearch("头像");//随机获取头像
             // 定义本地保存目录变量
-            String saveDirectory = "./upload/";
+            String saveDirectory = "upload/";
             // 生成UUID文件名
             fileName = UUID.randomUUID() + ".jpg";
             // 构建本地目标文件路径

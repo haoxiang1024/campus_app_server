@@ -27,7 +27,7 @@ logging:
     com.school.mapper: debug
 file:
   upload:
-    path: ./school/upload/
+    path: ./upload/
 pagehelper:
   helper-dialect: mysql          # 指定数据库方言
   reasonable: true
