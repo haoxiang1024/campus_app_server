@@ -103,22 +103,22 @@ public class LostFoundServiceImpl implements LostFoundService {
         // 将JSON字符串解析为LostFound实体对象
         LostFound lostFound = JSON.parseObject(lostfoundJson, LostFound.class);
         //敏感词检测
-//        if(sensitiveWordUtil.contains(lostFound.getContent())||sensitiveWordUtil.contains(lostFound.getTitle())||sensitiveWordUtil.contains(lostFound.getPlace())){
-//            lostFound.setState("已驳回");
-//            Integer userId = lostFound.getUserId();
-//            lostFoundMapper.addLostFound(lostFound);
-//            //扣除积分
-//            userMapper.deductPoints(lostFound.getUserId(),50 );
-//            //记录积分流水
-//            PointHistory history = new PointHistory();
-//            history.setUser_id(userId);
-//            history.setType(4); //系统扣除
-//            history.setPoints_changed(-50);
-//            history.setDescription("发布违规信息");
-//            pointHistoryMapper.insert(history);
-//            return ServerResponse.createServerResponseByFail("内容包含敏感词，扣除50积分，请重新发布内容");
-//        }
-//
+        if(sensitiveWordUtil.contains(lostFound.getContent())||sensitiveWordUtil.contains(lostFound.getTitle())||sensitiveWordUtil.contains(lostFound.getPlace())){
+            lostFound.setState("已驳回");
+            Integer userId = lostFound.getUserId();
+            lostFoundMapper.addLostFound(lostFound);
+            //扣除积分
+            userMapper.deductPoints(lostFound.getUserId(),50 );
+            //记录积分流水
+            PointHistory history = new PointHistory();
+            history.setUser_id(userId);
+            history.setType(4); //系统扣除
+            history.setPoints_changed(-50);
+            history.setDescription("发布违规信息");
+            pointHistoryMapper.insert(history);
+            return ServerResponse.createServerResponseByFail("内容包含敏感词，扣除50积分，请重新发布内容");
+        }
+
         // 调用数据访问层保存失物招领信息
         if (lostFoundMapper.addLostFound(lostFound)) {
             String targetType = lostFound.getType().equals("失物") ? "招领" : "失物";
