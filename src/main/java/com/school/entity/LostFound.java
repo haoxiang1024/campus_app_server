@@ -33,7 +33,7 @@ public class LostFound implements Serializable {
     /** 联系电话 */
     private String phone;
     
-    /** 状态：0-未解决，1-已解决 */
+    /** 状态： */
     private String state;
     
     /** 是否置顶：0-不置顶，1-置顶 */
@@ -74,41 +74,6 @@ public class LostFound implements Serializable {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
-    }
-
-    /**
-     * 全参数构造函数
-     * 
-     * @param id 失物招领ID
-     * @param title 标题
-     * @param img 图片URL
-     * @param pub_date 发布时间
-     * @param content 内容描述
-     * @param place 地点
-     * @param phone 联系电话
-     * @param state 状态
-     * @param stick 是否置顶
-     * @param lostfoundtype_id 类型ID
-     * @param user_id 用户ID
-     * @param nickname 用户昵称
-     * @param type 类型名称
-     * @param lostfoundtype 类型对象
-     */
-    public LostFound(Integer id, String title, String img, Date pub_date, String content, String place, String phone, String state, Integer stick, Integer lostfoundtype_id, Integer user_id, String nickname, String type, LostFoundType lostfoundtype) {
-        this.id = id;
-        this.title = title;
-        this.img = img;
-        this.pub_date = pub_date;
-        this.content = content;
-        this.place = place;
-        this.phone = phone;
-        this.state = state;
-        this.stick = stick;
-        this.lostfoundtype_id = lostfoundtype_id;
-        this.user_id = user_id;
-        this.nickname = nickname;
-        this.type = type;
-        this.lostfoundtype = lostfoundtype;
     }
 
     /**
