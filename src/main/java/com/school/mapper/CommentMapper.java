@@ -46,7 +46,7 @@ public interface CommentMapper {
             "c.reply_user_id, " +
             "u1.nickname AS nickname, " +
             "u1.photo AS photo, " +
-            "u2.nickname AS replyNickname " +
+            "u2.nickname AS reply_nickname " +
             "FROM comment c " +
             "LEFT JOIN user u1 ON c.user_id = u1.id " +
             "LEFT JOIN user u2 ON c.reply_user_id = u2.id " +

@@ -10,8 +10,8 @@
             c.user_id,
             c.content,
             c.state,
-            c.parentId AS parentId,
-            c.replyUserId AS replyUserId,
+            c.parent_id AS parentId,
+            c.reply_user_id AS replyUserId,
             c.create_time,
             u.nickname,
             u.photo
@@ -19,9 +19,9 @@
                  LEFT JOIN user u ON c.user_id = u.id
         WHERE c.state = 1
           AND (
-            c.replyUserId = #{userId}
+            c.reply_user_id = #{userId}
 
-                OR (c.parentId = 0 AND c.lostfound_id IN (SELECT id FROM lostfound WHERE user_id = #{userId}))
+                OR (c.parent_id = 0 AND c.lostfound_id IN (SELECT id FROM lostfound WHERE user_id = #{userId}))
             )
           AND c.user_id != #{userId}
         ORDER BY c.create_time DESC
