@@ -17,7 +17,6 @@ public class MessageVO {
     private List<MessageVO> replies; // 用于存放该留言下的所有二级评论
     private Integer replyUserId;    // 被回复人ID
     private String replyNickname;   // 被回复人昵称
-    private String rejectReason;
     private Integer state;
 
     public Integer getState() {
@@ -32,13 +31,7 @@ public class MessageVO {
         return replyUserId;
     }
 
-    public String getRejectReason() {
-        return rejectReason;
-    }
 
-    public void setRejectReason(String rejectReason) {
-        this.rejectReason = rejectReason;
-    }
 
     public void setReplyUserId(Integer replyUserId) {
         this.replyUserId = replyUserId;

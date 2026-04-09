@@ -10,7 +10,6 @@ public class CommentVO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
     private Date create_time;
     private String state;
-    private String rejectReason;
 
     // 联表查询出的额外字段
     private String nickname; // 评论人昵称
@@ -26,7 +25,6 @@ public class CommentVO {
                 ", content='" + content + '\'' +
                 ", create_time=" + create_time +
                 ", state='" + state + '\'' +
-                ", rejectReason='" + rejectReason + '\'' +
                 ", nickname='" + nickname + '\'' +
                 ", title='" + title + '\'' +
                 '}';
@@ -64,13 +62,7 @@ public class CommentVO {
         this.state = state;
     }
 
-    public String getRejectReason() {
-        return rejectReason;
-    }
 
-    public void setRejectReason(String rejectReason) {
-        this.rejectReason = rejectReason;
-    }
 
     public String getNickname() {
         return nickname;

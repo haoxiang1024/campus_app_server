@@ -205,12 +205,7 @@ public class AdminServiceImpl implements AdminService {
         comment.setId(commentId);
         comment.setState(state);
 
-        // 记录或清空驳回原因
-        if (state == 2) {
-            comment.setRejectReason(reason);
-        } else if (state == 1) {
-            comment.setRejectReason("");
-        }
+
 
         int rows = adminMapper.updateCommentSelective(comment);
         if (rows > 0) {

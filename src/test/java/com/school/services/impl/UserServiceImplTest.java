@@ -52,15 +52,15 @@ class UserServiceImplTest {
 //                userService.register(phoneNumber,email,"a12345678",0);
 //
 //            }
-//            List<User> userList = userMapper.getalll();
-//            for (User user : userList) {
-//                String response = rongCloudApi.getToken(String.valueOf(user.getId()), user.getNickname(), user.getPhoto());
-//                System.out.println("服务商返回原始数据: " + response);
-//                JSONObject jsonObject = JSON.parseObject(response);
-//                String token = jsonObject.getString("token");
-//                user.setIm_token(token);
-//                userMapper.updateUserInfo(user);
-//            }
+            List<User> userList = userMapper.getalll();
+            for (User user : userList) {
+                String response = rongCloudApi.getToken(String.valueOf(user.getId()), user.getNickname(), user.getPhoto());
+                System.out.println("服务商返回原始数据: " + response);
+                JSONObject jsonObject = JSON.parseObject(response);
+                String token = jsonObject.getString("token");
+                user.setIm_token(token);
+                userMapper.updateUserInfo(user);
+            }
 
 // 配置基础参数
 
@@ -133,6 +133,6 @@ class UserServiceImplTest {
 //
 //                }
 //            }
-        mockDataGenerator.generateData();
+       // mockDataGenerator.generateData();
     }
 }

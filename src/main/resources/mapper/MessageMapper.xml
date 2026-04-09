@@ -45,7 +45,6 @@
         m.create_time as createTime,
         m.state,              m.parent_id as parentId,
         m.reply_user_id as replyUserId,
-        m.reject_reason as rejectReason,
         u.nickname,
         u.photo,
         ru.nickname as replyNickname
@@ -82,7 +81,6 @@
             m.state,
             m.parent_id as parentId,
             m.reply_user_id as replyUserId,
-            m.reject_reason as rejectReason,
             u.nickname,
             u.photo,
             ru.nickname as replyNickname

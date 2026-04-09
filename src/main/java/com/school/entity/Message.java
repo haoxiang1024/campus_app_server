@@ -13,16 +13,9 @@ public class Message {
     private Integer state;
     private Integer parentId;
     private Integer replyUserId;
-    private String rejectReason;
     public Message() {}
 
-    public String getRejectReason() {
-        return rejectReason;
-    }
 
-    public void setRejectReason(String rejectReason) {
-        this.rejectReason = rejectReason;
-    }
 
     public Integer getReplyUserId() {
         return replyUserId;

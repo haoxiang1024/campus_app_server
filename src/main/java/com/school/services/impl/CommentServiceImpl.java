@@ -110,13 +110,13 @@ public class CommentServiceImpl implements CommentService {
         
         // 第一次遍历：区分主评论和回复评论
         for (Comment comment : allComments) {
-            if (comment.getParentId() == 0) {
+            if (comment.getParent_id() == 0) {
                 // 如果为 0，说明它是独立的一楼主评论
                 comment.setReplies(new ArrayList<>()); // 初始化回复列表
                 mainComments.add(comment);
             } else {
                 // 否则它是二楼回复，根据 parentId 放进对应的分组里
-                Integer parentId = comment.getParentId();
+                Integer parentId = comment.getParent_id();
                 // 使用computeIfAbsent确保父评论ID对应的列表存在
                 replyMap.computeIfAbsent(parentId, k -> new ArrayList<>()).add(comment);
             }

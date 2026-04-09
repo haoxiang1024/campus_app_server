@@ -37,72 +37,64 @@ public class Comment {
     private int state;
     
     /** 父评论ID，用于构建评论层级关系 */
-    private int parentId;
+    private int parent_id;
     
     /** 被回复用户的ID */
-    private int replyUserId;
+    private int reply_user_id;
     
     /** 被回复用户的昵称 */
-    private String replyNickname;
+    private String reply_nickname;
 
     /** 子评论列表，用于存储回复该评论的所有子评论 */
     private List<Comment> replies;
 
-    /**
-     * 获取父评论ID
-     * @return 父评论ID
-     */
-    public int getParentId() {
-        return parentId;
-    }
-    private String rejectReason;  // 驳回原因
-    /**
-     * 设置父评论ID
-     * @param parentId 父评论ID
-     */
-    public void setParentId(int parentId) {
-        this.parentId = parentId;
+
+
+    @Override
+    public String toString() {
+        return "Comment{" +
+                "id=" + id +
+                ", lostfound_id=" + lostfound_id +
+                ", user_id=" + user_id +
+                ", nickname='" + nickname + '\'' +
+                ", photo='" + photo + '\'' +
+                ", content='" + content + '\'' +
+                ", state=" + state +
+                ", parent_id=" + parent_id +
+                ", reply_user_id=" + reply_user_id +
+                ", reply_nickname='" + reply_nickname + '\'' +
+                ", replies=" + replies +
+                ", create_time=" + create_time +
+                '}';
     }
 
-    public String getRejectReason() {
-        return rejectReason;
+    public int getParent_id() {
+        return parent_id;
     }
 
-    public void setRejectReason(String rejectReason) {
-        this.rejectReason = rejectReason;
+    public void setParent_id(int parent_id) {
+        this.parent_id = parent_id;
     }
 
-    /**
-     * 获取被回复者用户ID
-     * @return 被回复者用户ID
-     */
-    public int getReplyUserId() {
-        return replyUserId;
+    public int getReply_user_id() {
+        return reply_user_id;
     }
 
-    /**
-     * 设置被回复者用户ID
-     * @param replyUserId 被回复者用户ID
-     */
-    public void setReplyUserId(int replyUserId) {
-        this.replyUserId = replyUserId;
+    public void setReply_user_id(int reply_user_id) {
+        this.reply_user_id = reply_user_id;
     }
 
-    /**
-     * 获取被回复者昵称
-     * @return 被回复者昵称
-     */
-    public String getReplyNickname() {
-        return replyNickname;
+    public String getReply_nickname() {
+        return reply_nickname;
     }
 
-    /**
-     * 设置被回复者昵称
-     * @param replyNickname 被回复者昵称
-     */
-    public void setReplyNickname(String replyNickname) {
-        this.replyNickname = replyNickname;
+    public void setReply_nickname(String reply_nickname) {
+        this.reply_nickname = reply_nickname;
     }
+
+
+
+
 
     /**
      * 获取子评论列表
@@ -120,24 +112,7 @@ public class Comment {
         this.replies = replies;
     }
 
-    @Override
-    public String toString() {
-        return "Comment{" +
-                "id=" + id +
-                ", lostfound_id=" + lostfound_id +
-                ", user_id=" + user_id +
-                ", nickname='" + nickname + '\'' +
-                ", photo='" + photo + '\'' +
-                ", content='" + content + '\'' +
-                ", state=" + state +
-                ", parentId=" + parentId +
-                ", replyUserId=" + replyUserId +
-                ", replyNickname='" + replyNickname + '\'' +
-                ", replies=" + replies +
-                ", rejectReason='" + rejectReason + '\'' +
-                ", create_time=" + create_time +
-                '}';
-    }
+
 
     /**
      * 获取评论状态

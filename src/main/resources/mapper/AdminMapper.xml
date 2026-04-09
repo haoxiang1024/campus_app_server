@@ -66,7 +66,7 @@
         c.id,
         c.content,
         c.create_time AS create_time,  c.state,
-        c.rejectReason AS rejectReason, u.nickname AS nickname,
+        u.nickname AS nickname,
         l.title AS title
         FROM comment c
         LEFT JOIN user u ON c.user_id = u.id
@@ -112,9 +112,7 @@
             <if test="state != null and state != ''">
                 state = #{state},
             </if>
-            <if test="rejectReason != null">
-                rejectReason = #{rejectReason},
-            </if>
+
         </set>
         WHERE id = #{id}
     </update>
