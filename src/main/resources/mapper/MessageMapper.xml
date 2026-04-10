@@ -65,7 +65,7 @@
 
     <update id="updateMessageState">
         UPDATE message
-        SET state = #{state}, reject_reason = #{reason}
+        SET state = #{state}
         WHERE id = #{id}
     </update>
 

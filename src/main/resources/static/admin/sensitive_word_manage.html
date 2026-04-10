@@ -1,0 +1,202 @@
+<link href="./css/sweetalert2.min.css" rel="stylesheet">
+<style>
+  .content-wrapper { background: #ffffff !important; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 25px; margin: 15px; color: #333 !important; }
+  .text-custom-blue { color: #00aaff !important; }
+  .table-light th { background-color: #f8f9fa !important; color: #666 !important; font-weight: 600; }
+  .btn-outline-custom { color: #00aaff !important; border-color: #dee2e6 !important; }
+  .btn-outline-custom:hover:not(:disabled) { background-color: #00aaff !important; color: white !important; }
+  .btn-outline-custom:disabled { cursor: not-allowed; opacity: 0.5; }
+  .btn-link { text-decoration: none !important; }
+</style>
+
+<div class="content-wrapper">
+  <div class="d-flex justify-content-between align-items-center mb-4 gap-3 flex-wrap">
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-danger btn-sm" id="batchDeleteBtn">批量删除</button>
+      <button class="btn btn-warning btn-sm text-white px-3" onclick="openAddModal()">+ 添加敏感词</button>
+    </div>
+    <div class="d-flex gap-2">
+      <div class="input-group input-group-sm" style="width: 220px;">
+        <input type="text" id="searchInput" class="form-control" placeholder="搜索敏感词...">
+        <button class="btn btn-primary" type="button" id="searchBtn">
+          <i class="fa fa-search"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+      <tr>
+        <th style="width: 45px;"><input type="checkbox" id="selectAll" class="form-check-input"></th>
+        <th>序号</th>
+        <th>敏感词</th>
+        <th class="text-center">操作</th>
+      </tr>
+      </thead>
+      <tbody id="wordTableBody">
+      <tr><td colspan="4" class="text-center text-muted">正在检索数据...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="d-flex flex-column align-items-center mt-4">
+    <div class="d-flex align-items-center gap-3">
+      <div class="btn-group">
+        <button class="btn btn-sm btn-outline-custom px-3" id="btnFirstPage">首页</button>
+        <button class="btn btn-sm btn-outline-custom px-3" id="btnPrevPage">上一页</button>
+      </div>
+      <span id="pageInfo" class="text-custom-blue fw-bold">第 1 页 / 共 1 页</span>
+      <div class="btn-group">
+        <button class="btn btn-sm btn-outline-custom px-3" id="btnNextPage">下一页</button>
+        <button class="btn btn-sm btn-outline-custom px-3" id="btnLastPage">末页</button>
+      </div>
+    </div>
+    <div class="mt-2 text-muted small">共 <span id="totalCount">0</span> 条记录</div>
+  </div>
+</div>
+
+<div class="modal fade" id="addModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content shadow-lg border-0">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold text-custom-blue">添加敏感词</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addForm">
+          <div class="mb-3">
+            <label class="form-label">敏感词内容</label>
+            <input type="text" class="form-control" name="word" required placeholder="请输入敏感词">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="submitWord()">保存提交</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="./js/jquery.min.js"></script>
+<script src="./js/bootstrap.bundle.min.js"></script>
+<script src="./js/sweetalert2@11.js"></script>
+
+<script>
+  (function() {
+    let currentPage = 1;
+    let totalPages = 1;
+    const pageSize = 10;
+    let allData = [];
+
+    // 加载表格数据
+    function loadData(page) {
+      currentPage = page || 1;
+      const keyword = $('#searchInput').val().trim();
+
+      $('#wordTableBody').html('<tr><td colspan="4" class="text-center text-muted">正在检索最新数据...</td></tr>');
+
+      $.get('/school/admin/sensitive/list', { page: currentPage, pageSize: pageSize, keyword: keyword }, function(res) {
+        if(res && res.status === 0 && res.data) {
+          allData = res.data.list || [];
+          const totalItems = res.data.total || 0;
+          totalPages = res.data.totalPages || 1;
+
+          renderTable(allData);
+
+          $('#pageInfo').text(`第 ${currentPage} 页 / 共 ${totalPages} 页`);
+          $('#totalCount').text(totalItems);
+          $('#btnFirstPage, #btnPrevPage').prop('disabled', currentPage <= 1);
+          $('#btnNextPage, #btnLastPage').prop('disabled', currentPage >= totalPages);
+          $('#selectAll').prop('checked', false);
+        } else {
+          $('#wordTableBody').html('<tr><td colspan="4" class="text-center text-danger">数据加载失败</td></tr>');
+        }
+      }).fail(function() {
+        $('#wordTableBody').html('<tr><td colspan="4" class="text-center text-danger">网络异常</td></tr>');
+      });
+    }
+
+    // 渲染表格
+    function renderTable(data) {
+      let html = '';
+      if (!data || !data.length) {
+        html = '<tr><td colspan="4" class="text-center text-muted">暂无数据</td></tr>';
+      } else {
+        data.forEach((item, index) => {
+          const serialNum = (currentPage - 1) * pageSize + index + 1;
+          html += `<tr>
+                        <td><input type="checkbox" class="item-checkbox form-check-input" value="${item.word}"></td>
+                        <td>${serialNum}</td>
+                        <td class="fw-bold text-danger">${item.word}</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-link text-danger p-0" onclick="deleteWord('${item.word}')">删除</button>
+                        </td>
+                    </tr>`;
+        });
+      }
+      $('#wordTableBody').html(html);
+    }
+
+    // 批量删除
+    $('#batchDeleteBtn').on('click', function() {
+      const selectedWords = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get();
+      if (!selectedWords.length) return window.Toast.error('请先勾选项目');
+
+      window.Toast.confirm('批量删除', `确定要删除选中的 ${selectedWords.length} 个敏感词吗？`, () => {
+        $.post('/school/admin/sensitive/batchDelete', { words: selectedWords.join(',') }, (res) => {
+          if (res && res.status === 0) {
+            window.Toast.success('批量删除成功');
+            loadData(1);
+          } else window.Toast.error(res?.msg || '操作失败');
+        }).fail(() => window.Toast.error("网络异常"));
+      });
+    });
+
+    // 单个删除
+    window.deleteWord = (word) => {
+      window.Toast.confirm("删除确认", `确定删除敏感词【${word}】吗？`, () => {
+        $.post('/school/admin/sensitive/delete', { word: word }, (res) => {
+          if(res && res.status === 0) { window.Toast.success("已删除"); loadData(currentPage); }
+          else window.Toast.error(res?.msg || '删除失败');
+        }).fail(() => window.Toast.error('网络异常，删除失败'));
+      });
+    };
+
+    // 新增弹窗
+    window.openAddModal = () => {
+      $('#addForm')[0].reset();
+      new bootstrap.Modal('#addModal').show();
+    };
+
+    // 提交新增
+    window.submitWord = () => {
+      const addForm = $('#addForm')[0];
+      if (!addForm.checkValidity()) return addForm.reportValidity();
+
+      const word = $('#addForm [name="word"]').val().trim();
+
+      $.post('/school/admin/sensitive/add', { word: word }, (res) => {
+        if (res && res.status === 0) {
+          window.Toast.success("添加成功");
+          bootstrap.Modal.getInstance('#addModal').hide();
+          loadData(1);
+        } else window.Toast.error(res?.msg || "添加失败");
+      }).fail(() => window.Toast.error("网络异常"));
+    };
+
+    // 事件绑定
+    $('#searchBtn').on('click', () => loadData(1));
+    $('#searchInput').on('keypress', e => { if(e.which === 13) loadData(1); });
+    $('#selectAll').on('change', function() { $('.item-checkbox').prop('checked', this.checked); });
+    $('#btnFirstPage').on('click', () => loadData(1));
+    $('#btnLastPage').on('click', () => loadData(totalPages));
+    $('#btnPrevPage').on('click', () => { if(currentPage > 1) loadData(currentPage - 1); });
+    $('#btnNextPage').on('click', () => { if(currentPage < totalPages) loadData(currentPage + 1); });
+
+    // 初始化
+    loadData(1);
+  })();
+</script>

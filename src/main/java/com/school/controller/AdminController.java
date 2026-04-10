@@ -9,6 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
+
 /**
  * 管理员控制器类
  * 处理管理员相关的请求，包括用户管理、失物招领管理等
@@ -29,7 +31,8 @@ public class AdminController {
     private MessageService messageService;
     @Autowired
     private ShopService shopService;
-
+    @Autowired
+    private ISensitiveWordService sensitiveWordService;
     /**
      * 获取所有用户数据
      * @return 返回ServerResponse对象，包含所有用户信息
@@ -385,5 +388,40 @@ public class AdminController {
     @PostMapping("/pointHistory/delete")
     public ServerResponse delete(@RequestParam("id") Integer id) {
         return shopService.deletePointHistory(id);
+    }
+
+    //敏感词库
+    // 分页查询列表
+    @ResponseBody
+    @GetMapping("/sensitive/list")
+    public ServerResponse getList(@RequestParam(defaultValue = "1") int page,
+                                       @RequestParam(defaultValue = "10") int pageSize,
+                                       @RequestParam(required = false) String keyword) {
+        Map<String, Object> data = sensitiveWordService.getSensitiveWordList(page, pageSize, keyword);
+        return ServerResponse.createServerResponseBySuccess( data);
+    }
+
+    // 新增
+    @ResponseBody
+    @PostMapping("/sensitive/add")
+    public ServerResponse addWord(@RequestParam String word) {
+        boolean success = sensitiveWordService.addSensitiveWord(word);
+        return success ? ServerResponse.createServerResponseBySuccess("添加敏感词成功") : ServerResponse.createServerResponseByFail("添加失败或敏感词已存在");
+    }
+
+    // 删除单个
+    @ResponseBody
+    @PostMapping("/sensitive/delete")
+    public ServerResponse deleteWord(@RequestParam String word) {
+        boolean success = sensitiveWordService.deleteSensitiveWord(word);
+        return success ? ServerResponse.createServerResponseBySuccess("删除成功") : ServerResponse.createServerResponseByFail("删除失败");
+    }
+
+    // 批量删除
+    @ResponseBody
+    @PostMapping("/sensitive/batchDelete")
+    public ServerResponse batchDelete(@RequestParam String words) {
+        boolean success = sensitiveWordService.batchDeleteSensitiveWords(words);
+        return success ? ServerResponse.createServerResponseBySuccess("批量删除成功") : ServerResponse.createServerResponseByFail("批量删除失败");
     }
 }

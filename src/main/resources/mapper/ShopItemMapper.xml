@@ -3,7 +3,7 @@
 <mapper namespace="com.school.mapper.ShopItemMapper">
 
     <select id="selectAllActive" resultType="com.school.entity.ShopItem">
-        SELECT * FROM shop_item WHERE status = 1 AND stock > 0 ORDER BY create_time DESC
+        SELECT * FROM shop_item WHERE status = 1 AND stock > 0 ORDER BY id DESC
     </select>
 
     <select id="selectByPrimaryKey" resultType="com.school.entity.ShopItem">
