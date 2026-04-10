@@ -375,7 +375,14 @@ public class UserServiceImpl implements UserService {
             // 返回最新用户信息并处理头像路径
             User updatedUser = userMapper.userInfo(id);
             updatedUser.setPhoto(util.updatePic(updatedUser.getPhoto()));
-            return ServerResponse.createServerResponseBySuccess(updatedUser, "手机号修改成功");
+            // IM用户资料同步修改
+            String res=rongCloudApi.refresh(String.valueOf(updatedUser.getId()),updatedUser.getNickname(),updatedUser.getPhoto());
+            JSONObject jsonObject = JSON.parseObject(res);
+            String imcode = jsonObject.getString("code");
+            if(imcode.equals("200")){
+                return ServerResponse.createServerResponseBySuccess(updatedUser, "手机号修改成功");
+            }
+
         }
         return ServerResponse.createServerResponseByFail("修改失败，请稍后重试");
     }
