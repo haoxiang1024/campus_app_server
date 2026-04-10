@@ -11,7 +11,7 @@
  Target Server Version : 80045 (8.0.45)
  File Encoding         : 65001
 
- Date: 10/04/2026 15:39:22
+ Date: 10/04/2026 15:40:26
 */
 
 SET NAMES utf8mb4;
@@ -218,4 +218,109 @@ INSERT INTO `message` VALUES (7, 21, '那你', '2026-04-09 15:07:58', 1, 0, NULL
 INSERT INTO `message` VALUES (8, 21, '那你', '2026-04-09 15:08:01', 1, 7, 21);
 INSERT INTO `message` VALUES (9, 1, '小姐', '2026-04-10 14:46:38', 2, 0, NULL);
 INSERT INTO `message` VALUES (11, 22, '😭', '2026-04-10 15:18:08', 1, 0, NULL);
-INSERT INTO `message` 
+INSERT INTO `message` VALUES (12, 22, '还', '2026-04-10 15:18:11', 1, 11, 22);
+INSERT INTO `message` VALUES (13, 22, '饿', '2026-04-10 15:18:14', 1, 10, 22);
+INSERT INTO `message` VALUES (14, 22, '去', '2026-04-10 15:18:19', 1, 7, 21);
+INSERT INTO `message` VALUES (15, 22, '去', '2026-04-10 15:18:54', 1, 0, NULL);
+INSERT INTO `message` VALUES (16, 22, '去', '2026-04-10 15:19:01', 1, 0, NULL);
+INSERT INTO `message` VALUES (17, 22, '去', '2026-04-10 15:19:03', 1, 0, NULL);
+
+-- ----------------------------
+-- Table structure for point_history
+-- ----------------------------
+DROP TABLE IF EXISTS `point_history`;
+CREATE TABLE `point_history`  (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '记录ID',
+  `user_id` int NOT NULL COMMENT '关联用户ID',
+  `type` int NOT NULL COMMENT '变动类型：1-发布奖励, 2-退还积分, 3-兑换消耗, 4-系统扣除',
+  `points_changed` int NOT NULL COMMENT '变动数值(正负)',
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '变动描述',
+  `create_time` datetime NULL DEFAULT NULL COMMENT '记录创建时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `fk_history_user`(`user_id` ASC) USING BTREE,
+  CONSTRAINT `fk_history_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户积分变动历史表' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of point_history
+-- ----------------------------
+INSERT INTO `point_history` VALUES (1, 21, 4, -50, '发布违规信息被驳回扣除', '2026-04-10 13:57:38');
+INSERT INTO `point_history` VALUES (2, 21, 4, -50, '发布违规信息被驳回扣除', '2026-04-10 13:57:38');
+INSERT INTO `point_history` VALUES (3, 21, 3, -50, '兑换了商品：优惠券', '2026-04-10 14:14:56');
+INSERT INTO `point_history` VALUES (4, 1, 4, -50, '发布违规留言', '2026-04-10 14:46:38');
+INSERT INTO `point_history` VALUES (5, 1, 4, -50, '发布违规评论', '2026-04-10 14:46:51');
+INSERT INTO `point_history` VALUES (6, 1, 4, -50, '发布违规信息', '2026-04-10 14:47:33');
+INSERT INTO `point_history` VALUES (7, 22, 3, -500, '兑换了商品：运动手环', '2026-04-10 15:32:14');
+
+-- ----------------------------
+-- Table structure for shop_item
+-- ----------------------------
+DROP TABLE IF EXISTS `shop_item`;
+CREATE TABLE `shop_item`  (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '商品ID',
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '商品名称',
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '商品描述',
+  `image_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '商品图片URL',
+  `required_points` int NOT NULL COMMENT '兑换所需积分',
+  `stock` int NOT NULL DEFAULT 0 COMMENT '商品库存',
+  `status` int NULL DEFAULT 1 COMMENT '状态: 0-下架, 1-上架',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '积分商城商品表' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of shop_item
+-- ----------------------------
+INSERT INTO `shop_item` VALUES (1, '文具套装', '包含多种常用文具的实用套装，满足日常学习、考试与办公的书写需求，精致便携，是提升学习效率的好帮手。', 'dee86d40-0c46-45bc-8f95-2f22500ac501.jpg', 500, 20, 1);
+INSERT INTO `shop_item` VALUES (2, '小词典', '紧凑轻便的随身小词典，收录核心高频词汇，释义准确清晰，是语言学习和日常快速查阅的得力工具。', '03e4ca48-a041-47a4-98a3-97c294b01e55.jpg', 50, 10, 1);
+INSERT INTO `shop_item` VALUES (3, '优惠券', '超值专享购物优惠券，可在指定商城或活动范围内抵扣相应金额，让您的积分兑换更具性价比。', 'af187150-4cff-4411-9c3e-a048d61c7380.jpg', 50, 99, 1);
+INSERT INTO `shop_item` VALUES (4, '高等数学第7版上下册同济大学', '经典高校理工科教材，内容详实、逻辑严谨，涵盖微积分等全部核心知识点，助力期末冲刺与考研复习。', '8acfd498-b16a-4f51-b143-64e4aa840156.jpg', 500, 10, 1);
+INSERT INTO `shop_item` VALUES (5, '水杯', '采用食品级安全环保材质制成的优质水杯，容量适中，密封防漏设计，无论日常办公还是户外运动都非常适合携带。', '36aab817-d58e-48dc-9565-c7d8c559f178.jpg', 1000, 20, 1);
+INSERT INTO `shop_item` VALUES (6, '运动手环', '智能便携的运动手环，支持计步、心率监测及睡眠质量分析等多种功能，轻巧贴合手腕，全方位记录您的健康生活数据。', 'b78bef2f-0542-45f3-849d-cce77be023ee.jpg', 500, 9, 1);
+
+-- ----------------------------
+-- Table structure for user
+-- ----------------------------
+DROP TABLE IF EXISTS `user`;
+CREATE TABLE `user`  (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '用户唯一标识ID',
+  `nickname` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '用户昵称',
+  `phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '用户手机号码',
+  `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '用户邮箱地址',
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '用户登录密码',
+  `photo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '用户头像URL',
+  `sex` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '用户性别',
+  `points` int NULL DEFAULT 0 COMMENT '用户当前积分余额',
+  `reg_date` datetime NULL DEFAULT NULL COMMENT '用户注册时间',
+  `state` int NULL DEFAULT 0 COMMENT '用户账户状态：0-正常，1-禁用',
+  `role` int NULL DEFAULT 0 COMMENT '用户角色权限：0-普通用户，1-管理员',
+  `im_token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '即时通讯token',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户信息表' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of user
+-- ----------------------------
+INSERT INTO `user` VALUES (1, 'admin', '18682675515', '3502777299@qq.com', '$2a$12$Ikp/n4voUd3RAiwF9YFZr.hHM3j60HYtE37TMqGIquuaqYCyTo3YG', '62acf3a1-81f7-4e43-bf8b-a6e18a6794be.jpg', '男', 350, '2026-04-03 15:49:11', 1, 1, 'j3iWf2UVvHvWe8Gagt9eVucOVPaubDvP@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (2, '小卷毛', '15181544770', '智宸.陆@yahoo.com', '$2a$12$Lc.uwEMhuHykVt0Jhu504eM4dV.Kuwx2JHrH5ucePk0g1hMnzOyQO', '3bb432c6-4e75-49b3-bba2-3e94984b8074.jpg', '男', 100, '2026-04-03 15:49:15', 1, 0, 'REsGtneW7IrWe8Gagt9eVqwORvtZaE4u@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (3, '小豆豆', '14769903669', '炫明.幸@yahoo.com', '$2a$12$r38YVOyy8FUGzoAJPsS.NOkojgEo6vF5LN3mI9zzXtkyu4AU4vHMm', '855f056a-e4ab-4946-9bdd-00af77ffcce7.jpg', '男', 100, '2026-04-03 15:49:18', 1, 0, 'uEv3PrRXazPWe8Gagt9eVoaRPdmtO5Li@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (4, '小米', '17788266423', '雨泽.康@gmail.com', '$2a$12$Ehcvkxw5rxa9ZLGbIcfrvOsTMqUejdD7xvGm6tgVFM771u1lpU/uS', 'ea8419f7-a7ca-47c1-801c-307c62c54c91.jpg', '女', 100, '2026-04-03 15:49:21', 1, 0, 'ec4uURaQfdvWe8Gagt9eVpFZeG7y2OPD@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (5, '阿宝', '17673297533', '静.逄@yahoo.com', '$2a$12$VOxsIOilu9YwJDxyGt5dxO1UF27hkG15HyRvbbpj0jFr9mVFaZiH.', '8d6efdfe-75c5-4af3-8b03-1dab67c02f1b.jpg', '女', 100, '2026-04-03 15:49:22', 1, 0, 'JxJ3mLKujoXWe8Gagt9eVs4mGIlHP9dW@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (6, '小葡萄', '17742030782', '梓晨.鲁@hotmail.com', '$2a$12$kVggIOHaYTmFCo61h9IXc.STtnC5lY.2R.Q/t3HUSSoWBmPUqaOgm', '7790af45-30ad-4577-8b52-68fb43115342.jpg', '女', 100, '2026-04-03 15:49:25', 1, 0, 'AyJOFRDS87XWe8Gagt9eVszO742jh5ci@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (7, '小娃', '14709633758', '擎苍.空@yahoo.com', '$2a$12$7T2gD.fcxaX8lqlNuSZ1XOUTcu0oMEF4K40Mf4WlmSWZxXVaVRDZm', '89fea17e-7ff9-4d0a-80f7-2af7ca0eaca2.jpg', '女', 100, '2026-04-03 15:49:28', 1, 0, 'NRyEieMSTHjWe8Gagt9eVs0O7D3rBskk@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (8, '小铃铛', '18147050474', '明辉.闫@yahoo.com', '$2a$12$IbSFuyRu/ZztNepLO2jC2e3g1Cwn4sToU5wG3CUL/Sp7hPpXFX3W2', 'bafb77b5-243f-4ec0-815a-8d6a5b6c500e.jpg', '女', 100, '2026-04-03 15:49:31', 1, 0, 'iqIOlquMIk/We8Gagt9eVnTqxSP0bBBE@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (9, '阿宝', '15894563165', '君浩.印@hotmail.com', '$2a$12$0UGeAfERte0BxsgZXkcW3Omz3mTuCGYq8E7dA6eKpc4EtFUk50P/O', '88fdb2ef-5f43-4188-887f-e685c03019d9.jpg', '女', 100, '2026-04-03 15:49:34', 1, 0, 'NW2eRjU5pxjWe8Gagt9eVmaZb3q8V2R6@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (10, '小鹿', '15926158116', '苑博.宁@hotmail.com', '$2a$12$WX58xWIjXpz34UPeeAvQA.LFMMoYHkpMCMnt7VFth/DgctKzMifjW', 'c4a346af-eed8-4d1d-8a9e-c7ca0ad01999.jpg', '女', 100, '2026-04-03 15:49:36', 1, 0, 'YENqSwn9E1F506fu7H8tdDWEihbsQRy1@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (11, '小陀螺', '17677683529', '浩宇.松@gmail.com', '$2a$12$QhZMAvVJ7I8rzc7uRuyuYeA8LMQPHdyRDlLbSkUQEIWst2w8JKmRq', 'cbff736c-adaf-41ff-901e-acb7f204070f.jpg', '女', 100, '2026-04-03 15:49:38', 1, 0, 'nitDIF06LUB506fu7H8tdL6RLkP3bDkp@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (12, '多多', '14579175249', '凯瑞.靳@gmail.com', '$2a$12$REZoyRCkbnDh5WHCKcQ13uIDU5PEq8Z0DpVSKbB8rguGfHu9Q17Wi', 'c3c72e12-466b-4d04-8e4c-cdf58fb65f16.jpg', '女', 100, '2026-04-03 15:49:40', 1, 0, 'WKAiJ8lN/Rd506fu7H8tdE0njPdHlM+T@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (13, '小汪汪', '14750397104', '皓轩.吕@yahoo.com', '$2a$12$qyg8Dp.EKS3V.NlJHEwQqOwAcfhdyzeUd/hlOaS0FVYhbGIppc2YS', '58d46398-e674-4e77-84c5-dc8ccad14684.jpg', '女', 100, '2026-04-03 15:49:43', 1, 0, 'zfLaqHMtLfp506fu7H8tdMnIv2lhYUeu@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (14, '小飞花', '17109699777', '鹤轩.闵@gmail.com', '$2a$12$PDmYywCivPtcEkcnOXpO.eL2BOcJM76m/Uha30sT5/HPsfHbDR6Wm', 'e5be2928-acd7-4cd5-8d6f-8a60dac1b975.jpg', '女', 100, '2026-04-03 15:49:46', 1, 0, 'nC+ndUQBdUB506fu7H8tdLae3sRJnk8a@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (15, '小太阳', '15229652553', '伟宸.景@hotmail.com', '$2a$12$zcAoJTCvmX0NzGBREDlfo.dA5Wy7jBNz8inOXA1oxtlXAv/usrpR.', '8e56070c-3d4c-4b2f-baba-02160c1bf224.jpg', '男', 100, '2026-04-03 15:49:48', 1, 0, 'vpLd0CgOq9J506fu7H8tdBEbbMFtMr1t@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (16, '小太阳', '15274789455', '俊驰.庄@gmail.com', '$2a$12$Qlo7AQ5o9p96LIAUMjGzYeG3YUDykjuPQ4UZAoUlEBsN.mEofnqSS', '98b3ee2c-18a7-47af-af38-e82e613648be.jpg', '男', 100, '2026-04-03 15:49:51', 1, 0, 't7W3dgBVYpl506fu7H8tdB1a0sBw5OzY@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (17, '蜜蜂', '17209399858', '烨华.皇甫@yahoo.com', '$2a$12$P08qUbOVIlhL/j6ke9A3mOeTKtSLavEHbKbryDcB8jkfuDiGhjFTS', 'a7bc0acd-df58-4b6f-81e3-b5b8b8c1682a.jpg', '男', 100, '2026-04-03 15:49:54', 1, 0, '74XJDb3vhWV506fu7H8tdFq6A7F/YMG4@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (18, '小霸王', '17014149379', '思源.明@gmail.com', '$2a$12$LiAET5LXUggA1pvxkeUPOuJuFVLQJGl9blI2EXBfhJmDXrgNeL8fq', 'df245dc1-ff44-4f68-89ea-8a78028bd14b.jpg', '男', 100, '2026-04-03 15:49:56', 1, 0, 'cKE6emFrK91506fu7H8tdLcPPyfVgWkT@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (19, '小狮子', '15652071538', '擎苍.张@gmail.com', '$2a$12$VP7rJIyEOVW7cW90VuuIfuLm7htzwTh4l9r8neCiXt1dC26Flg2ai', '26514bc2-f722-4199-99c1-41e4ea27f066.jpg', '男', 100, '2026-04-03 15:49:59', 1, 0, '9q3wDyTRkfV506fu7H8tdFfENKB7gZ5E@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (20, '小丹', '17323403644', '伟祺.晋@gmail.com', '$2a$12$RBGSumg3U9oqd8tOGkiNx.V1iCp5bHnFEJXc0iGj31Dd3r2f6aHQi', '93a09e1e-011f-414c-9a7e-fc3add606829.jpg', '男', 100, '2026-04-03 15:52:05', 1, 0, '9/QXZdkVLal506fu7H8tdJwSx0fPizth@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (21, '小果', '18784212633', '3502777299@qq.com', '$2a$12$P4pUCjD0JIokvcNOmX0P5.IPp64vi4PbXLpwIo/84Qz6gaZwvYPa2', '43959d47-e69f-484b-bb93-0793ce0c0845.jpg', '男', 50, '2026-04-09 15:05:03', 1, 0, 'RVMe+PfShcx506fu7H8tdLgYNHyLmtLX@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (22, '茶', '18682675516', '3502777299@qq.com', '$2a$12$ntu/24EZAhkuj/pG90MmzuH9gJZJYAVngkgxNQbc..zsV.lxCKoCq', '2c8fdf1a-343c-421f-aeb9-ff8ff2f3aeb7.jpg', '女', 1000, '2026-04-10 15:14:10', 1, 0, '2Hi8AvjXPbh506fu7H8tdC3InJbkjgCg@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+
+SET FOREIGN_KEY_CHECKS = 1;
