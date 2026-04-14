@@ -104,11 +104,11 @@
                     <div class="row">
                         <div class="col-6 mb-3">
                             <label class="form-label">所需积分</label>
-                            <input type="number" class="form-control" id="itemPoints" name="required_points" required>
+                            <input type="number" class="form-control" id="itemPoints" name="required_points" min="1" oninput="value=value.replace(/[^\d]/g,'')" required>
                         </div>
                         <div class="col-6 mb-3">
                             <label class="form-label">库存</label>
-                            <input type="number" class="form-control" id="itemStock" name="stock" required>
+                            <input type="number" class="form-control" id="itemStock" name="stock" min="0" oninput="value=value.replace(/[^\d]/g,'')" required>
                         </div>
                     </div>
                     <div class="mb-3">
@@ -185,11 +185,12 @@
 
         window.saveItem = function() {
             const form = $('#itemForm')[0];
+            // 浏览器会根据 min="1" 自动拦截 0 并提示用户
             if (!form.checkValidity()) return form.reportValidity();
 
             const formData = new FormData(form);
 
-            // 拦截空文件提交，避免上传空文件流
+            // 防空文件提交
             const fileInput = $('#itemImageFile')[0];
             if (!fileInput.files || fileInput.files.length === 0) {
                 formData.delete('imageFile');
@@ -257,8 +258,8 @@
         window.showAddModal = () => {
             $('#itemForm')[0].reset();
             $('#itemId').val('');
-            // 清空旧的图片路径
             $('#itemImageUrl').val('');
+            $('#itemImageFile').val('');
             $('#itemImagePreview').attr('src', './img/default.png');
             $('#modalTitle').text('添加新商品');
             bootstrap.Modal.getOrCreateInstance('#itemModal').show();
@@ -266,8 +267,9 @@
 
         window.showEditModal = (item) => {
             $('#itemId').val(item.id);
-            // 绑定旧的图片路径
             $('#itemImageUrl').val(item.image_url || '');
+
+            $('#itemImageFile').val('');
 
             $('#itemName').val(item.name);
             $('#itemDescription').val(item.description || '');
