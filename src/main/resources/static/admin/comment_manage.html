@@ -98,8 +98,6 @@
 <script src="./js/sweetalert2@11.js"></script>
 
 <script>
-
-
     (function() {
         // 分页及数据状态变量
         let currentPage = 1;
@@ -167,6 +165,10 @@
                     if(item.state == 0) {
                         btns += `<button class="btn btn-sm btn-link text-success p-0 me-2 fw-bold" onclick="updateStatus(${item.id}, '已通过')">通过</button>`;
                         btns += `<button class="btn btn-sm btn-link text-warning p-0 me-2 fw-bold" onclick="updateStatus(${item.id}, '已驳回')">驳回</button>`;
+                    } else if(item.state == 1) {
+                        btns += `<button class="btn btn-sm btn-link text-warning p-0 me-2 fw-bold" onclick="updateStatus(${item.id}, '已驳回')">驳回</button>`;
+                    } else if(item.state == 2) {
+                        btns += `<button class="btn btn-sm btn-link text-success p-0 me-2 fw-bold" onclick="updateStatus(${item.id}, '已通过')">通过</button>`;
                     }
                     btns += `<button class="btn btn-sm btn-link text-danger p-0" onclick="deleteItem(${item.id})">删除</button>`;
 
@@ -187,20 +189,26 @@
         }
 
         // 批量操作核心逻辑
-        function batchOperate(targetStateText, confirmTitle, successMsg, requireReason = false) {
+        function batchOperate(targetStateText, confirmTitle, successMsg) {
             const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get();
             if (!selectedIds.length) return window.Toast.error('请先勾选项目');
 
-            const targetItems = allData.filter(item => selectedIds.includes(item.id.toString()) && item.state == 0);
-            if (targetItems.length === 0) return window.Toast.error('选中的记录中没有可处理的【待审核】项');
+            const targetItems = allData.filter(item => {
+                if (!selectedIds.includes(item.id.toString())) return false;
+                if (targetStateText === '已驳回') return item.state == 0 || item.state == 1;
+                if (targetStateText === '已通过') return item.state == 0 || item.state == 2;
+                return false;
+            });
+
+            if (targetItems.length === 0) return window.Toast.error('选中的记录中没有可处理的项');
 
             const stateCode = targetStateText === '已通过' ? 1 : 2;
 
-            const executeBatch = (reason = '') => {
+            const executeBatch = () => {
                 const promises = targetItems.map(item => $.post('/school/admin/updateCommentStatus', {
                     commentId: item.id,
                     state: stateCode,
-                    reason: reason
+                    reason: ''
                 }));
 
                 Promise.all(promises).then(results => {
@@ -213,16 +221,12 @@
                 });
             };
 
-            if (requireReason) {
-                window.Toast.prompt(confirmTitle, '请输入统一的驳回原因', executeBatch);
-            } else {
-                window.Toast.confirm(confirmTitle, `确定要将这 ${targetItems.length} 条记录标记为【${targetStateText}】吗？`, executeBatch);
-            }
+            window.Toast.confirm(confirmTitle, `确定要将这 ${targetItems.length} 条记录标记为【${targetStateText}】吗？`, executeBatch);
         }
 
         // 绑定批量审核按钮
-        $('#batchApproveBtn').on('click', () => batchOperate('已通过', '批量通过', '审核通过', false));
-        $('#batchRejectBtn').on('click', () => batchOperate('已驳回', '批量驳回', '已驳回', true));
+        $('#batchApproveBtn').on('click', () => batchOperate('已通过', '批量通过', '审核通过'));
+        $('#batchRejectBtn').on('click', () => batchOperate('已驳回', '批量驳回', '已驳回'));
 
         // 批量删除
         $('#batchDeleteBtn').on('click', function() {
@@ -243,15 +247,11 @@
 
         // 单条审核操作
         window.updateStatus = (id, state) => {
-            if (state === '已驳回') {
-                window.Toast.prompt('审核驳回', '说明驳回理由（可选）', (reason) => {
-                    sendUpdateRequest(id, state, reason);
-                });
-            } else {
-                window.Toast.confirm('审核通过', '确认通过该评论吗？', () => {
-                    sendUpdateRequest(id, state, '');
-                });
-            }
+            const confirmMsg = state === '已驳回' ? '确认驳回该评论吗？' : '确认通过该评论吗？';
+            const titleMsg = state === '已驳回' ? '审核驳回' : '审核通过';
+            window.Toast.confirm(titleMsg, confirmMsg, () => {
+                sendUpdateRequest(id, state, '');
+            });
         };
 
         // 发送状态更新请求
@@ -324,6 +324,5 @@
 
         // 初始化加载数据
         loadData(1);
-
     })();
 </script>
