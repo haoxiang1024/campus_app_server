@@ -510,13 +510,16 @@
         };
 
         window.submitRegistration = () => {
+            // 校验表单有效性
             const addForm = $('#addForm')[0];
             if (!addForm.checkValidity()) return addForm.reportValidity();
 
+            // 获取下拉框与文件数据
             const op = $('#addOp').val();
             const file = $('#upload_file')[0].files[0];
             if (!file) return window.Toast.error("请选择物品图片");
 
+            // 组装对象数据
             const itemData = {
                 title: $('#addForm [name="title"]').val().trim(),
                 place: $('#addForm [name="place"]').val().trim(),
@@ -530,12 +533,12 @@
                 stick: $('#addIsTop').val()
             };
 
+            // 构建表单数据
             const formData = new FormData();
             formData.append('upload_file', file);
-            formData.append('op', op);
-            formData.append(op === '失物' ? 'lostJson' : 'foundJson', JSON.stringify(itemData));
-            formData.append(op === '失物' ? 'foundJson' : 'lostJson', "");
+            formData.append('lostFoundJson', JSON.stringify(itemData));
 
+            // 提交数据
             $.ajax({
                 url: '/school/addLostFound',
                 type: 'POST',
