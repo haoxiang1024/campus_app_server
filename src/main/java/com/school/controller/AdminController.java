@@ -261,15 +261,14 @@ public class AdminController {
      * 更新评论状态 (通过/驳回)
      * @param commentId 评论ID
      * @param state 新的状态值
-     * @param reason 驳回原因（可选）
      */
     @ResponseBody
     @RequestMapping ("/updateCommentStatus")
     public ServerResponse updateCommentStatus(
             @RequestParam("commentId") Integer commentId,
-            @RequestParam("state") int state,
-            @RequestParam(value = "reason", required = false) String reason) {
-        return adminService.updateCommentStatus(commentId, state, reason);
+            @RequestParam("state") int state
+            ) {
+        return adminService.updateCommentStatus(commentId, state);
     }
 
     /**

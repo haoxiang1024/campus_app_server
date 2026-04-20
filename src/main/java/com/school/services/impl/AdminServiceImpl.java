@@ -200,13 +200,10 @@ public class AdminServiceImpl implements AdminService {
      * 更新评论状态
      */
     @Override
-    public ServerResponse updateCommentStatus(Integer commentId, int state, String reason) {
+    public ServerResponse updateCommentStatus(Integer commentId, int state) {
         Comment comment = new Comment();
         comment.setId(commentId);
         comment.setState(state);
-
-
-
         int rows = adminMapper.updateCommentSelective(comment);
         if (rows > 0) {
             return ServerResponse.createServerResponseBySuccess("操作成功");

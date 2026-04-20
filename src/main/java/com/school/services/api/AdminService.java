@@ -69,7 +69,7 @@ public interface AdminService {
     /**
      * 更新评论状态
      */
-    ServerResponse updateCommentStatus(Integer commentId, int state, String reason);
+    ServerResponse updateCommentStatus(Integer commentId, int state);
 
     /**
      * 删除评论

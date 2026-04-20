@@ -207,8 +207,8 @@
             const executeBatch = () => {
                 const promises = targetItems.map(item => $.post('/school/admin/updateCommentStatus', {
                     commentId: item.id,
-                    state: stateCode,
-                    reason: ''
+                    state: stateCode
+
                 }));
 
                 Promise.all(promises).then(results => {
