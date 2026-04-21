@@ -11,7 +11,7 @@
  Target Server Version : 80045 (8.0.45)
  File Encoding         : 65001
 
- Date: 10/04/2026 15:40:26
+ Date: 21/04/2026 14:59:47
 */
 
 SET NAMES utf8mb4;
@@ -26,7 +26,7 @@ CREATE TABLE `comment`  (
   `lostfound_id` int NOT NULL COMMENT '关联的失物招领信息ID',
   `user_id` int NOT NULL COMMENT '评论用户的ID',
   `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '评论内容',
-  `state` int NULL DEFAULT 0 COMMENT '评论状态：0-正常，1-删除',
+  `state` int NULL DEFAULT 0 COMMENT '评论状态：0 待审核 1已通过 2 已驳回',
   `parent_id` int NULL DEFAULT 0 COMMENT '父评论ID',
   `reply_user_id` int NULL DEFAULT NULL COMMENT '被回复用户的ID',
   `create_time` datetime NULL DEFAULT NULL COMMENT '评论创建时间',
@@ -36,25 +36,13 @@ CREATE TABLE `comment`  (
   INDEX `fk_comment_parent`(`parent_id` ASC) USING BTREE,
   CONSTRAINT `fk_comment_lostfound` FOREIGN KEY (`lostfound_id`) REFERENCES `lostfound` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_comment_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 46 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '评论信息表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 48 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '评论信息表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of comment
 -- ----------------------------
-INSERT INTO `comment` VALUES (32, 1, 2, '1', 1, 0, 0, '2026-04-09 15:38:55');
-INSERT INTO `comment` VALUES (33, 1, 21, '2', 1, 32, 2, '2026-04-09 15:39:13');
-INSERT INTO `comment` VALUES (34, 1, 2, '345', 1, 33, 21, '2026-04-09 15:39:32');
-INSERT INTO `comment` VALUES (35, 2, 1, '小姐', 2, 0, 0, '2026-04-10 14:46:51');
-INSERT INTO `comment` VALUES (36, 5, 22, '😀', 1, 0, 0, '2026-04-10 15:14:43');
-INSERT INTO `comment` VALUES (37, 5, 22, '😅', 1, 36, 22, '2026-04-10 15:14:50');
-INSERT INTO `comment` VALUES (38, 1, 22, '😊', 1, 0, 0, '2026-04-10 15:15:03');
-INSERT INTO `comment` VALUES (39, 4, 22, '不', 1, 0, 0, '2026-04-10 15:15:30');
-INSERT INTO `comment` VALUES (40, 4, 22, '不', 1, 39, 22, '2026-04-10 15:15:34');
-INSERT INTO `comment` VALUES (41, 16, 22, '🤣', 1, 0, 0, '2026-04-10 15:16:26');
-INSERT INTO `comment` VALUES (42, 16, 22, '要', 1, 41, 22, '2026-04-10 15:16:30');
-INSERT INTO `comment` VALUES (43, 1, 22, '她', 1, 38, 22, '2026-04-10 15:17:03');
-INSERT INTO `comment` VALUES (44, 1, 22, '33号', 1, 32, 2, '2026-04-10 15:17:29');
-INSERT INTO `comment` VALUES (45, 1, 22, '吗', 1, 32, 21, '2026-04-10 15:17:36');
+INSERT INTO `comment` VALUES (46, 2, 23, '不会', 1, 0, 0, '2026-04-14 15:24:41');
+INSERT INTO `comment` VALUES (47, 2, 23, '好', 1, 0, 0, '2026-04-14 15:24:44');
 
 -- ----------------------------
 -- Table structure for exchange_order
@@ -79,12 +67,11 @@ CREATE TABLE `exchange_order`  (
   INDEX `fk_order_item`(`item_id` ASC) USING BTREE,
   CONSTRAINT `fk_order_item` FOREIGN KEY (`item_id`) REFERENCES `shop_item` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_order_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '积分兑换订单表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '积分兑换订单表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of exchange_order
 -- ----------------------------
-INSERT INTO `exchange_order` VALUES (1, 'EX1775801696111', 21, 3, '优惠券', 50, '46E83EAB', 1, '2026-04-10 14:14:56', '2026-04-10 14:20:15', 1);
 
 -- ----------------------------
 -- Table structure for lostfound
@@ -111,21 +98,21 @@ CREATE TABLE `lostfound`  (
   INDEX `fk_lostfound_type`(`lostfoundtype_id` ASC) USING BTREE,
   CONSTRAINT `fk_lostfound_type` FOREIGN KEY (`lostfoundtype_id`) REFERENCES `lostfound_type` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_lostfound_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 58 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '失物招领信息表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 60 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '失物招领信息表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of lostfound
 -- ----------------------------
-INSERT INTO `lostfound` VALUES (1, '丢失水杯', '94fc4dfb-d8e2-47aa-9f94-248cb9940ea2.jpg', '2026-04-04 15:25:21', '在西南科技大学(青义校区西区图书馆) 丢失了水杯，，联系电话：18682675515', '西南科技大学(青义校区西区图书馆)', '18682675515', '寻找中', 1, 4, 1, 'admin', '失物', 104.694491, 31.540717);
-INSERT INTO `lostfound` VALUES (2, '丢失水杯', '6e4365ed-13d8-4d23-ad0f-058e83d8bf05.jpg', '2026-04-04 15:25:21', '在西南科技大学-7食堂 丢失了水杯，，联系电话：17673297533', '西南科技大学-7食堂', '17673297533', '寻找中', 1, 4, 5, '阿宝', '失物', 104.699591, 31.543621);
-INSERT INTO `lostfound` VALUES (3, '丢失水杯', '4facd3e3-b938-4fb0-b83b-04d4993acea9.jpg', '2026-04-04 15:25:21', '在西南科技大学(青义校区东1教学楼) 丢失了水杯，，联系电话：17673297533', '西南科技大学(青义校区东1教学楼)', '17673297533', '寻找中', 1, 4, 5, '阿宝', '失物', 104.706371, 31.541627);
-INSERT INTO `lostfound` VALUES (4, '丢失手机', '68ea307e-1d55-4603-8a82-5c0444dfa9c6.jpg', '2026-04-04 15:25:21', '在西南科技大学东区-体育场 丢失了手机，，联系电话：14769903669', '西南科技大学东区-体育场', '14769903669', '寻找中', 1, 1, 3, '小豆豆', '失物', 104.710198, 31.543931);
-INSERT INTO `lostfound` VALUES (5, '丢失手机', '6f8251b0-ba5a-4b96-9a3f-822ba2340c72.jpg', '2026-04-04 15:25:21', '在西南科技大学(青义校区)-西7教学楼 丢失了手机，，联系电话：14769903669', '西南科技大学(青义校区)-西7教学楼', '14769903669', '寻找中', 1, 1, 3, '小豆豆', '失物', 104.693323, 31.543984);
-INSERT INTO `lostfound` VALUES (6, '丢失手机', '617d2bfd-27e8-4714-a10c-00692fd18ab3.jpg', '2026-04-04 15:25:21', '在西南科技大学(青义校区西区图书馆) 丢失了手机，，联系电话：18682675515', '西南科技大学(青义校区西区图书馆)', '18682675515', '寻找中', 1, 1, 1, 'admin', '失物', 104.694491, 31.540717);
-INSERT INTO `lostfound` VALUES (7, '丢失黑色签字笔', '315e3eb8-e623-47ea-beee-2e4d52be76f4.jpg', '2026-04-04 15:25:21', '在西南科技大学-7食堂 丢失了黑色签字笔，，联系电话：14769903669', '西南科技大学-7食堂', '14769903669', '寻找中', 1, 4, 3, '小豆豆', '失物', 104.699591, 31.543621);
-INSERT INTO `lostfound` VALUES (8, '丢失黑色签字笔', 'b340f516-ed05-4225-be15-d7ebeccc8690.jpg', '2026-04-04 15:25:21', '在西南科技大学(青义校区东1教学楼) 丢失了黑色签字笔，，联系电话：17788266423', '西南科技大学(青义校区东1教学楼)', '17788266423', '寻找中', 1, 4, 4, '小米', '失物', 104.706371, 31.541627);
-INSERT INTO `lostfound` VALUES (9, '丢失黑色签字笔', 'efac7436-34a1-4107-abc7-d17f69bcf2a2.jpg', '2026-04-04 15:25:21', '在西南科技大学东区-体育场 丢失了黑色签字笔，，联系电话：15181544770', '西南科技大学东区-体育场', '15181544770', '寻找中', 1, 4, 2, '小卷毛', '失物', 104.710198, 31.543931);
-INSERT INTO `lostfound` VALUES (10, '丢失耳机', 'e3c82710-9324-4eb5-8cb8-aee29d2abee9.jpg', '2026-04-04 15:25:21', '在西南科技大学(青义校区)-西7教学楼 丢失了耳机，，联系电话：15181544770', '西南科技大学(青义校区)-西7教学楼', '15181544770', '寻找中', 1, 1, 2, '小卷毛', '失物', 104.693323, 31.543984);
+INSERT INTO `lostfound` VALUES (1, '丢失水杯', '94fc4dfb-d8e2-47aa-9f94-248cb9940ea2.jpg', '2026-04-20 14:16:15', '在西南科技大学(青义校区西区图书馆) 丢失了水杯，，联系电话：18682675515', '西南科技大学(青义校区西区图书馆)', '18682675515', '寻找中', 1, 4, 1, 'admin', '失物', 104.694491, 31.540717);
+INSERT INTO `lostfound` VALUES (2, '丢失水杯', '6e4365ed-13d8-4d23-ad0f-058e83d8bf05.jpg', '2026-04-19 20:47:16', '在西南科技大学-7食堂 丢失了水杯，，联系电话：17673297533', '西南科技大学-7食堂', '17673297533', '寻找中', 1, 4, 5, '阿宝', '失物', 104.699591, 31.543621);
+INSERT INTO `lostfound` VALUES (3, '丢失水杯', '4facd3e3-b938-4fb0-b83b-04d4993acea9.jpg', '2026-04-19 20:47:35', '在西南科技大学(青义校区东1教学楼) 丢失了水杯，，联系电话：17673297533', '西南科技大学(青义校区东1教学楼)', '17673297533', '寻找中', 1, 4, 5, '阿宝', '失物', 104.706371, 31.541627);
+INSERT INTO `lostfound` VALUES (4, '丢失手机', '68ea307e-1d55-4603-8a82-5c0444dfa9c6.jpg', '2026-04-19 20:47:26', '在西南科技大学东区-体育场 丢失了手机，，联系电话：14769903669', '西南科技大学东区-体育场', '14769903669', '寻找中', 1, 1, 3, '小豆豆', '失物', 104.710198, 31.543931);
+INSERT INTO `lostfound` VALUES (5, '丢失手机', '6f8251b0-ba5a-4b96-9a3f-822ba2340c72.jpg', '2026-04-19 20:47:26', '在西南科技大学(青义校区)-西7教学楼 丢失了手机，，联系电话：14769903669', '西南科技大学(青义校区)-西7教学楼', '14769903669', '寻找中', 1, 1, 3, '小豆豆', '失物', 104.693323, 31.543984);
+INSERT INTO `lostfound` VALUES (6, '丢失手机', '617d2bfd-27e8-4714-a10c-00692fd18ab3.jpg', '2026-04-19 20:47:26', '在西南科技大学(青义校区西区图书馆) 丢失了手机，，联系电话：18682675515', '西南科技大学(青义校区西区图书馆)', '18682675515', '寻找中', 1, 1, 1, 'admin', '失物', 104.694491, 31.540717);
+INSERT INTO `lostfound` VALUES (7, '丢失黑色签字笔', '315e3eb8-e623-47ea-beee-2e4d52be76f4.jpg', '2026-04-19 20:47:26', '在西南科技大学-7食堂 丢失了黑色签字笔，，联系电话：14769903669', '西南科技大学-7食堂', '14769903669', '寻找中', 1, 4, 3, '小豆豆', '失物', 104.699591, 31.543621);
+INSERT INTO `lostfound` VALUES (8, '丢失黑色签字笔', 'b340f516-ed05-4225-be15-d7ebeccc8690.jpg', '2026-04-19 20:47:26', '在西南科技大学(青义校区东1教学楼) 丢失了黑色签字笔，，联系电话：17788266423', '西南科技大学(青义校区东1教学楼)', '17788266423', '寻找中', 1, 4, 4, '小米', '失物', 104.706371, 31.541627);
+INSERT INTO `lostfound` VALUES (9, '丢失黑色签字笔', 'efac7436-34a1-4107-abc7-d17f69bcf2a2.jpg', '2026-04-19 20:47:26', '在西南科技大学东区-体育场 丢失了黑色签字笔，，联系电话：15181544770', '西南科技大学东区-体育场', '15181544770', '寻找中', 1, 4, 2, '小卷毛', '失物', 104.710198, 31.543931);
+INSERT INTO `lostfound` VALUES (10, '丢失耳机', 'e3c82710-9324-4eb5-8cb8-aee29d2abee9.jpg', '2026-04-19 20:47:26', '在西南科技大学(青义校区)-西7教学楼 丢失了耳机，，联系电话：15181544770', '西南科技大学(青义校区)-西7教学楼', '15181544770', '寻找中', 1, 1, 2, '小卷毛', '失物', 104.693323, 31.543984);
 INSERT INTO `lostfound` VALUES (11, '丢失耳机', '726c7791-73dc-4335-baa3-d28a109c2533.jpg', '2026-04-04 14:33:28', '在西南科技大学(青义校区西区图书馆) 丢失了耳机，，联系电话：15181544770', '西南科技大学(青义校区西区图书馆)', '15181544770', '寻找中', 0, 1, 2, '小卷毛', '失物', 104.694491, 31.540717);
 INSERT INTO `lostfound` VALUES (12, '丢失耳机', '4973a9bd-cb61-405d-8bf4-4db3df96dd88.jpg', '2026-04-04 14:33:28', '在西南科技大学-7食堂 丢失了耳机，，联系电话：14769903669', '西南科技大学-7食堂', '14769903669', '寻找中', 0, 1, 3, '小豆豆', '失物', 104.699591, 31.543621);
 INSERT INTO `lostfound` VALUES (13, '找到水杯', 'e623470d-4264-4936-8f7d-cd0a46ec588f.jpg', '2026-04-04 15:25:33', '在西南科技大学(青义校区东1教学楼) 找到了水杯，，联系电话：18682675515', '西南科技大学(青义校区东1教学楼)', '18682675515', '待认领', 1, 4, 1, 'admin', '招领', 104.706371, 31.541627);
@@ -166,13 +153,8 @@ INSERT INTO `lostfound` VALUES (47, '找到钥匙', 'c1cabf62-41e6-494e-8460-d4a
 INSERT INTO `lostfound` VALUES (48, '丢失钥匙', 'e0f47934-4b0a-47dd-b05f-71b331e1ca8d.jpg', '2026-04-04 14:50:30', '在 西南科技大学-7食堂 丢失了钥匙，联系电话：18682675515', '西南科技大学-7食堂', '18682675515', '寻找中', 0, 5, 1, 'admin', '失物', 104.699591, 31.543621);
 INSERT INTO `lostfound` VALUES (49, '找到钥匙', 'de69822f-602f-48c1-93c3-486c261d590e.jpg', '2026-04-04 14:50:30', '在 西南科技大学-7食堂 找到了钥匙，联系电话：15181544770', '西南科技大学-7食堂', '15181544770', '待认领', 0, 5, 2, '小卷毛', '招领', 104.699591, 31.543621);
 INSERT INTO `lostfound` VALUES (50, '丢失雨伞', 'e1764a01-790c-4a00-9491-6eb136efa35a.jpg', '2026-04-04 14:50:30', '在 西南科技大学(青义校区西区图书馆) 丢失了雨伞，联系电话：15181544770', '西南科技大学(青义校区西区图书馆)', '15181544770', '寻找中', 0, 5, 2, '小卷毛', '失物', 104.694491, 31.540717);
-INSERT INTO `lostfound` VALUES (51, '找到雨伞', '41b15283-ff87-4e9b-ab4b-f1c5d3e20f81.jpg', '2026-04-04 14:50:30', '在 西南科技大学(青义校区)-西7教学楼 找到了雨伞，联系电话：14769903669', '西南科技大学(青义校区)-西7教学楼', '14769903669', '待认领', 0, 5, 3, '小豆豆', '招领', 104.693323, 31.543984);
-INSERT INTO `lostfound` VALUES (52, '2', 'b838b84d-afce-4195-a58e-a3e99d7b2a0c.jpg', '2026-04-04 15:56:03', '2', '中国四川省广安市广安区井河镇（黑沟院子）', '18682675515', '待审核', 0, 1, 1, NULL, '失物', 106.62948, 30.736891);
-INSERT INTO `lostfound` VALUES (53, '123', '0e3b523e-8408-42a6-a4a4-aca18d075e46.jpg', '2026-04-10 13:57:38', '123', '中国四川省广安市广安区井河镇（皂角岩）', '18784212634', '已驳回', 0, 2, 21, NULL, '失物', 106.629542, 30.736848);
-INSERT INTO `lostfound` VALUES (54, '223', 'a45e4931-fbc8-46df-b7b4-2c0f62df6a1a.jpg', '2026-04-10 13:57:38', '223', '中国四川省广安市广安区井河镇（双胜电动三轮车）', '18784212634', '已驳回', 0, 3, 21, NULL, '招领', 106.629542, 30.736848);
-INSERT INTO `lostfound` VALUES (55, '小姐', 'b9f88e37-7084-4598-8a7c-d346104d474c.jpg', '2026-04-10 14:47:32', '1', '中国四川省广安市广安区井河镇', '18682675515', '已驳回', 0, 1, 1, NULL, '失物', 106.628973, 30.737259);
-INSERT INTO `lostfound` VALUES (56, '12345', 'aebc3c64-1cfa-4d3c-bdb8-f3d981a92b6f.jpg', '2026-04-10 15:16:06', '11111', '中国四川省广安市广安区井河镇', '18682675516', '待审核', 0, 4, 22, NULL, '失物', 106.628973, 30.737259);
-INSERT INTO `lostfound` VALUES (57, '5678', 'b9413166-38e9-4230-8e17-0340f7934c64.jpg', '2026-04-10 15:16:45', '5678', '中国四川省广安市广安区井河镇', '18682675516', '待审核', 0, 4, 22, NULL, '招领', 106.628973, 30.737259);
+INSERT INTO `lostfound` VALUES (51, '找到雨伞', '41b15283-ff87-4e9b-ab4b-f1c5d3e20f81.jpg', '2026-04-19 20:39:46', '在 西南科技大学(青义校区)-西7教学楼 找到了雨伞，联系电话：14769903669', '西南科技大学(青义校区)-西7教学楼', '14769903669', '待认领', 0, 5, 3, '小豆豆', '招领', 104.693323, 31.543984);
+INSERT INTO `lostfound` VALUES (59, '2', 'a5852053-059b-47cf-93cd-0bce07553ae9.jpg', '2026-04-19 15:06:54', '2', '中国四川省广安市广安区井河镇（皂角岩）', '18682675515', '待审核', 0, 1, 1, NULL, '失物', 106.629601, 30.736877);
 
 -- ----------------------------
 -- Table structure for lostfound_type
@@ -182,7 +164,7 @@ CREATE TABLE `lostfound_type`  (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '类型唯一标识ID',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '类型名称',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '失物招领类型表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '失物招领类型表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of lostfound_type
@@ -209,21 +191,13 @@ CREATE TABLE `message`  (
   INDEX `fk_message_user`(`user_id` ASC) USING BTREE,
   INDEX `fk_message_parent`(`parent_id` ASC) USING BTREE,
   CONSTRAINT `fk_message_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 18 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '留言信息表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 20 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '留言信息表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of message
 -- ----------------------------
-INSERT INTO `message` VALUES (7, 21, '那你', '2026-04-09 15:07:58', 1, 0, NULL);
-INSERT INTO `message` VALUES (8, 21, '那你', '2026-04-09 15:08:01', 1, 7, 21);
-INSERT INTO `message` VALUES (9, 1, '小姐', '2026-04-10 14:46:38', 2, 0, NULL);
-INSERT INTO `message` VALUES (11, 22, '😭', '2026-04-10 15:18:08', 1, 0, NULL);
-INSERT INTO `message` VALUES (12, 22, '还', '2026-04-10 15:18:11', 1, 11, 22);
-INSERT INTO `message` VALUES (13, 22, '饿', '2026-04-10 15:18:14', 1, 10, 22);
-INSERT INTO `message` VALUES (14, 22, '去', '2026-04-10 15:18:19', 1, 7, 21);
-INSERT INTO `message` VALUES (15, 22, '去', '2026-04-10 15:18:54', 1, 0, NULL);
-INSERT INTO `message` VALUES (16, 22, '去', '2026-04-10 15:19:01', 1, 0, NULL);
-INSERT INTO `message` VALUES (17, 22, '去', '2026-04-10 15:19:03', 1, 0, NULL);
+INSERT INTO `message` VALUES (18, 23, '你好', '2026-04-14 15:23:31', 1, 0, NULL);
+INSERT INTO `message` VALUES (19, 23, '不会', '2026-04-14 15:23:53', 1, 0, NULL);
 
 -- ----------------------------
 -- Table structure for point_history
@@ -239,18 +213,12 @@ CREATE TABLE `point_history`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `fk_history_user`(`user_id` ASC) USING BTREE,
   CONSTRAINT `fk_history_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户积分变动历史表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 53 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户积分变动历史表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of point_history
 -- ----------------------------
-INSERT INTO `point_history` VALUES (1, 21, 4, -50, '发布违规信息被驳回扣除', '2026-04-10 13:57:38');
-INSERT INTO `point_history` VALUES (2, 21, 4, -50, '发布违规信息被驳回扣除', '2026-04-10 13:57:38');
-INSERT INTO `point_history` VALUES (3, 21, 3, -50, '兑换了商品：优惠券', '2026-04-10 14:14:56');
-INSERT INTO `point_history` VALUES (4, 1, 4, -50, '发布违规留言', '2026-04-10 14:46:38');
-INSERT INTO `point_history` VALUES (5, 1, 4, -50, '发布违规评论', '2026-04-10 14:46:51');
-INSERT INTO `point_history` VALUES (6, 1, 4, -50, '发布违规信息', '2026-04-10 14:47:33');
-INSERT INTO `point_history` VALUES (7, 22, 3, -500, '兑换了商品：运动手环', '2026-04-10 15:32:14');
+INSERT INTO `point_history` VALUES (52, 1, 4, -50, '发布违规信息被驳回扣除', '2026-04-20 14:16:01');
 
 -- ----------------------------
 -- Table structure for shop_item
@@ -265,17 +233,17 @@ CREATE TABLE `shop_item`  (
   `stock` int NOT NULL DEFAULT 0 COMMENT '商品库存',
   `status` int NULL DEFAULT 1 COMMENT '状态: 0-下架, 1-上架',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '积分商城商品表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '积分商城商品表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of shop_item
 -- ----------------------------
-INSERT INTO `shop_item` VALUES (1, '文具套装', '包含多种常用文具的实用套装，满足日常学习、考试与办公的书写需求，精致便携，是提升学习效率的好帮手。', 'dee86d40-0c46-45bc-8f95-2f22500ac501.jpg', 500, 20, 1);
-INSERT INTO `shop_item` VALUES (2, '小词典', '紧凑轻便的随身小词典，收录核心高频词汇，释义准确清晰，是语言学习和日常快速查阅的得力工具。', '03e4ca48-a041-47a4-98a3-97c294b01e55.jpg', 50, 10, 1);
+INSERT INTO `shop_item` VALUES (1, '文具', '包含多种常用文具的实用套装，满足日常学习、考试与办公的书写需求，精致便携，是提升学习效率的好帮手。', 'bcd35263-acf9-4276-9183-9a9b63d4600d.jpg', 600, 20, 1);
+INSERT INTO `shop_item` VALUES (2, '小词典', '紧凑轻便的随身小词典，收录核心高频词汇，释义准确清晰，是语言学习和日常快速查阅的得力工具。', '03e4ca48-a041-47a4-98a3-97c294b01e55.jpg', 50, 9, 1);
 INSERT INTO `shop_item` VALUES (3, '优惠券', '超值专享购物优惠券，可在指定商城或活动范围内抵扣相应金额，让您的积分兑换更具性价比。', 'af187150-4cff-4411-9c3e-a048d61c7380.jpg', 50, 99, 1);
-INSERT INTO `shop_item` VALUES (4, '高等数学第7版上下册同济大学', '经典高校理工科教材，内容详实、逻辑严谨，涵盖微积分等全部核心知识点，助力期末冲刺与考研复习。', '8acfd498-b16a-4f51-b143-64e4aa840156.jpg', 500, 10, 1);
+INSERT INTO `shop_item` VALUES (4, '高等数学第7版上下册', '经典高校理工科教材，内容详实、逻辑严谨，涵盖微积分等全部核心知识点，助力期末冲刺与考研复习。', '521d2a40-0d2d-4315-8c16-ab4c64e9a098.jpg', 500, 10, 1);
 INSERT INTO `shop_item` VALUES (5, '水杯', '采用食品级安全环保材质制成的优质水杯，容量适中，密封防漏设计，无论日常办公还是户外运动都非常适合携带。', '36aab817-d58e-48dc-9565-c7d8c559f178.jpg', 1000, 20, 1);
-INSERT INTO `shop_item` VALUES (6, '运动手环', '智能便携的运动手环，支持计步、心率监测及睡眠质量分析等多种功能，轻巧贴合手腕，全方位记录您的健康生活数据。', 'b78bef2f-0542-45f3-849d-cce77be023ee.jpg', 500, 9, 1);
+INSERT INTO `shop_item` VALUES (6, '运动手环', '智能便携的运动手环，支持计步、心率监测及睡眠质量分析等多种功能，轻巧贴合手腕，全方位记录您的健康生活数据。', 'b78bef2f-0542-45f3-849d-cce77be023ee.jpg', 500, 8, 1);
 
 -- ----------------------------
 -- Table structure for user
@@ -295,16 +263,16 @@ CREATE TABLE `user`  (
   `role` int NULL DEFAULT 0 COMMENT '用户角色权限：0-普通用户，1-管理员',
   `im_token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '即时通讯token',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户信息表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 24 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户信息表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES (1, 'admin', '18682675515', '3502777299@qq.com', '$2a$12$Ikp/n4voUd3RAiwF9YFZr.hHM3j60HYtE37TMqGIquuaqYCyTo3YG', '62acf3a1-81f7-4e43-bf8b-a6e18a6794be.jpg', '男', 350, '2026-04-03 15:49:11', 1, 1, 'j3iWf2UVvHvWe8Gagt9eVucOVPaubDvP@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
-INSERT INTO `user` VALUES (2, '小卷毛', '15181544770', '智宸.陆@yahoo.com', '$2a$12$Lc.uwEMhuHykVt0Jhu504eM4dV.Kuwx2JHrH5ucePk0g1hMnzOyQO', '3bb432c6-4e75-49b3-bba2-3e94984b8074.jpg', '男', 100, '2026-04-03 15:49:15', 1, 0, 'REsGtneW7IrWe8Gagt9eVqwORvtZaE4u@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
-INSERT INTO `user` VALUES (3, '小豆豆', '14769903669', '炫明.幸@yahoo.com', '$2a$12$r38YVOyy8FUGzoAJPsS.NOkojgEo6vF5LN3mI9zzXtkyu4AU4vHMm', '855f056a-e4ab-4946-9bdd-00af77ffcce7.jpg', '男', 100, '2026-04-03 15:49:18', 1, 0, 'uEv3PrRXazPWe8Gagt9eVoaRPdmtO5Li@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
-INSERT INTO `user` VALUES (4, '小米', '17788266423', '雨泽.康@gmail.com', '$2a$12$Ehcvkxw5rxa9ZLGbIcfrvOsTMqUejdD7xvGm6tgVFM771u1lpU/uS', 'ea8419f7-a7ca-47c1-801c-307c62c54c91.jpg', '女', 100, '2026-04-03 15:49:21', 1, 0, 'ec4uURaQfdvWe8Gagt9eVpFZeG7y2OPD@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
-INSERT INTO `user` VALUES (5, '阿宝', '17673297533', '静.逄@yahoo.com', '$2a$12$VOxsIOilu9YwJDxyGt5dxO1UF27hkG15HyRvbbpj0jFr9mVFaZiH.', '8d6efdfe-75c5-4af3-8b03-1dab67c02f1b.jpg', '女', 100, '2026-04-03 15:49:22', 1, 0, 'JxJ3mLKujoXWe8Gagt9eVs4mGIlHP9dW@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (1, 'admin', '18682675515', '3502777299@qq.com', '$2a$12$Ikp/n4voUd3RAiwF9YFZr.hHM3j60HYtE37TMqGIquuaqYCyTo3YG', '62acf3a1-81f7-4e43-bf8b-a6e18a6794be.jpg', '男', -100, '2026-04-03 15:49:11', 1, 1, 'j3iWf2UVvHvWe8Gagt9eVucOVPaubDvP@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (2, '小卷毛', '15181544770', '智宸.陆@yahoo.com', '$2a$12$Lc.uwEMhuHykVt0Jhu504eM4dV.Kuwx2JHrH5ucePk0g1hMnzOyQO', '3bb432c6-4e75-49b3-bba2-3e94984b8074.jpg', '男', -200, '2026-04-03 15:49:15', 1, 0, 'REsGtneW7IrWe8Gagt9eVqwORvtZaE4u@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (3, '小豆豆', '14769903669', '炫明.幸@yahoo.com', '$2a$12$r38YVOyy8FUGzoAJPsS.NOkojgEo6vF5LN3mI9zzXtkyu4AU4vHMm', '855f056a-e4ab-4946-9bdd-00af77ffcce7.jpg', '男', -400, '2026-04-03 15:49:18', 1, 0, 'uEv3PrRXazPWe8Gagt9eVoaRPdmtO5Li@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (4, '小米', '17788266423', '雨泽.康@gmail.com', '$2a$12$Ehcvkxw5rxa9ZLGbIcfrvOsTMqUejdD7xvGm6tgVFM771u1lpU/uS', 'ea8419f7-a7ca-47c1-801c-307c62c54c91.jpg', '女', -50, '2026-04-03 15:49:21', 1, 0, 'ec4uURaQfdvWe8Gagt9eVpFZeG7y2OPD@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (5, '阿宝', '17673297533', '静.逄@yahoo.com', '$2a$12$VOxsIOilu9YwJDxyGt5dxO1UF27hkG15HyRvbbpj0jFr9mVFaZiH.', '8d6efdfe-75c5-4af3-8b03-1dab67c02f1b.jpg', '女', -300, '2026-04-03 15:49:22', 1, 0, 'JxJ3mLKujoXWe8Gagt9eVs4mGIlHP9dW@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
 INSERT INTO `user` VALUES (6, '小葡萄', '17742030782', '梓晨.鲁@hotmail.com', '$2a$12$kVggIOHaYTmFCo61h9IXc.STtnC5lY.2R.Q/t3HUSSoWBmPUqaOgm', '7790af45-30ad-4577-8b52-68fb43115342.jpg', '女', 100, '2026-04-03 15:49:25', 1, 0, 'AyJOFRDS87XWe8Gagt9eVszO742jh5ci@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
 INSERT INTO `user` VALUES (7, '小娃', '14709633758', '擎苍.空@yahoo.com', '$2a$12$7T2gD.fcxaX8lqlNuSZ1XOUTcu0oMEF4K40Mf4WlmSWZxXVaVRDZm', '89fea17e-7ff9-4d0a-80f7-2af7ca0eaca2.jpg', '女', 100, '2026-04-03 15:49:28', 1, 0, 'NRyEieMSTHjWe8Gagt9eVs0O7D3rBskk@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
 INSERT INTO `user` VALUES (8, '小铃铛', '18147050474', '明辉.闫@yahoo.com', '$2a$12$IbSFuyRu/ZztNepLO2jC2e3g1Cwn4sToU5wG3CUL/Sp7hPpXFX3W2', 'bafb77b5-243f-4ec0-815a-8d6a5b6c500e.jpg', '女', 100, '2026-04-03 15:49:31', 1, 0, 'iqIOlquMIk/We8Gagt9eVnTqxSP0bBBE@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
@@ -321,6 +289,7 @@ INSERT INTO `user` VALUES (18, '小霸王', '17014149379', '思源.明@gmail.com
 INSERT INTO `user` VALUES (19, '小狮子', '15652071538', '擎苍.张@gmail.com', '$2a$12$VP7rJIyEOVW7cW90VuuIfuLm7htzwTh4l9r8neCiXt1dC26Flg2ai', '26514bc2-f722-4199-99c1-41e4ea27f066.jpg', '男', 100, '2026-04-03 15:49:59', 1, 0, '9q3wDyTRkfV506fu7H8tdFfENKB7gZ5E@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
 INSERT INTO `user` VALUES (20, '小丹', '17323403644', '伟祺.晋@gmail.com', '$2a$12$RBGSumg3U9oqd8tOGkiNx.V1iCp5bHnFEJXc0iGj31Dd3r2f6aHQi', '93a09e1e-011f-414c-9a7e-fc3add606829.jpg', '男', 100, '2026-04-03 15:52:05', 1, 0, '9/QXZdkVLal506fu7H8tdJwSx0fPizth@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
 INSERT INTO `user` VALUES (21, '小果', '18784212633', '3502777299@qq.com', '$2a$12$P4pUCjD0JIokvcNOmX0P5.IPp64vi4PbXLpwIo/84Qz6gaZwvYPa2', '43959d47-e69f-484b-bb93-0793ce0c0845.jpg', '男', 50, '2026-04-09 15:05:03', 1, 0, 'RVMe+PfShcx506fu7H8tdLgYNHyLmtLX@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
-INSERT INTO `user` VALUES (22, '茶', '18682675516', '3502777299@qq.com', '$2a$12$ntu/24EZAhkuj/pG90MmzuH9gJZJYAVngkgxNQbc..zsV.lxCKoCq', '2c8fdf1a-343c-421f-aeb9-ff8ff2f3aeb7.jpg', '女', 1000, '2026-04-10 15:14:10', 1, 0, '2Hi8AvjXPbh506fu7H8tdC3InJbkjgCg@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (22, '茶', '18682675514', '3502777299@qq.com', '$2a$12$HTlHC0UQu9kpg3eyC3GBtOZFPPvkIA7k7q1bpoaN20cS3d9rx85mG', '2c8fdf1a-343c-421f-aeb9-ff8ff2f3aeb7.jpg', '女', 999998849, '2026-04-10 15:14:10', 1, 0, '2Hi8AvjXPbh506fu7H8tdC3InJbkjgCg@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
+INSERT INTO `user` VALUES (23, '小小雅', '18682674515', '3502777299@qq.com', '$2a$12$2Agn7MuIXwQtQTEfp0PJjehyDP6F2KI0dvho92glEMPU.VO4kGa.u', 'd5e3eb0f-4a74-41dc-946f-3d623982b7f2.jpg', '男', 100, '2026-04-14 14:55:26', 1, 0, 'RV0mNfKW1td506fu7H8tdMAxz2Zs66IO@5zau.cn.rongnav.com;5zau.cn.rongcfg.com');
 
 SET FOREIGN_KEY_CHECKS = 1;
