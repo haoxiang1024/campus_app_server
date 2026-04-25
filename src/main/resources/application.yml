@@ -2,7 +2,6 @@ server:
   servlet:
     context-path: /school
   port: 8081
-# 引入其他的配置文件
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
