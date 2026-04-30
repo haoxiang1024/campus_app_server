@@ -30,7 +30,6 @@ public class SensitiveWordLoader {
         // 定义文件路径
         String filePath = System.getProperty("user.dir") + File.separator + "upload" + File.separator + "sensitive_words.txt";
         File file = new File(filePath);
-
         if (file.exists()) {
             try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"))) {
                 String line;
