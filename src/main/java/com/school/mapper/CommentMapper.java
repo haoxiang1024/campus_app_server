@@ -72,5 +72,8 @@ public interface CommentMapper {
             "WHERE c.state = 1 AND c.user_id = #{user_id} " +
             "ORDER BY c.create_time DESC")
     List<Comment> getComments(@Param("user_id") int userId);
+    //根据评论ID 查询出单条评论信息
+    @Select("SELECT * FROM comment WHERE id = #{id}")
+    Comment getCommentById(@Param("id") int id);
 
 }

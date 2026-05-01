@@ -101,18 +101,18 @@ public interface AdminMapper {
     boolean updateStickStatus(@Param("id")int id,@Param("stick")int stick);
 
     /**
-     * 简单查询：删除评论
+     * 删除评论
      */
     @Delete("DELETE FROM comment WHERE id = #{commentId}")
     int deleteCommentById(@Param("commentId") Integer commentId);
 
     /**
-     * 复杂查询：多条件联表查询评论
+     * 多条件联表查询评论
      */
     List<CommentVO> getCommentsByCondition(@Param("keyword") String keyword, @Param("state") String state);
 
     /**
-     * 复杂查询：动态更新评论状态和原因
+     * 动态更新评论状态和原因
      */
     int updateCommentSelective(Comment comment);
 }

@@ -3,9 +3,7 @@ package com.school.services.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.school.entity.*;
-import com.school.mapper.AdminMapper;
-import com.school.mapper.LostFoundMapper;
-import com.school.mapper.LostFoundTypeMapper;
+import com.school.mapper.*;
 import com.school.services.api.AdminService;
 import com.school.utils.ServerResponse;
 import com.school.utils.Util;
@@ -32,6 +30,12 @@ public class AdminServiceImpl implements AdminService {
     private LostFoundTypeMapper lostFoundTypeMapper;
     @Autowired
     private LostFoundMapper lostFoundMapper;
+    @Autowired
+    private PointHistoryMapper pointHistoryMapper;
+    @Autowired
+    private UserMapper userMapper;
+    @Autowired
+    private CommentMapper commentMapper;
     /**
      * 获取所有用户数量
      * @return ServerResponse 包含用户总数的响应对象
@@ -201,16 +205,51 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public ServerResponse updateCommentStatus(Integer commentId, int state) {
-        Comment comment = new Comment();
-        comment.setId(commentId);
+        // 查询评论
+        Comment comment = commentMapper.getCommentById(commentId);
+        if (comment == null) {
+            return ServerResponse.createServerResponseByFail(404, "评论不存在");
+        }
+
+        Integer userId = comment.getUser_id();
+        Integer oldState = comment.getState(); // 保存原状态
+
+        // 更新评论状态
         comment.setState(state);
         int rows = adminMapper.updateCommentSelective(comment);
-        if (rows > 0) {
+
+        if (rows <= 0) {
+            return ServerResponse.createServerResponseByFail(500, "操作失败，可能数据不存在");
+        }
+
+        //  处理积分变更
+        // 从待审核或已通过改为已驳回
+        if ((oldState == 0 || oldState == 1) && state == 2) {
+            // 驳回：扣除50积分
+            userMapper.addPoints(userId, -50);
+            recordPointHistory(userId, 4, -50, "发布违规评论被驳回");
             return ServerResponse.createServerResponseBySuccess("操作成功");
         }
-        return ServerResponse.createServerResponseByFail(500, "操作失败，可能数据不存在");
-    }
 
+        // 从已驳回改为已通过（撤销驳回）
+        if (oldState == 2 && state == 1) {
+            // 撤销驳回：返还50积分
+            userMapper.addPoints(userId, 50);
+            recordPointHistory(userId, 5, 50, "管理员撤销误驳回，返还积分");
+            return ServerResponse.createServerResponseBySuccess("操作成功");
+        }
+        // 其他状态变更
+        return ServerResponse.createServerResponseBySuccess("操作成功");
+    }
+    // 提取积分流水记录方法
+    private void recordPointHistory(Integer userId, int historyType, int pointsChange, String description) {
+        PointHistory history = new PointHistory();
+        history.setUser_id(userId);
+        history.setType(historyType);
+        history.setPoints_changed(pointsChange);
+        history.setDescription(description);
+        pointHistoryMapper.insert(history);
+    }
     /**
      * 删除评论
      */
