@@ -235,7 +235,7 @@ public class AdminServiceImpl implements AdminService {
         if (oldState == 2 && state == 1) {
             // 撤销驳回：返还50积分
             userMapper.addPoints(userId, 50);
-            recordPointHistory(userId, 5, 50, "管理员撤销误驳回，返还积分");
+            recordPointHistory(userId, 5, 50, "撤销误驳回，返还积分");
             return ServerResponse.createServerResponseBySuccess("操作成功");
         }
         // 其他状态变更
