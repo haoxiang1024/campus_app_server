@@ -142,7 +142,7 @@
                         <div class="col-md-6">
                             <label class="form-label">地点</label>
                             <div class="input-group">
-                                <input type="text" class="form-control" name="place" id="addPlace" required placeholder="请点击选择位置获取经纬度，可在此手动修改">
+                                <input type="text" class="form-control" name="place" id="addPlace" required placeholder="请点击选择位置，在此修改位置">
                                 <button class="btn btn-outline-primary" type="button" onclick="openMapModal()">选择位置</button>
                             </div>
                         </div>
@@ -202,7 +202,7 @@
 <script src="./js/jquery.min.js"></script>
 <script src="./js/bootstrap.bundle.min.js"></script>
 <script src="./js/sweetalert2@11.js"></script>
-
+<script src="./js/config.js"></script>
 <script>
     (function() {
         let currentLostPage = 1;
@@ -238,7 +238,10 @@
             window.map.centerAndZoom(defaultPoint, 16);
             window.map.enableScrollWheelZoom(true);
             window.geoc = new BMapGL.Geocoder();
-
+        // 强制刷新渲染容器
+            setTimeout(() => {
+                window.map.checkResize();
+            }, 200);
             // 搜索服务配置
             localSearch = new BMapGL.LocalSearch(window.map, {
                 renderOptions: {map: window.map},
@@ -302,8 +305,8 @@
                     // 用户拒绝权限或请求超时触发降级
                     handleLocationFallback();
                 }, {
-                    enableHighAccuracy: true,
-                    timeout: 5000, // 5秒强制超时防卡死
+                    enableHighAccuracy: false,
+                    timeout: 3000, // 5秒强制超时防卡死
                     maximumAge: 0
                 });
             } else {
@@ -716,8 +719,8 @@
             const itemData = {
                 title: $('#addForm [name="title"]').val().trim(),
                 place: $('#addPlace').val().trim(), // 直接获取可能有被管理员微调过的输入框的值
-                longitude: window.selectedLng,
-                latitude: window.selectedLat,
+                longitude: parseFloat(window.selectedLng.toFixed(6)),
+                latitude: parseFloat(window.selectedLat.toFixed(6)),
                 phone: $('#addForm [name="phone"]').val().trim(),
                 content: $('#addForm [name="content"]').val().trim(),
                 state: '待审核',
