@@ -256,6 +256,14 @@ public class LostFoundServiceImpl implements LostFoundService {
      */
     @Override
     public ServerResponse deleteLostFoundById(Integer id) {
+        //退还用户积分
+        LostFound lostFound = lostFoundMapper.selectByPrimaryKey(id);
+        if (lostFound.getType().equals("招领")&lostFound.getState().equals("待认领"))
+        {
+            userMapper.addPoints(lostFound.getUserId(), 10);
+        recordPointHistory(lostFound.getUserId(), 2, 10, "招领帖子被删除，退还积分");
+        }
+        //执行删除
         int result = lostFoundMapper.deleteByPrimaryKey(id);
         return result > 0 ? ServerResponse.createServerResponseBySuccess("删除成功") : ServerResponse.createServerResponseByFail("删除失败");
     }
@@ -266,14 +274,12 @@ public class LostFoundServiceImpl implements LostFoundService {
     @Override
     @Transactional(rollbackFor = Exception.class) // 开启事务
     public ServerResponse updateLostFoundStatus(Integer lostFoundId, String state) {
-
         // 查出数据库中原本的记录
         LostFound lostFound = lostFoundMapper.selectByPrimaryKey(lostFoundId);
         if (lostFound == null) {
             return ServerResponse.createServerResponseByFail("记录不存在");
         }
 
-        // 保存旧状态、类型和发布人ID
         String oldState = lostFound.getState();
 
         // 状态未改变直接返回
@@ -289,43 +295,50 @@ public class LostFoundServiceImpl implements LostFoundService {
 
         // 只有当存在发布人时，才进行积分结算
         if (userId != null) {
-            boolean isApprovedFoundPost = "待审核".equals(oldState) && "待认领".equals(state) && "招领".equals(type);
-            boolean isRejectedPost = "已驳回".equals(state);
-
-            //  初始化积分变动参数
             int pointsChange = 0;
             int historyType = 0;
             String historyDesc = null;
 
-            //  匹配对应的积分规则
-            if (isApprovedFoundPost) {
-                pointsChange = 10;
-                historyType = 1; // 招领奖励
-                historyDesc = "招领帖子审核通过奖励";
-            } else if (isRejectedPost) {
+            //  驳回操作（扣除50分）
+            if ("已驳回".equals(state) && !"已驳回".equals(oldState)) {
                 pointsChange = -50;
                 historyType = 4; // 系统扣除
                 historyDesc = "发布违规信息被驳回扣除";
             }
 
-            //  若积分发生变动，统一执行加扣和流水入库
-            if (pointsChange != 0) {
-                // 更新用户总积分
-                userMapper.addPoints(userId, pointsChange);
+            // 撤销驳回（退还50分）
+            else if ("已驳回".equals(oldState) && !"已驳回".equals(state)) {
+                pointsChange = 50;
+                historyType = 2; // 退还积分
+                historyDesc = "驳回撤销，退还积分";
+            }
 
-                // 记录流水
-                PointHistory history = new PointHistory();
-                history.setUser_id(userId);
-                history.setType(historyType);
-                history.setPoints_changed(pointsChange);
-                history.setDescription(historyDesc);
-                pointHistoryMapper.insert(history);
+            // 首次通过招领帖子（奖励10分）
+            else if ("待审核".equals(oldState) && "待认领".equals(state) && "招领".equals(type)) {
+                pointsChange = 10;
+                historyType = 1; // 招领奖励
+                historyDesc = "招领帖子审核通过奖励";
+            }
+
+            // 若积分发生变动，统一执行加扣和流水入库
+            if (pointsChange != 0) {
+                userMapper.addPoints(userId, pointsChange);
+                recordPointHistory(userId, historyType, pointsChange, historyDesc);
             }
         }
 
         return ServerResponse.createServerResponseBySuccess("操作成功");
     }
 
+    // 提取积分流水记录方法
+    private void recordPointHistory(Integer userId, int historyType, int pointsChange, String description) {
+        PointHistory history = new PointHistory();
+        history.setUser_id(userId);
+        history.setType(historyType);
+        history.setPoints_changed(pointsChange);
+        history.setDescription(description);
+        pointHistoryMapper.insert(history);
+    }
 
 
     /**

@@ -141,7 +141,10 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">地点</label>
-                            <input type="text" class="form-control" name="place" required>
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="place" id="addPlace" required placeholder="请点击选择位置获取经纬度，可在此手动修改">
+                                <button class="btn btn-outline-primary" type="button" onclick="openMapModal()">选择位置</button>
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">联系电话</label>
@@ -170,6 +173,32 @@
     </div>
 </div>
 
+<div class="modal fade" id="mapModal" tabindex="-1" style="z-index: 1060;">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">在地图上选择地点</h5>
+                <button type="button" class="btn-close" onclick="closeMapModal()"></button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group mb-2">
+                    <input type="text" id="mapSearchKeyword" class="form-control" placeholder="输入关键字搜索地点，例如：图书馆">
+                    <button class="btn btn-primary" type="button" onclick="executeMapSearch()">搜索</button>
+                </div>
+                <div class="input-group mb-2">
+                    <span class="input-group-text bg-light">当前选中位置</span>
+                    <input type="text" id="tempPlaceInput" class="form-control text-primary fw-bold" placeholder="请搜索或点击地图获取地址">
+                </div>
+                <div id="baiduMap" style="width: 100%; height: 400px; background-color: #eee;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeMapModal()">取消</button>
+                <button type="button" class="btn btn-primary" onclick="confirmLocation()">确认位置</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="./js/jquery.min.js"></script>
 <script src="./js/bootstrap.bundle.min.js"></script>
 <script src="./js/sweetalert2@11.js"></script>
@@ -181,7 +210,162 @@
         const pageSize = 10;
         let allData = [];
 
-        // 格式化图片与时间
+        window.selectedLng = null;
+        window.selectedLat = null;
+        let tempLng = null;
+        let tempLat = null;
+        let localSearch = null;
+        let marker = null;
+        window.geoc = null;
+
+        // 动态加载百度地图脚本
+        window.loadBaiduMap = function() {
+            const ak = (typeof MAP_CONFIG !== 'undefined') ? MAP_CONFIG.baiduAK : "YOUR_FALLBACK_AK";
+            const script = document.createElement("script");
+            script.type = "text/javascript";
+            script.src = `https://api.map.baidu.com/api?type=webgl&v=1.0&ak=${ak}&callback=initMap`;
+            script.onerror = function() {
+                window.Toast ? window.Toast.error("地图加载失败，请关闭广告拦截插件") : alert("地图加载失败");
+            };
+            document.body.appendChild(script);
+        };
+
+        // 地图初始化
+        window.initMap = function() {
+            window.map = new BMapGL.Map("baiduMap");
+            // 默认中心点（防止定位失败时地图白屏）
+            const defaultPoint = new BMapGL.Point(104.755, 31.536);
+            window.map.centerAndZoom(defaultPoint, 16);
+            window.map.enableScrollWheelZoom(true);
+            window.geoc = new BMapGL.Geocoder();
+
+            // 搜索服务配置
+            localSearch = new BMapGL.LocalSearch(window.map, {
+                renderOptions: {map: window.map},
+                onMarkersSet: function(pois) {
+                    if(pois.length > 0) window.updateTempLocation(pois[0].point);
+                }
+            });
+
+            // 点击地图选点事件
+            window.map.addEventListener("click", function(e) {
+                window.updateTempLocation(e.latlng);
+            });
+
+            // 初始化完毕后自动请求定位
+            window.requestLocation();
+        };
+
+        // 更新地图临时标记及地址信息
+        window.updateTempLocation = function(pt) {
+            if(!window.geoc) return;
+            if(marker) window.map.removeOverlay(marker);
+            marker = new BMapGL.Marker(pt);
+            window.map.addOverlay(marker);
+
+            window.geoc.getLocation(pt, function(rs) {
+                const addComp = rs.addressComponents;
+                let detailName = "";
+                if(rs.surroundingPois && rs.surroundingPois.length > 0) {
+                    detailName = rs.surroundingPois[0].title;
+                } else {
+                    detailName = addComp.street + addComp.streetNumber;
+                }
+                const fullPlace = addComp.province + addComp.city + addComp.district + detailName;
+                tempLng = pt.lng;
+                tempLat = pt.lat;
+                $('#tempPlaceInput').val(fullPlace);
+            }, { poiRadius: 100, numPois: 5 });
+        };
+
+        // 强制定请求浏览器底层位置权限，配置超时防卡死
+        window.requestLocation = function() {
+            if(!window.map) return;
+            $('#tempPlaceInput').attr('placeholder', '正在请求浏览器位置权限...');
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const ggPoint = new BMapGL.Point(lng, lat);
+
+                    // GPS坐标转为百度坐标
+                    const convertor = new BMapGL.Convertor();
+                    convertor.translate([ggPoint], 1, 5, function(data) {
+                        if (data.status === 0) {
+                            window.map.panTo(data.points[0]);
+                            window.updateTempLocation(data.points[0]);
+                            if(window.Toast) window.Toast.success('精准定位成功');
+                        }
+                    });
+                }, function(error) {
+                    // 用户拒绝权限或请求超时触发降级
+                    handleLocationFallback();
+                }, {
+                    enableHighAccuracy: true,
+                    timeout: 5000, // 5秒强制超时防卡死
+                    maximumAge: 0
+                });
+            } else {
+                handleLocationFallback();
+            }
+        };
+
+        // 降级：使用百度API的IP城市定位
+        function handleLocationFallback() {
+            if(window.Toast) window.Toast.warning('未获取浏览器精确定位，使用城市范围定位');
+            const myCity = new BMapGL.LocalCity();
+            myCity.get(function(result) {
+                window.map.panTo(result.center);
+                $('#tempPlaceInput').attr('placeholder', '定位完成，请搜索或点击地图获取准确地址');
+            });
+        }
+
+        // 搜索地图关键字
+        window.executeMapSearch = function() {
+            const keyword = $('#mapSearchKeyword').val().trim();
+            if(keyword && localSearch) localSearch.search(keyword);
+        };
+
+        // 打开地图弹窗
+        window.openMapModal = function() {
+            const mapModalEl = document.getElementById('mapModal');
+            const bsMapModal = new bootstrap.Modal(mapModalEl);
+            bsMapModal.show();
+
+            $('#tempPlaceInput').val('');
+            $('#tempPlaceInput').attr('placeholder', '正在获取地图组件...');
+
+            mapModalEl.addEventListener('shown.bs.modal', function () {
+                if (!window.mapLoaded) {
+                    window.loadBaiduMap();
+                    window.mapLoaded = true;
+                } else if (window.map) {
+                    window.map.checkResize();
+                    window.requestLocation(); // 每次打开弹窗均重新检查定位
+                }
+            }, { once: true });
+        };
+
+        // 关闭地图弹窗
+        window.closeMapModal = function() {
+            const mapModalEl = document.getElementById('mapModal');
+            const bsMapModal = bootstrap.Modal.getInstance(mapModalEl);
+            if(bsMapModal) bsMapModal.hide();
+        };
+
+        // 确认地址并回填
+        window.confirmLocation = function() {
+            const finalPlace = $('#tempPlaceInput').val().trim();
+            if(!tempLng || !tempLat || !finalPlace) {
+                return window.Toast.error("请先在地图上点击选择具体位置");
+            }
+            $('#addPlace').val(finalPlace); // 允许回填后由管理员在外层输入框继续微调
+            window.selectedLng = tempLng;
+            window.selectedLat = tempLat;
+            closeMapModal();
+        };
+
         function getPhotoUrl(photo) {
             if (!photo || photo.trim() === '') return './svgs/solid/circle-user.svg';
             if (photo.startsWith('http')) return photo;
@@ -196,7 +380,6 @@
             return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
         }
 
-        // 加载表格数据
         function loadData(page) {
             currentLostPage = page || 1;
             const keyword = $('#searchInput').val().trim();
@@ -232,7 +415,6 @@
             });
         }
 
-        // 渲染表格
         function renderLostTable(data) {
             let html = '';
             if (!data || !data.length) {
@@ -285,7 +467,6 @@
             });
         }
 
-        // 置顶操作
         function updateStickStatus(id, stick) {
             return $.post('/school/admin/updateStickStatus', { id: id, stick: stick })
                 .done(function(res) {
@@ -304,7 +485,6 @@
                 });
         }
 
-        // 批量审核通过（跳过已通过项）
         $('#batchApproveBtn').on('click', function() {
             const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get().filter(id => id);
             if (!selectedIds.length) return window.Toast.error('请先勾选项目');
@@ -342,7 +522,6 @@
             });
         });
 
-        // 批量驳回（跳过已驳回项）
         $('#batchRejectBtn').on('click', function() {
             const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get().filter(id => id);
             if (!selectedIds.length) return window.Toast.error('请先勾选项目');
@@ -381,7 +560,6 @@
             });
         });
 
-        // 批量删除
         $('#batchDeleteBtn').on('click', function() {
             const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get().filter(id => id);
             if (!selectedIds.length) return window.Toast.error('请勾选要删除的项目');
@@ -396,7 +574,6 @@
             });
         });
 
-        // 批量置顶
         $('#batchStickBtn').on('click', function() {
             const targetIds = [];
             let skipCount = 0;
@@ -414,7 +591,6 @@
             });
         });
 
-        // 批量取消置顶
         $('#batchCancleStickBtn').on('click', function() {
             const targetIds = [];
             let skipCount = 0;
@@ -432,7 +608,6 @@
             });
         });
 
-        // 单个通过（防重复操作）
         window.approveSingle = (id) => {
             if (!id) return window.Toast.error('无效的记录ID');
             const item = allData.find(u => u.id == id);
@@ -452,7 +627,6 @@
             });
         };
 
-        // 单个驳回（防重复操作）
         window.rejectSingle = (id) => {
             if (!id) return window.Toast.error('无效的记录ID');
             const item = allData.find(u => u.id == id);
@@ -474,7 +648,6 @@
             });
         };
 
-        // 单个删除
         window.deleteItem = (id) => {
             if (!id) return window.Toast.error('无效的记录ID');
             window.Toast.confirm("删除确认", "确定永久删除此信息吗？", () => {
@@ -485,7 +658,6 @@
             });
         };
 
-        // 查看详情
         window.showLostDetail = (id) => {
             if (!id) return window.Toast.error('无效的记录ID');
             $.get('/school/admin/getLostFoundById', { lostFoundId: id, _t: new Date().getTime() }, function(res) {
@@ -497,17 +669,17 @@
                         <div class="mb-2"><strong>类型：</strong>${typeLabel}</div>
                         <div class="mb-2"><strong>标题：</strong>${item.title || '未命名'}</div>
                         <div class="mb-2"><strong>地点：</strong>${item.place || '-'}</div>
+                        <div class="mb-2"><strong>经纬度：</strong>${item.longitude || '-'}, ${item.latitude || '-'}</div>
                         <div class="mb-3"><strong>详情：</strong>${item.content || '无'}</div>
                         <div class="detail-img-wrapper">
                             <img src="${getPhotoUrl(item.img)}" class="detail-img" onclick="window.open(this.src)">
                         </div>`;
                     $('#detailContent').html(content);
-                    new bootstrap.Modal('#detailModal').show();
+                    new bootstrap.Modal(document.getElementById('detailModal')).show();
                 } else window.Toast.error('获取详情失败');
             }).fail(() => window.Toast.error('网络异常，无法获取详情'));
         };
 
-        // 事件监听绑定
         $('#searchBtn').on('click', () => loadData(1));
         $('#searchInput').on('keypress', e => { if(e.which === 13) loadData(1); });
         $('#stateFilter, #typeFilter').on('change', () => loadData(1));
@@ -517,22 +689,25 @@
         $('#btnLostPrevPage').on('click', () => { if(currentLostPage > 1) loadData(currentLostPage - 1); });
         $('#btnLostNextPage').on('click', () => { if(currentLostPage < totalLostPages) loadData(currentLostPage + 1); });
 
-        // 初始化
         loadData(1);
 
-        // 新增弹窗初始化
         window.openAddModal = () => {
             $('#addForm')[0].reset();
+            window.selectedLng = null;
+            window.selectedLat = null;
             const now = new Date();
             now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
             $('#addTime').val(now.toISOString().slice(0, 16));
-            new bootstrap.Modal('#addModal').show();
+            new bootstrap.Modal(document.getElementById('addModal')).show();
         };
 
-        // 提交登记
         window.submitRegistration = () => {
             const addForm = $('#addForm')[0];
             if (!addForm.checkValidity()) return addForm.reportValidity();
+
+            if (!window.selectedLng || !window.selectedLat || !$('#addPlace').val()) {
+                return window.Toast.error("请点击选择位置按钮，通过地图检索获取准确位置坐标！");
+            }
 
             const op = $('#addOp').val();
             const file = $('#upload_file')[0].files[0];
@@ -540,7 +715,9 @@
 
             const itemData = {
                 title: $('#addForm [name="title"]').val().trim(),
-                place: $('#addForm [name="place"]').val().trim(),
+                place: $('#addPlace').val().trim(), // 直接获取可能有被管理员微调过的输入框的值
+                longitude: window.selectedLng,
+                latitude: window.selectedLat,
                 phone: $('#addForm [name="phone"]').val().trim(),
                 content: $('#addForm [name="content"]').val().trim(),
                 state: '待审核',
@@ -564,7 +741,7 @@
                 success: function(res) {
                     if (res && res.status === 0) {
                         window.Toast.success("发布成功！请等待审核");
-                        bootstrap.Modal.getInstance('#addModal').hide();
+                        bootstrap.Modal.getInstance(document.getElementById('addModal')).hide();
                         loadData(1);
                     } else window.Toast.error(res?.msg || "发布失败");
                 },
