@@ -29,10 +29,9 @@ public interface MessageService {
      * 更新留言状态 (审核通过/驳回)
      * @param commentId 留言ID
      * @param state 目标状态 (1:已通过, 2:已驳回)
-     * @param reason 驳回原因 (当状态为驳回时填写)
      * @return 操作结果
      */
-    ServerResponse updateCommentStatus(Integer commentId, Integer state, String reason);
+    ServerResponse updateCommentStatus(Integer commentId, Integer state);
 
     /**
      * 根据ID物理删除留言

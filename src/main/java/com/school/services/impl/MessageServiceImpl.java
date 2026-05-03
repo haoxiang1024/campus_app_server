@@ -119,10 +119,22 @@ public class MessageServiceImpl implements MessageService {
 
         return ServerResponse.createServerResponseBySuccess(data, "获取成功");
     }
-
+    // 提取积分流水记录方法
+    private void recordPointHistory(Integer userId, int historyType, int pointsChange, String description) {
+        PointHistory history = new PointHistory();
+        history.setUser_id(userId);
+        history.setType(historyType);
+        history.setPoints_changed(pointsChange);
+        history.setDescription(description);
+        pointHistoryMapper.insert(history);
+    }
     @Override
-    public ServerResponse updateCommentStatus(Integer commentId, Integer state, String reason) {
-        int row = messageMapper.updateMessageState(commentId, state, reason);
+    public ServerResponse updateCommentStatus(Integer commentId, Integer state) {
+        //扣除用戶积分
+//        Message message = messageMapper.getMessageById(commentId);
+//        userMapper.addPoints(userId, 50);
+//        recordPointHistory(userId, 5, 50, "撤销误驳回，返还积分");
+        int row = messageMapper.updateMessageState(commentId, state);
         if (row > 0) {
             return ServerResponse.createServerResponseBySuccess("状态更新成功");
         }

@@ -34,8 +34,8 @@ public interface MessageMapper {
                                         @Param("keyword") String keyword,
                                         @Param("state") Integer state);
 
-    //  更新留言状态与原因
-    int updateMessageState(@Param("id") Integer id, @Param("state") Integer state, @Param("reason") String reason);
+    //  更新留言状态
+    int updateMessageState(@Param("id") Integer id, @Param("state") Integer state);
 
     //  删除留言
     int deleteMessageById(@Param("id") Integer id);

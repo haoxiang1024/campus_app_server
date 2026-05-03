@@ -347,9 +347,9 @@ public class AdminController {
     @PostMapping("/updateMessageStatus")
     public ServerResponse updateMessageStatus(
             @RequestParam Integer messageId,
-            @RequestParam Integer state,
-            @RequestParam(required = false) String reason) {
-        return messageService.updateCommentStatus(messageId, state, reason);
+            @RequestParam Integer state
+           ) {
+        return messageService.updateCommentStatus(messageId, state);
     }
 
     // 删除留言

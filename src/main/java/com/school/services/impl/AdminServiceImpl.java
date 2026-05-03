@@ -255,6 +255,10 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public ServerResponse deleteCommentById(Integer commentId) {
+        //扣除用户积分
+        Comment comment = commentMapper.getCommentById(commentId);
+        userMapper.addPoints(comment.getUser_id(), -50);
+        recordPointHistory(comment.getUser_id(), 4, -50, "删除违规评论");
         int rows = adminMapper.deleteCommentById(commentId);
         if (rows > 0) {
             return ServerResponse.createServerResponseBySuccess("删除成功");
