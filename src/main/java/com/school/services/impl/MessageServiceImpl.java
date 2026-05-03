@@ -130,12 +130,20 @@ public class MessageServiceImpl implements MessageService {
     }
     @Override
     public ServerResponse updateCommentStatus(Integer commentId, Integer state) {
-        //扣除用戶积分
-//        Message message = messageMapper.getMessageById(commentId);
-//        userMapper.addPoints(userId, 50);
-//        recordPointHistory(userId, 5, 50, "撤销误驳回，返还积分");
+        Message message = messageMapper.getMessageById(commentId);
+        int oldState = message.getState();  // 获取当前状态
+        int newState = state;  // 要更新的目标状态
         int row = messageMapper.updateMessageState(commentId, state);
         if (row > 0) {
+            // 处理积分
+            if (newState == 2 && oldState != 2) {
+                // 驳回，扣除50积分
+                userMapper.addPoints(message.getUserId(), -50);
+                recordPointHistory(message.getUserId(), 4, 50, "留言被驳回，扣除用户积分");
+            } else if (newState != 2 && oldState == 2) {
+                userMapper.addPoints(message.getUserId(), 50);
+                recordPointHistory(message.getUserId(), 2, 50, "留言被撤销驳回，归还用户积分");
+            }
             return ServerResponse.createServerResponseBySuccess("状态更新成功");
         }
         return ServerResponse.createServerResponseByFail("更新失败");

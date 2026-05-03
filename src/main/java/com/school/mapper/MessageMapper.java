@@ -4,6 +4,7 @@ import com.school.entity.Message;
 import com.school.entity.MessageVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -46,4 +47,7 @@ public interface MessageMapper {
      * @return 留言视图对象列表
      */
     List<MessageVO> getMessagesByUserId(@Param("userId") Integer userId);
+    // 根据id获取留言
+    @Select("select * from message where id = #{id}")
+    Message getMessageById(@Param("id") Integer id);
 }
