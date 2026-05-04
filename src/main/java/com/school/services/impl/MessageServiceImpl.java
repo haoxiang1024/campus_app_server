@@ -2,6 +2,7 @@ package com.school.services.impl;
 
 import com.school.entity.Message;
 import com.school.entity.MessageVO;
+import com.school.entity.Msg;
 import com.school.entity.PointHistory;
 import com.school.mapper.MessageMapper;
 import com.school.mapper.PointHistoryMapper;
@@ -130,7 +131,7 @@ public class MessageServiceImpl implements MessageService {
     }
     @Override
     public ServerResponse updateCommentStatus(Integer commentId, Integer state) {
-        Message message = messageMapper.getMessageById(commentId);
+        Msg message = messageMapper.getMessageById(commentId);
         int oldState = message.getState();  // 获取当前状态
         int newState = state;  // 要更新的目标状态
         int row = messageMapper.updateMessageState(commentId, state);
@@ -138,11 +139,11 @@ public class MessageServiceImpl implements MessageService {
             // 处理积分
             if (newState == 2 && oldState != 2) {
                 // 驳回，扣除50积分
-                userMapper.addPoints(message.getUserId(), -50);
-                recordPointHistory(message.getUserId(), 4, 50, "留言被驳回，扣除用户积分");
+                userMapper.addPoints(message.getUser_id(), -50);
+                recordPointHistory(message.getUser_id(), 4, 50, "留言被驳回，扣除用户积分");
             } else if (newState != 2 && oldState == 2) {
-                userMapper.addPoints(message.getUserId(), 50);
-                recordPointHistory(message.getUserId(), 2, 50, "留言被撤销驳回，归还用户积分");
+                userMapper.addPoints(message.getUser_id(), 50);
+                recordPointHistory(message.getUser_id(), 2, 50, "留言被撤销驳回，归还用户积分");
             }
             return ServerResponse.createServerResponseBySuccess("状态更新成功");
         }

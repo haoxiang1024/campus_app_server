@@ -2,6 +2,7 @@ package com.school.mapper;
 
 import com.school.entity.Message;
 import com.school.entity.MessageVO;
+import com.school.entity.Msg;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -49,5 +50,5 @@ public interface MessageMapper {
     List<MessageVO> getMessagesByUserId(@Param("userId") Integer userId);
     // 根据id获取留言
     @Select("select * from message where id = #{id}")
-    Message getMessageById(@Param("id") Integer id);
+    Msg getMessageById(@Param("id") Integer id);
 }
