@@ -140,7 +140,7 @@ public class MessageServiceImpl implements MessageService {
             if (newState == 2 && oldState != 2) {
                 // 驳回，扣除50积分
                 userMapper.addPoints(message.getUser_id(), -50);
-                recordPointHistory(message.getUser_id(), 4, 50, "留言被驳回，扣除用户积分");
+                recordPointHistory(message.getUser_id(), 4, -50, "留言被驳回，扣除用户积分");
             } else if (newState != 2 && oldState == 2) {
                 userMapper.addPoints(message.getUser_id(), 50);
                 recordPointHistory(message.getUser_id(), 2, 50, "留言被撤销驳回，归还用户积分");
@@ -152,6 +152,10 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public ServerResponse deleteCommentById(Integer commentId) {
+        //扣除用户积分
+        Msg message = messageMapper.getMessageById(commentId);
+        userMapper.addPoints(message.getUser_id(), -50);
+        recordPointHistory(message.getUser_id(), 4, -50, "留言被删除，扣除用户积分");
         int row = messageMapper.deleteMessageById(commentId);
         if (row > 0) {
             return ServerResponse.createServerResponseBySuccess("删除成功");

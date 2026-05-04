@@ -259,8 +259,7 @@ public class LostFoundServiceImpl implements LostFoundService {
         //退还用户积分
         LostFound lostFound = lostFoundMapper.selectByPrimaryKey(id);
         if (lostFound.getType().equals("招领")&lostFound.getState().equals("待认领"))
-        {
-            userMapper.addPoints(lostFound.getUserId(), 10);
+        {userMapper.addPoints(lostFound.getUserId(), 10);
         recordPointHistory(lostFound.getUserId(), 2, 10, "招领帖子被删除，退还积分");
         }
         //执行删除
