@@ -73,5 +73,10 @@ public class CommentController {
     public ServerResponse getComments(@RequestParam("user_id") int user_id) {
         return commentService.getComments(user_id);
     }
+    @ResponseBody
+    @RequestMapping("/delComment")
+    public ServerResponse delComment(@RequestParam("commentId") Integer commentId) {
+        return commentService.deleteCommentById(commentId);
+    }
 
 }

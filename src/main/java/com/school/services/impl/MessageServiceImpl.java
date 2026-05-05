@@ -164,6 +164,15 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    public ServerResponse deleteComment(Integer commentId) {
+        int row = messageMapper.deleteMessageById(commentId);
+        if (row > 0) {
+            return ServerResponse.createServerResponseBySuccess("删除成功");
+        }
+        return ServerResponse.createServerResponseByFail("删除失败");
+    }
+
+    @Override
     public ServerResponse getMessagesByUserId(Integer userId) {
         if (userId == null) {
             return ServerResponse.createServerResponseByFail("用户ID不能为空");

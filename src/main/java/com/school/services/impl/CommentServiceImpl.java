@@ -2,6 +2,7 @@ package com.school.services.impl;
 
 import com.school.entity.Comment;
 import com.school.entity.PointHistory;
+import com.school.mapper.AdminMapper;
 import com.school.mapper.CommentMapper;
 import com.school.mapper.PointHistoryMapper;
 import com.school.mapper.UserMapper;
@@ -31,6 +32,8 @@ public class CommentServiceImpl implements CommentService {
     private PointHistoryMapper pointHistoryMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private AdminMapper adminMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -115,5 +118,14 @@ public class CommentServiceImpl implements CommentService {
             return ServerResponse.createServerResponseBySuccess(comments);
         }
         return ServerResponse.createServerResponseBySuccess(new ArrayList<>());
+    }
+
+    @Override
+    public ServerResponse deleteCommentById(Integer commentId) {
+        int rows = adminMapper.deleteCommentById(commentId);
+        if (rows > 0) {
+            return ServerResponse.createServerResponseBySuccess("删除成功");
+        }
+        return ServerResponse.createServerResponseByFail(500, "删除失败，可能数据不存在");
     }
 }

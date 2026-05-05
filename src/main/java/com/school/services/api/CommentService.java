@@ -33,5 +33,8 @@ public interface CommentService {
     ServerResponse getReceivedComments(int userId);
 
     ServerResponse getComments(int userId);
-
+    /**
+     * 删除评论
+     */
+    ServerResponse deleteCommentById(Integer commentId);
 }

@@ -50,6 +50,6 @@ public class MessageController {
     @ResponseBody
     @PostMapping("/deleteMessage")
     public ServerResponse deleteMessage(@RequestParam("id") Integer id) {
-        return messageService.deleteCommentById(id);
+        return messageService.deleteComment(id);
     }
 }

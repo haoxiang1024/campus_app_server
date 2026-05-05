@@ -34,12 +34,13 @@ public interface MessageService {
     ServerResponse updateCommentStatus(Integer commentId, Integer state);
 
     /**
-     * 根据ID物理删除留言
+     * 管理员根据ID物理删除留言
      * @param commentId 留言ID
      * @return 操作结果
      */
     ServerResponse deleteCommentById(Integer commentId);
-
+    //用户自己删除留言
+    ServerResponse deleteComment(Integer commentId);
     /**
      * 根据用户ID获取留言列表
      * @param userId 用户ID
