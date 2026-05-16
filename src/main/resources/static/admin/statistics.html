@@ -5,10 +5,10 @@
     .stat-card { transition: transform 0.3s ease, box-shadow 0.3s ease; border-radius: 0.75rem; }
     .stat-card:hover { transform: translateY(-5px); box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important; }
     .icon-box { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
-    /* 解决GL地图缩放按钮可能被遮挡的问题 */
+    /* 隐藏GL地图控件 */
     .BMap_cpyCtrl, .anchorBL { display: none !important; }
 
-    /* 自定义百度地图信息窗体滚动条样式 */
+    /* 自定义滚动条 */
     .custom-info-window::-webkit-scrollbar { width: 6px; }
     .custom-info-window::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
     .custom-info-window::-webkit-scrollbar-track { background: transparent; }
@@ -157,6 +157,7 @@
     $(function() {
         let dataMap = { users: 0, lost: 0, found: 0, items: 0, orders: 0, messages: 0, comments: 0, types: 0 };
 
+        // 发起数据请求
         const reqs = [
             $.get('/school/admin/getAllUser').then(res => { if(res?.status === 0) dataMap.users = Array.isArray(res.data) ? res.data.length : (res.data || 0); }),
             $.get('/school/admin/getAllLostFoundCount', { type: '失物' }).then(res => { if(res?.status === 0) dataMap.lost = res.data || 0; }),
@@ -168,6 +169,7 @@
             $.get('/school/getAllType').then(res => { if(res?.status === 0) dataMap.types = Array.isArray(res.data) ? res.data.length : (res.data || 0); })
         ];
 
+        // 绑定数据到UI
         Promise.allSettled(reqs).then(() => {
             $('#s_totalUsers').text(dataMap.users);
             $('#s_totalLost').text(dataMap.lost);
@@ -180,6 +182,7 @@
             initCharts(dataMap);
         });
 
+        // 初始化图表
         function initCharts(data) {
             const chartPie = echarts.init(document.getElementById('lostFoundChart'));
             chartPie.setOption({
@@ -211,14 +214,15 @@
             window.addEventListener('resize', () => { chartPie.resize(); chartBar.resize(); });
         }
 
+        // 初始化地图
         window.initMap = function() {
             const map = new BMapGL.Map("lostFoundMap");
-            const point = new BMapGL.Point(104.701646, 31.540942); // 校园中心点
+            const point = new BMapGL.Point(104.701646, 31.540942);
             map.centerAndZoom(point, 17);
             map.enableScrollWheelZoom(true);
             map.setTilt(0);
 
-            // 添加左上角图例控件
+            // 自定义图例控件
             function LegendControl() {
                 this.defaultAnchor = BMAP_ANCHOR_TOP_LEFT;
                 this.defaultOffset = new BMapGL.Size(15, 15);
@@ -247,10 +251,12 @@
             };
             map.addControl(new LegendControl());
 
-            // SVG 图标
-            const blueIconSvg = "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 384 512'%3E%3Cpath fill='%230d6efd' d='M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0z'/%3E%3Ccircle cx='192' cy='192' r='70' fill='white'/%3E%3C/svg%3E";
-            const redIconSvg = "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 384 512'%3E%3Cpath fill='%23dc3545' d='M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0z'/%3E%3Ccircle cx='192' cy='192' r='70' fill='white'/%3E%3C/svg%3E";
+            // 附带尺寸属性的蓝色图标
+            const blueIconSvg = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMCIgaGVpZ2h0PSI0MiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSIjMGQ2ZWZkIiBkPSJNMTIgMkM4LjEzIDIgNSA1LjEzIDUgOWMwIDUuMjUgNyAxMyA3IDEzczctNy43NSA3LTEzYzAtMy44Ny0zLjEzLTctNy03em0wIDkuNWMtMS4zOCAwLTIuNS0xLjEyLTIuNS0yLjVzMS4xMi0yLjUgMi41LTIuNSAyLjUgMS4xMiAyLjUgMi41LTEuMTIgMi41LTIuNSAyLjV6Ii8+PC9zdmc+";
+            // 附带尺寸属性的红色图标
+            const redIconSvg = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMCIgaGVpZ2h0PSI0MiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSIjZGMzNTQ1IiBkPSJNMTIgMkM4LjEzIDIgNSA1LjEzIDUgOWMwIDUuMjUgNyAxMyA3IDEzczctNy43NSA3LTEzYzAtMy44Ny0zLjEzLTctNy03em0wIDkuNWMtMS4zOCAwLTIuNS0xLjEyLTIuNS0yLjVzMS4xMi0yLjUgMi41LTIuNSAyLjUgMS4xMiAyLjUgMi41LTEuMTIgMi41LTIuNSAyLjV6Ii8+PC9zdmc+";
 
+            // 添加标记点
             const addMarkerGroup = (items, typeName, lng, lat, iconSvg) => {
                 if(items.length === 0) return;
 
@@ -304,12 +310,11 @@
                 marker.addEventListener("click", () => map.openInfoWindow(infoWindow, markerPoint));
             };
 
-            // 获取数据，处理重叠逻辑
+            // 获取数据并处理重叠
             $.get('/school/showTopList').then(res => {
                 if(res?.status === 0 && res.data) {
                     let locationMap = {};
 
-                    // 按基础坐标分组
                     res.data.forEach(item => {
                         if(item.longitude && item.latitude) {
                             let key = `${item.longitude}_${item.latitude}`;
@@ -318,27 +323,20 @@
                         }
                     });
 
-                    // 遍历每个地点
                     for (let key in locationMap) {
                         let itemsGroup = locationMap[key];
                         let baseLng = parseFloat(itemsGroup[0].longitude);
                         let baseLat = parseFloat(itemsGroup[0].latitude);
 
-                        // 把该地点的物品分离：失物 和 招领
                         let lostItems = itemsGroup.filter(i => i.type === '失物');
                         let foundItems = itemsGroup.filter(i => i.type !== '失物');
 
-                        // 重叠处理逻辑
                         if (lostItems.length > 0 && foundItems.length > 0) {
-                            // 同一个地点既有失物又有招领
-                            // 添加微小偏移量 让它们肩并肩显示
                             addMarkerGroup(lostItems, '失物', baseLng, baseLat, redIconSvg);
                             addMarkerGroup(foundItems, '招领', baseLng + 0.00030, baseLat, blueIconSvg);
                         } else if (lostItems.length > 0) {
-                            // 只有失物，正常原位置显示
                             addMarkerGroup(lostItems, '失物', baseLng, baseLat, redIconSvg);
                         } else if (foundItems.length > 0) {
-                            // 只有招领，正常原位置显示
                             addMarkerGroup(foundItems, '招领', baseLng, baseLat, blueIconSvg);
                         }
                     }
@@ -346,6 +344,7 @@
             });
         };
 
+        // 异步加载地图脚本
         function loadBaiduMap() {
             const ak = (typeof MAP_CONFIG !== 'undefined') ? MAP_CONFIG.baiduAK : "YOUR_FALLBACK_AK";
             const script = document.createElement("script");

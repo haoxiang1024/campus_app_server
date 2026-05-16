@@ -30,7 +30,7 @@
         <div class="d-flex gap-2">
             <select id="stateFilter" class="form-select form-select-sm" style="width: 120px;">
                 <option value="" selected>所有状态</option>
-                
+
                 <option value="1">已通过</option>
                 <option value="2">已驳回</option>
             </select>
@@ -193,10 +193,11 @@
             const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get();
             if (!selectedIds.length) return window.Toast.error('请先勾选项目');
 
+            // 过滤项：只过滤掉自身状态已等于目标状态的项
             const targetItems = allData.filter(item => {
                 if (!selectedIds.includes(item.id.toString())) return false;
-                if (targetStateText === '已驳回') return item.state == 0 || item.state == 1;
-                if (targetStateText === '已通过') return item.state == 0 || item.state == 2;
+                if (targetStateText === '通过') return item.state != 1;
+                if (targetStateText === '驳回') return item.state != 2;
                 return false;
             });
 
@@ -208,7 +209,6 @@
                 const promises = targetItems.map(item => $.post('/school/admin/updateCommentStatus', {
                     commentId: item.id,
                     state: stateCode
-
                 }));
 
                 Promise.all(promises).then(results => {
