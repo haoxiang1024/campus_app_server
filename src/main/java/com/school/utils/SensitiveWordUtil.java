@@ -16,7 +16,9 @@ public class SensitiveWordUtil {
     public static final int MAX_MATCH_TYPE = 2;
 
     /**
-     * 初始化敏感词库，构建DFA算法模型
+     * 初始化敏感词库，构建DFA算法
+     * 用HashMap构建一棵字典树，每个敏感词逐字插入树中，用isEnd标记词尾。
+     * 匹配时，文本只需要扫描一遍，沿着树走，就能判断是否命中敏感词，时间复杂度是O(n)，与词库大小无关
      */
     public static void initKeyWord(Set<String> wordSet) {
         sensitiveWordMap = new HashMap<>(wordSet.size());

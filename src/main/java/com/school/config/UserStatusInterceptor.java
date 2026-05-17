@@ -22,7 +22,9 @@ import java.nio.charset.StandardCharsets;
 
 @Component
 public class UserStatusInterceptor implements HandlerInterceptor {
-
+//先检查请求是否属于公开接口（登录、注册），是则放行
+//从Authorization头提取JWT Token，解析出用户ID
+//查询数据库校验用户是否被禁用，禁用了就返回401拦截
     @Autowired
     private UserMapper userMapper;
 
