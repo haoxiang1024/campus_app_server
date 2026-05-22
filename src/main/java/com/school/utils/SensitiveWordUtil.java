@@ -1,5 +1,5 @@
 package com.school.utils;
-//敏感词工具类
+
 
 import org.springframework.stereotype.Service;
 
@@ -8,18 +8,14 @@ import java.util.Map;
 import java.util.Set;
 @Service
 public class SensitiveWordUtil {
-    // 敏感词库树
+
     private static Map<Object, Object> sensitiveWordMap;
-    // 最小匹配规则（匹配“敏感”，文本为“敏感词”，匹配到“敏感”即返回）
+
     public static final int MIN_MATCH_TYPE = 1;
-    // 最大匹配规则（匹配“敏感词”，文本为“敏感词”，匹配到“敏感词”才返回）
+
     public static final int MAX_MATCH_TYPE = 2;
 
-    /**
-     * 初始化敏感词库，构建DFA算法
-     * 用HashMap构建一棵字典树，每个敏感词逐字插入树中，用isEnd标记词尾。
-     * 匹配时，文本只需要扫描一遍，沿着树走，就能判断是否命中敏感词，时间复杂度是O(n)，与词库大小无关
-     */
+
     public static void initKeyWord(Set<String> wordSet) {
         sensitiveWordMap = new HashMap<>(wordSet.size());
         for (String key : wordSet) {
@@ -42,9 +38,7 @@ public class SensitiveWordUtil {
         }
     }
 
-    /**
-     * 检索内容是否包含敏感词
-     */
+
     public static boolean contains(String txt) {
         for (int i = 0; i < txt.length(); i++) {
             int matchFlag = checkSensitiveWord(txt, i, MAX_MATCH_TYPE);
@@ -53,35 +47,28 @@ public class SensitiveWordUtil {
         return false;
     }
 
-    /**
-     * 检查敏感词数量
-     */
+
     private static int checkSensitiveWord(String txt, int beginIndex, int matchType) {
         Map nowMap = sensitiveWordMap;
         int matchFlag = 0;
-        int actualMatchLength = 0; // 记录真正完整匹配到的长度
+        int actualMatchLength = 0;
         for (int i = beginIndex; i < txt.length(); i++) {
             char word = txt.charAt(i);
             nowMap = (Map) nowMap.get(word);
             if (nowMap != null) {
                 matchFlag++;
                 if ("1".equals(nowMap.get("isEnd"))) {
-                    actualMatchLength = matchFlag; // 只有结尾了才算数
+                    actualMatchLength = matchFlag;
                     if (MIN_MATCH_TYPE == matchType) break;
                 }
             } else {
                 break;
             }
         }
-        return actualMatchLength; // 返回真正匹配成功的长度
+        return actualMatchLength;
     }
 
-    /**
-     * 替换敏感词
-     * @param content 待检测的文本
-     * @param replaceChar 替换字符，例如 "*"
-     * @return 替换后的文本
-     */
+
     public String replaceSensitiveWord(String content, String replaceChar) {
         if (content == null || content.trim().isEmpty()) {
             return content;
@@ -92,11 +79,11 @@ public class SensitiveWordUtil {
             int length = checkSensitiveWord(result.toString(), i, 1);
 
             if (length > 0) {
-                // 找到敏感词，创建对应长度的替换字符串
+
                 String stars = getReplaceChars(replaceChar, length);
-                // 替换从 i 到 i+length 的内容
+
                 result.replace(i, i + length, stars);
-                // 指针跳过已替换的词
+
                 i = i + length - 1;
             }
         }
@@ -104,9 +91,7 @@ public class SensitiveWordUtil {
         return result.toString();
     }
 
-    /**
-     * 生成指定长度的替换符
-     */
+
     private String getReplaceChars(String replaceChar, int length) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < length; i++) {

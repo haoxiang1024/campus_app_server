@@ -4,106 +4,42 @@ import com.school.entity.User;
 import com.school.utils.ServerResponse;
 
 
-/**
- * 用户服务接口
- * 提供用户管理相关的核心业务功能
- */
+
 public interface UserService {
-    /**
-     * 用户注册
-     * @param phone 手机号码
-     * @param email 邮箱地址
-     * @param password 密码
-     * @return ServerResponse 包含注册用户信息和操作结果的响应对象
-     */
+
     ServerResponse register(String phone,String email,String password,int role);
     
-    /**
-     * 用户登录
-     * @param phone 手机号码
-     * @param pwd 密码
-     * @return ServerResponse 包含用户信息和登录结果的响应对象
-     */
+
     ServerResponse login(String phone,String pwd);
     
-    /**
-     * 重置用户密码
-     * @param phone 手机号码
-     * @param newPwd 新密码
-     * @return ServerResponse 包含用户信息和重置结果的响应对象
-     */
+
     ServerResponse resetPwd(String phone,String newPwd);
     
-    /**
-     * 更新用户头像
-     * @param photo 头像URL
-     * @param id 用户ID
-     * @return ServerResponse 包含更新后用户信息的响应对象
-     */
+
     ServerResponse updatePhoto(String photo,int id);
     
-    /**
-     * 更新用户基本信息
-     * @param nickname 昵称
-     * @param sex 性别
-     * @param id 用户ID
-     * @return ServerResponse 包含更新后用户信息的响应对象
-     */
+
     ServerResponse updateAc(String nickname,String sex,int id);
 
-    /**
-     * 管理员更新用户信息
-     * @param user 用户对象
-     * @return ServerResponse 操作结果响应对象
-     */
+
     ServerResponse updateUserInfo(User user);
     
-    /**
-     * 根据ID获取单个用户信息
-     * @param id 用户ID
-     * @return User 用户实体对象
-     */
+
     User getUserById(Integer id);
     
-    /**
-     * 修改用户状态（启用/禁用）
-     * @param ids 逗号分隔的ID字符串，如 "1,2,3"
-     * @param status 目标状态（1-启用，0-禁用）
-     * @return ServerResponse 操作结果响应对象
-     */
+
     ServerResponse updateUserStatus(String ids, Integer status);
     
 
-    /**
-     * 获取IM用户Token
-     * @param uid 用户ID
-     * @param nickname 用户昵称
-     * @return ServerResponse 包含IM Token的响应对象
-     */
+
     ServerResponse getIMUserToken(int uid, String nickname);
 
-    /**
-     * 验证已有邮箱并修改手机号
-     * @param id 用户ID
-     * @param newPhone 新手机号
-     * @param code 邮箱验证码
-     * @return ServerResponse 操作结果
-     */
+
     ServerResponse updatePhone(int id, String newPhone, String code);
 
-    /**
-     * 验证已有邮箱并修改邮箱
-     * @param id 用户ID
-     * @param newEmail 新邮箱
-     * @param code 邮箱验证码
-     * @return ServerResponse 操作结果
-     */
+
     ServerResponse updateEmail(int id, String newEmail, String code);
 
-    /**
-     * 注销用户账号
-     * @param id 用户ID
-     * @return ServerResponse 操作结果
-     */
+
     ServerResponse deleteAccount(int id);
 }

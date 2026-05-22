@@ -23,7 +23,7 @@
 </p>
 
 <script>
-    // 获取 URL 上的参数
+
     function getQueryVariable(variable) {
         var query = window.location.search.substring(1);
         var vars = query.split("&");
@@ -36,22 +36,22 @@
 
     function openApp() {
         var id = getQueryVariable("id");
-        var type = getQueryVariable("type") || "found"; // 如果没有传 type，默认兼容老版本的 found
+        var type = getQueryVariable("type") || "found";
 
         if(id) {
-            // 根据 type 动态生成唤起 App 的协议路径
+
             var hostPath = (type === "lost") ? "lost" : "found";
             window.location.href = "hxcampus://" + hostPath + "/detail?id=" + id;
         }
     }
 
-    // 页面加载完执行初始化
+
     window.onload = function() {
         var type = getQueryVariable("type") || "found";
         var titleElement = document.getElementById("page-title");
         var htmlTitleElement = document.getElementById("html-title");
 
-        // 动态修改页面的文案展示
+
         if (type === "lost") {
             htmlTitleElement.innerText = "寻物启事详情";
             titleElement.innerText = "发现一条校园寻物启事";
@@ -60,8 +60,8 @@
             titleElement.innerText = "发现一条校园失物招领";
         }
 
-        // // 自动尝试唤起一次
-        // openApp();
+
+
     };
 </script>
 </body>

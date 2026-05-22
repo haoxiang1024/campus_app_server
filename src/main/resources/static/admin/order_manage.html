@@ -1,27 +1,27 @@
 <link href="./css/sweetalert2.min.css" rel="stylesheet">
 <style>
-  /* 统一页面容器与基础色调 */
+
   .content-wrapper { background: #ffffff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 25px; margin: 15px; color: #333; }
   .text-custom-blue { color: #00aaff !important; }
   .bg-custom-blue { background-color: #00aaff !important; color: white !important; }
   .btn-custom-blue { background-color: #00aaff; color: white; border: none; }
   .btn-custom-blue:hover { background-color: #0088cc; color: white; }
 
-  /* 统一表格样式 */
+
   .table-light th { background-color: #f8f9fa !important; color: #666 !important; font-weight: 600; }
   .form-control:focus, .form-select:focus { border-color: #00aaff; box-shadow: 0 0 0 0.25rem rgba(0, 170, 255, 0.25); }
 
-  /* 添加 !important 防止被 Bootstrap 默认样式覆盖 */
+
   .btn-outline-custom { color: #00aaff !important; border-color: #dee2e6 !important; }
   .btn-outline-custom:hover:not(:disabled) { background-color: #00aaff !important; color: white !important; }
   .btn-outline-custom:disabled { cursor: not-allowed; opacity: 0.5; }
 
-  /* 核验码字体增强 */
+
   .verify-badge { font-family: monospace; font-size: 1.1em; letter-spacing: 1px; font-weight: bold; }
-  /* 表格超链接按钮无下划线 */
+
   .text-decoration-none { text-decoration: none !important; }
 
-  /* 统一的下拉框边框样式 */
+
   .form-select-sm { border-color: #dee2e6 !important; color: #666; }
 </style>
 
@@ -116,7 +116,7 @@
     const pageSize = 10;
     let allOrders = [];
 
-    // 挂载到 window，保证 HTML 上的 onclick 能够调用
+
     window.loadOrders = function(page) {
       currentPage = page || 1;
       const keyword = $('#searchInput').val().trim();
@@ -238,7 +238,7 @@
       });
     };
 
-    // 统一解除旧事件绑定再重新绑定，防止重复触发
+
     $('#searchBtn').off('click').on('click', () => window.loadOrders(1));
     $('#stateFilter').off('change').on('change', () => window.loadOrders(1));
     $('#selectAll').off('change').on('change', function() {

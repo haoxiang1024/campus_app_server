@@ -1,6 +1,6 @@
 <link href="./css/sweetalert2.min.css" rel="stylesheet">
 <style>
-    /* 页面基础样式 */
+
     .content-wrapper { background: #ffffff !important; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 25px; margin: 15px; color: #333 !important; }
     .text-custom-blue { color: #00aaff !important; }
     .table-light th { background-color: #f8f9fa !important; color: #666 !important; font-weight: 600; }
@@ -10,7 +10,7 @@
     .btn-link { text-decoration: none !important; }
     .form-select-sm { border-color: #dee2e6 !important; color: #666; }
 
-    /* 积分正负颜色 */
+
     .text-points-gain { color: #28a745 !important; font-weight: bold; }
     .text-points-cost { color: #dc3545 !important; font-weight: bold; }
 </style>
@@ -86,7 +86,7 @@
         const pageSize = 10;
         let allData = [];
 
-        // 格式化时间戳
+
         function formatDate(ts) {
             if (!ts) return '-';
             const parseValue = isNaN(Number(ts)) ? ts : Number(ts);
@@ -95,7 +95,7 @@
             return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}:${d.getSeconds().toString().padStart(2,'0')}`;
         }
 
-        // 加载表格数据
+
         function loadData(page) {
             currentPage = page || 1;
             const keyword = $('#searchInput').val().trim();
@@ -116,7 +116,7 @@
 
                     renderTable(allData);
 
-                    // 更新分页组件状态
+
                     $('#pageInfo').text(`第 ${currentPage} 页 / 共 ${totalPages} 页`);
                     $('#totalCount').text(totalItems);
                     $('#btnFirstPage, #btnPrevPage').prop('disabled', currentPage <= 1);
@@ -130,7 +130,7 @@
             });
         }
 
-        // 渲染表格 HTML
+
         function renderTable(data) {
             let html = '';
             if (!data || !data.length) {
@@ -139,7 +139,7 @@
                 data.forEach(item => {
                     item = item || {};
 
-                    // 解析类型
+
                     let typeBadge = '';
 
                     if (item.type === 1) {
@@ -154,13 +154,13 @@
                         typeBadge = '<span class="badge bg-secondary">未知类型</span>';
                     }
 
-                    // 解析数值颜色
+
                     let points = item.points_changed || 0;
                     let pointsHtml = points > 0
                         ? `<span class="text-points-gain">+${points}</span>`
                         : `<span class="text-points-cost">${points}</span>`;
 
-                    // 拼接行
+
                     html += `<tr>
                         <td><input type="checkbox" class="item-checkbox form-check-input" value="${item.id || 0}"></td>
                         <td>${item.id || 0}</td>
@@ -178,7 +178,7 @@
             $('#historyTableBody').html(html);
         }
 
-        // 单个删除
+
         window.deleteItem = (id) => {
             if (!id) return window.Toast.error('无效的记录ID');
             window.Toast.confirm("删除确认", "确定永久删除此流水记录吗？（警告：通常不建议删除审计日志）", () => {
@@ -193,7 +193,7 @@
             });
         };
 
-        // 批量删除
+
         $('#batchDeleteBtn').on('click', function() {
             const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get().filter(id => id);
             if (!selectedIds.length) return window.Toast.error('请勾选要删除的记录');
@@ -210,7 +210,7 @@
             });
         });
 
-        // 事件监听
+
         $('#searchBtn').on('click', () => loadData(1));
         $('#searchInput').on('keypress', e => { if(e.which === 13) loadData(1); });
         $('#typeFilter').on('change', () => loadData(1));
@@ -221,7 +221,7 @@
         $('#btnPrevPage').on('click', () => { if(currentPage > 1) loadData(currentPage - 1); });
         $('#btnNextPage').on('click', () => { if(currentPage < totalPages) loadData(currentPage + 1); });
 
-        // 初始化加载数据
+
         loadData(1);
     })();
 </script>

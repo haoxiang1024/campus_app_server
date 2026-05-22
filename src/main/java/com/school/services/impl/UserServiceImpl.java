@@ -25,10 +25,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/**
- * 用户服务实现类
- * 实现用户管理相关的核心业务功能，包括注册、登录、IM集成等
- */
+
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
@@ -39,41 +36,34 @@ public class UserServiceImpl implements UserService {
     private Util util;
     @Autowired
     private TokenUtils serverTokenUtils;
-    /**
-     * 用户注册
-     * 创建新用户账户，包含随机昵称、头像生成和IM系统集成
-     * @param phone 手机号码
-     * @param email 邮箱地址
-     * @param password 密码
-     * @return ServerResponse 包含注册用户信息和操作结果的响应对象
-     */
+
     @Override
     public ServerResponse register(String phone,String email,String password,int role) {
-        // 初始化用户基本属性
-        Date time = DateUtil.getTime();//获取时间
-        int points=100;//初始积分
-        String sex=Util.SexRandom(); // 随机性别
-        String nickname = Util.NickNameRandom();//随机获取昵称
-        String photo; // 头像URL
-        String fileName;//文件名
-        int state=1;//状态：1启用 0禁用 role:0普通用户 1管理员
-        // 密码加密处理
+
+        Date time = DateUtil.getTime();
+        int points=100;
+        String sex=Util.SexRandom();
+        String nickname = Util.NickNameRandom();
+        String photo;
+        String fileName;
+        int state=1;
+
         String hashedPwd=Util.encryptPwd(password);
         
-        // 获取随机头像
+
         try {
-            photo = Util.ImageSearch("头像");//随机获取头像
-            // 定义本地保存目录变量
+            photo = Util.ImageSearch("头像");
+
             String saveDirectory = "upload/";
-            // 生成UUID文件名
+
             fileName = UUID.randomUUID() + ".jpg";
-            // 构建本地目标文件路径
+
             Path targetPath = Paths.get(saveDirectory, fileName);
-            // 确保目标目录及其父目录存在
+
             Files.createDirectories(targetPath.getParent());
-            // 解析URL对象
+
             URL url = new URI(photo).toURL();
-            // 打开输入流并拷贝至本地文件
+
             try (InputStream in = url.openStream()) {
                 Files.copy(in, targetPath, StandardCopyOption.REPLACE_EXISTING);
             }
@@ -81,10 +71,10 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException(e);
         }
         
-        // 创建用户对象
+
         User user = new User(fileName,phone,sex,points,time,email,state,role,nickname,hashedPwd);
         
-        // 验证手机号是否已经注册过
+
         List<User> userList = userMapper.getalll();
         for(User u:userList){
             if(u.getPhone().equals(phone)){
@@ -92,21 +82,21 @@ public class UserServiceImpl implements UserService {
             }
         }
         
-        // 执行数据库注册操作
+
         if(userMapper.register(user)) {
-            // IM系统注册 - 同步创建IM账户
+
             String response = Util.registerUserToProvider(user.getId().toString(), user.getNickname(), user.getPhoto());
             JSONObject jsonObject = JSON.parseObject(response);
-            //imtoken
+
             String token = jsonObject.getString("token");
-            //存入数据库
+
             user.setIm_token(token);
             userMapper.updateUserInfo(user);
-            // 验证IM注册是否成功
+
             if(token != null && !token.isEmpty()){
-                //token
+
                 String bearerToken = serverTokenUtils.generateToken(user.getId());
-                //设置用户信息
+
                 LoginResponseDTO loginResponseDTO=new LoginResponseDTO(user,bearerToken);
                 return ServerResponse.createServerResponseBySuccess(loginResponseDTO, "注册成功");
             }
@@ -115,70 +105,58 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    /**
-     * 用户登录
-     * 验证用户身份并返回完整的用户信息
-     * @param phone 手机号码
-     * @param pwd 密码
-     * @return ServerResponse 包含用户信息和登录结果的响应对象
-     */
+
     @Override
     public ServerResponse login(String phone, String pwd) {
-        // 根据手机号查找用户ID
+
         Integer userid = userMapper.findUserByPhone(phone);
         if (userid == null) {
-            // 如果查询不到用户ID，说明该账号未注册
+
             return ServerResponse.createServerResponseByFail("登录失败，该手机号尚未注册");
         }
         
-        // 获取数据库中存储的加密密码
+
         String hashedPwd = userMapper.login(phone);
         
-        // 验证密码是否匹配
+
         boolean isMatch = Util.verifyPwd(pwd, hashedPwd);
         if (isMatch) {
-            // 密码正确，获取详细用户信息
+
             User userInfo = userMapper.userInfo(userid);
-            // 检查用户是否被禁用
+
              if (userInfo.getstate() == 0) {
                  return ServerResponse.createServerResponseByFail("该账号已被禁用");
              }
             
-            // 更新头像路径为完整URL
+
             String pic = util.updatePic(userInfo.getPhoto());
             userInfo.setPhoto(pic);
-            //token
+
             String bearerToken = serverTokenUtils.generateToken(userInfo.getId());
-            //设置用户信息
+
             LoginResponseDTO loginResponseDTO=new LoginResponseDTO(userInfo,bearerToken);
             
             return ServerResponse.createServerResponseBySuccess(loginResponseDTO, "登录成功");
         } else {
-            // 密码错误
+
             return ServerResponse.createServerResponseByFail("登录失败，密码错误");
         }
 
     }
 
-    /**
-     * 重置用户密码
-     * 用于用户忘记密码时的安全重置功能
-     * @param phone 手机号码
-     * @param newPwd 新密码
-     * @return ServerResponse 包含用户信息和重置结果的响应对象
-     */
+
     @Override
     public ServerResponse resetPwd(String phone, String newPwd) {
-        //获取用户信息
+
         Integer userId = userMapper.findUserByPhone(phone);
         if (userId == null) {
             return ServerResponse.createServerResponseBySuccess("用户不存在");
         }
-            //密码重置
-                String hashedPwd =  Util.encryptPwd(newPwd);//加密存储密码
+
+                String hashedPwd =  Util.encryptPwd(newPwd);
                 if (userMapper.resetPwd(phone, hashedPwd)) {
                     User userInfo = userMapper.userInfo(userId);
-                    //重置成功
+
                     return ServerResponse.createServerResponseBySuccess(userInfo, "重置成功");
                 }else {
                     return ServerResponse.createServerResponseBySuccess("重置失败");
@@ -187,21 +165,15 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    /**
-     * 更新用户头像
-     * 同步更新数据库和IM系统的用户头像信息
-     * @param photo 头像URL
-     * @param id 用户ID
-     * @return ServerResponse 包含更新后用户信息的响应对象
-     */
+
     @Override
     public ServerResponse updatePhoto(String photo, int id) {
         if (userMapper.updatePhoto(photo, id)) {
-            User userInfo = userMapper.userInfo(id);//获取用户信息
-            //设置头像
+            User userInfo = userMapper.userInfo(id);
+
             String pic = util.updatePic(userInfo.getPhoto());
             userInfo.setPhoto(pic);
-            //IM用户资料同步修改
+
             String res=rongCloudApi.refresh(String.valueOf(id),userInfo.getNickname(),photo);
             JSONObject jsonObject = JSON.parseObject(res);
             String code = jsonObject.getString("code");
@@ -215,22 +187,15 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    /**
-     * 更新用户基本信息
-     * 同步更新数据库和IM系统的用户基本信息
-     * @param nickname 昵称
-     * @param sex 性别
-     * @param id 用户ID
-     * @return ServerResponse 包含更新后用户信息的响应对象
-     */
+
     @Override
     public ServerResponse updateAc(String nickname, String sex,int id) {
         if (userMapper.updateAc(nickname,sex,id)) {
             User userInfo = userMapper.userInfo(id);
-            //设置头像
+
             String pic = util.updatePic(userInfo.getPhoto());
             userInfo.setPhoto(pic);
-            //IM用户资料同步修改
+
             String res=rongCloudApi.refresh(String.valueOf(id),nickname,userInfo.getPhoto());
             JSONObject jsonObject = JSON.parseObject(res);
             String code = jsonObject.getString("code");
@@ -246,17 +211,12 @@ public class UserServiceImpl implements UserService {
 
 
 
-    /**
-     * 管理员更新用户信息
-     * 支持批量更新用户资料并同步到IM系统
-     * @param user 用户对象
-     * @return ServerResponse 操作结果响应对象
-     */
+
     @Override
     public ServerResponse updateUserInfo(User user) {
         int resultCount = userMapper.updateUserInfo(user);
         if (resultCount > 0) {
-            //IM用户资料同步修改
+
             String res=rongCloudApi.refresh(String.valueOf(user.getId()),user.getNickname(),user.getPhoto());
             JSONObject jsonObject = JSON.parseObject(res);
             String code = jsonObject.getString("code");
@@ -270,23 +230,13 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    /**
-     * 根据ID获取单个用户信息
-     * @param id 用户ID
-     * @return User 用户实体对象
-     */
+
     @Override
     public User getUserById(Integer id) {
         return userMapper.getUserById(id);
     }
 
-    /**
-     * 修改用户状态（启用/禁用）
-     * 支持批量操作用户账户状态
-     * @param ids 逗号分隔的ID字符串，如 "1,2,3"
-     * @param status 目标状态（1-启用，0-禁用）
-     * @return ServerResponse 操作结果响应对象
-     */
+
     @Override
     public ServerResponse updateUserStatus(String ids, Integer status) {
         if (StringUtils.isEmpty(ids)) {
@@ -312,21 +262,15 @@ public class UserServiceImpl implements UserService {
 
 
 
-    /**
-     * 获取IM用户Token
-     * 处理用户首次连接和重复连接的不同场景
-     * @param uid 用户ID
-     * @param nickname 用户昵称
-     * @return ServerResponse 包含IM Token的响应对象
-     */
+
     @Override
     public ServerResponse getIMUserToken(int uid, String nickname) {
         User user = userMapper.userInfo(uid);
-        //判断是否是非首次连接
+
         if (user.getIm_token() != null && !user.getIm_token().isEmpty()) {
             return ServerResponse.createServerResponseBySuccess(user.getIm_token(),"token获取成功");
         }
-        //首次连接
+
         String response=Util.registerUserToProvider(String.valueOf(uid),nickname,user.getPhoto());
         JSONObject jsonObject = JSON.parseObject(response);
         String token = jsonObject.getString("token");
@@ -338,12 +282,10 @@ public class UserServiceImpl implements UserService {
         return ServerResponse.createServerResponseByFail("聊天服务连接失败，请稍后再试");
     }
 
-    /**
-     * 验证已有邮箱并修改手机号
-     */
+
     @Override
     public ServerResponse updatePhone(int id, String newPhone, String code) {
-        //  获取当前用户信息，拿到绑定的旧邮箱
+
         User user = userMapper.userInfo(id);
         if (user == null) {
             return ServerResponse.createServerResponseByFail("用户不存在");
@@ -353,29 +295,29 @@ public class UserServiceImpl implements UserService {
             return ServerResponse.createServerResponseByFail("原账号未绑定邮箱，无法进行安全验证");
         }
 
-        //  校验发送到旧邮箱的验证码
+
         boolean isValid = EmailVerificationUtils.verifyCode(oldEmail, code);
         if (!isValid) {
             return ServerResponse.createServerResponseByFail("验证码错误或已过期");
         }
 
-        //  检查新手机号是否已被其他账号占用
+
         Integer existId = userMapper.findUserByPhone(newPhone);
         if (existId != null && !existId.equals(id)) {
             return ServerResponse.createServerResponseByFail("该手机号已被其他账号绑定");
         }
 
-        //  更新手机号
+
         User updateParam = new User();
         updateParam.setId(id);
         updateParam.setPhone(newPhone);
 
         int result = userMapper.updateUserInfo(updateParam);
         if (result > 0) {
-            // 返回最新用户信息并处理头像路径
+
             User updatedUser = userMapper.userInfo(id);
             updatedUser.setPhoto(util.updatePic(updatedUser.getPhoto()));
-            // IM用户资料同步修改
+
             String res=rongCloudApi.refresh(String.valueOf(updatedUser.getId()),updatedUser.getNickname(),updatedUser.getPhoto());
             JSONObject jsonObject = JSON.parseObject(res);
             String imcode = jsonObject.getString("code");
@@ -387,12 +329,10 @@ public class UserServiceImpl implements UserService {
         return ServerResponse.createServerResponseByFail("修改失败，请稍后重试");
     }
 
-    /**
-     * 验证已有邮箱并修改邮箱
-     */
+
     @Override
     public ServerResponse updateEmail(int id, String newEmail, String code) {
-        //  获取当前用户信息，拿到绑定的旧邮箱
+
         User user = userMapper.userInfo(id);
         if (user == null) {
             return ServerResponse.createServerResponseByFail("用户不存在");
@@ -402,20 +342,20 @@ public class UserServiceImpl implements UserService {
             return ServerResponse.createServerResponseByFail("原账号未绑定邮箱，无法进行安全验证");
         }
 
-        //  校验发送到旧邮箱的验证码
+
         boolean isValid = EmailVerificationUtils.verifyCode(oldEmail, code);
         if (!isValid) {
             return ServerResponse.createServerResponseByFail("验证码错误或已过期");
         }
 
-        //  更新为新邮箱
+
         User updateParam = new User();
         updateParam.setId(id);
         updateParam.setEmail(newEmail);
 
         int result = userMapper.updateUserInfo(updateParam);
         if (result > 0) {
-            // 返回最新用户信息并处理头像路径
+
             User updatedUser = userMapper.userInfo(id);
             updatedUser.setPhoto(util.updatePic(updatedUser.getPhoto()));
             return ServerResponse.createServerResponseBySuccess(updatedUser, "邮箱修改成功");
@@ -423,12 +363,10 @@ public class UserServiceImpl implements UserService {
         return ServerResponse.createServerResponseByFail("修改失败，请稍后重试");
     }
 
-    /**
-     * 注销用户账号
-     */
+
     @Override
     public ServerResponse deleteAccount(int id) {
-        // 执行数据库删除操作
+
         int result = userMapper.deleteUserById(id);
         if (result > 0) {
             return ServerResponse.createServerResponseBySuccess("账号已注销");

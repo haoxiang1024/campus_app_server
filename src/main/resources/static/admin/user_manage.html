@@ -1,11 +1,11 @@
 <link href="./css/sweetalert2.min.css" rel="stylesheet">
 
 <style>
-    /* 状态开关及禁用按钮样式 */
+
     .form-check-input.status-switch:checked { background-color: #00aaff; border-color: #00aaff; }
     .btn-outline-custom:disabled { cursor: not-allowed; opacity: 0.5; }
 
-    /* 页面基础样式 */
+
     .text-custom-blue { color: #00aaff !important; }
     .table-avatar-zoom { transition: transform 0.2s ease; }
     .table-avatar-zoom:hover {
@@ -231,21 +231,21 @@
         const pageSize = 10;
         let allUsersData = [];
 
-        // 格式化图片地址
+
         function getPhotoUrl(photo) {
             if (!photo) return './svgs/solid/circle-user.svg';
             if (photo.startsWith('http')) return photo;
             return '/school/upload/' + photo;
         }
 
-        // 格式化时间戳
+
         function formatDate(ts) {
             if (!ts) return '未设置';
             const d = new Date(ts);
             return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
         }
 
-        // 渲染表格数据
+
         function renderUserTable(list) {
             allUsersData = list;
             const $tbody = $('#userTableBody');
@@ -290,12 +290,12 @@
             });
             $tbody.html(html);
 
-            // 绑定状态切换事件
+
             $('.status-switch').off('change').on('change', function() {
                 updateUserStatus([$(this).data('id')], this.checked ? 1 : 0);
             });
 
-            // 绑定编辑回显事件
+
             $('.btn-edit-user').off('click').on('click', function() {
                 const user = allUsersData.find(item => item.id == $(this).data('id'));
                 if (user) {
@@ -311,14 +311,14 @@
                 }
             });
 
-            // 绑定重置密码事件
+
             $('.btn-reset-pwd').off('click').on('click', function() {
                 const id = $(this).data('id');
                 window.Toast.confirm('重置确认', '确定要将该用户的密码重置为 a12345678 吗？', () => resetPassword([id]));
             });
         }
 
-        // 加载用户列表
+
         function loadUsers(page) {
             currentPage = page;
             const kw = $('#userKeyword').val().trim();
@@ -359,7 +359,7 @@
             });
         }
 
-        // 提交状态更新
+
         function updateUserStatus(ids, state) {
             $.post('/school/admin/updateUserStatus', { ids: ids.join(','), state: state }, function(res) {
                 if (res.status === 0) window.Toast.success('状态更新成功');
@@ -368,7 +368,7 @@
             });
         }
 
-        // 提交重置密码
+
         function resetPassword(ids) {
             $.post('/school/admin/resetPassword', { ids: ids.join(',') }, function(res) {
                 if (res.status === 0) window.Toast.success('密码已成功重置');
@@ -377,16 +377,16 @@
             });
         }
 
-        // 打开新增弹窗
+
         window.openAddModal = function() {
             $('#addUserForm')[0].reset();
-            // 重置密码输入框类型为 password 并恢复图标
+
             $('#addPasswordInput').attr('type', 'password');
             $('#toggleAddPassword i').removeClass('fa-eye-slash').addClass('fa-eye');
             $('#addUserModal').modal('show');
         };
 
-        // 切换密码显示隐藏状态
+
         $('#toggleAddPassword').on('click', function() {
             const pwdInput = $('#addPasswordInput');
             const icon = $(this).find('i');
@@ -399,7 +399,7 @@
             }
         });
 
-        // 提交新增用户
+
         $('#btnSubmitAdd').on('click', function() {
             const form = $('#addUserForm')[0];
             if (!form.checkValidity()) {
@@ -429,22 +429,22 @@
             });
         });
 
-        // 绑定过滤事件
+
         $('#btnSearchUser').on('click', () => loadUsers(1));
         $('#userKeyword').on('keypress', e => { if(e.which === 13) loadUsers(1); });
         $('#userState').on('change', () => loadUsers(1));
         $('#userRole').on('change', () => loadUsers(1));
 
-        // 绑定分页事件
+
         $('#btnFirstPage').on('click', () => loadUsers(1));
         $('#btnLastPage').on('click', () => loadUsers(totalPages));
         $('#btnPrevPage').on('click', () => { if(currentPage > 1) loadUsers(currentPage - 1); });
         $('#btnNextPage').on('click', () => { if(currentPage < totalPages) loadUsers(currentPage + 1); });
 
-        // 绑定全选事件
+
         $('#selectAll').on('change', function() { $('.user-checkbox').prop('checked', this.checked); });
 
-        // 提交编辑表单数据
+
         $('#btnSubmitEdit').on('click', function() {
             const formData = new FormData(document.getElementById('editUserForm'));
             $.ajax({
@@ -465,7 +465,7 @@
             });
         });
 
-        // 批量启用
+
         $('#btnBatchEnable').off('click').on('click', function() {
             const selectedIds = $('.user-checkbox:checked').map((i, el) => el.value).get();
             if (!selectedIds.length) return window.Toast.error('请选择用户');
@@ -488,7 +488,7 @@
             window.Toast.confirm('确认批量启用', msg, () => updateUserStatus(targetIds, 1));
         });
 
-        // 批量禁用
+
         $('#btnBatchDisable').off('click').on('click', function() {
             const selectedIds = $('.user-checkbox:checked').map((i, el) => el.value).get();
             if (!selectedIds.length) return window.Toast.error('请选择用户');
@@ -511,14 +511,14 @@
             window.Toast.confirm('确认批量禁用', msg, () => updateUserStatus(targetIds, 0));
         });
 
-        // 批量重置
+
         $('#btnBatchReset').click(function() {
             const ids = $('.user-checkbox:checked').map((i, el) => el.value).get();
             if (!ids.length) return window.Toast.error('请选择用户');
             window.Toast.confirm('重置确认', `确认重置选中用户的密码吗？`, () => resetPassword(ids));
         });
 
-        // 预览头像
+
         $('#editPhoto').on('change', function() {
             const file = this.files[0];
             if (file) {

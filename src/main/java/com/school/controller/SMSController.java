@@ -19,12 +19,7 @@ import java.util.Random;
 public class SMSController {
 
 
-    /**
-     * @param phone  手机号
-     * @param codes  验证码
-     * @param opCode 操作码，用于判断是发送验证码还是校验验证码  send发送短信，verify验证短信
-     * @return
-     */
+
     @ResponseBody
     @RequestMapping("/sms")
     public ServerResponse SMS(String phone, String codes, String opCode) {
@@ -38,10 +33,10 @@ public class SMSController {
             String mobile_code = Integer.toString(random.nextInt(900000) + 100000);
 
             String content = "您的验证码是：" + mobile_code + "。请不要把验证码泄露给其他人。";
-            //发送短信  参考网站 https://user.ihuyi.com/new/login.html
-            NameValuePair[] data = {//提交短信
-                    new NameValuePair("account", "C27056597"), //查看用户名 登录用户中心->验证码通知短信>产品总览->API接口信息->APIID
-                    new NameValuePair("password", "dd3fa0ffe431b5fc5e50b2f70ecae9cd"), //查看密码 登录用户中心->验证码通知短信>产品总览->API接口信息->APIKEY
+
+            NameValuePair[] data = {
+                    new NameValuePair("account", "C27056597"),
+                    new NameValuePair("password", "dd3fa0ffe431b5fc5e50b2f70ecae9cd"),
                     new NameValuePair("mobile", phone),
                     new NameValuePair("content", content),
             };
@@ -64,20 +59,9 @@ public class SMSController {
                 }
 
             } catch (IOException | DocumentException e) {
-                // TODO Auto-generated catch block
+
                 e.printStackTrace();
             }
-        } else if (opCode.equals("verify")) {
-//            //从缓存中读取手机号和验证码
-//            String phone1 = String.valueOf(redisService.get("phone"));
-//            String mobile_code = String.valueOf(redisService.get("mobile_code"));
-//            if (codes.equals(mobile_code) && phone.equals(phone1)) {
-//                //验证成功
-//                return ServerResponse.createServerResponseBySuccess("手机号验证成功!");
-//            } else {
-//                //验证失败
-//                return ServerResponse.createServerResponseByFail(1, "手机号验证失败!");
-//            }
         }
         return ServerResponse.createServerResponseBySuccess("未知操作");
     }

@@ -18,16 +18,16 @@ public class SensitiveWordLoader {
     @Autowired
     private SensitiveWordUtil sensitiveWordUtil;
 
-    // 初始化加载
+
     @PostConstruct
     public void init() {
         refreshWordCount();
     }
 
-    // 从TXT文件加载敏感词库
+
     public void refreshWordCount() {
         Set<String> words = new HashSet<>();
-        // 定义文件路径
+
         String filePath = System.getProperty("user.dir") + File.separator + "upload" + File.separator + "sensitive_words.txt";
         File file = new File(filePath);
         if (file.exists()) {
@@ -43,7 +43,7 @@ public class SensitiveWordLoader {
             }
         }
 
-        // 初始化到工具类
+
         sensitiveWordUtil.initKeyWord(words);
     }
 }

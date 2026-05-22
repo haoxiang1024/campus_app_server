@@ -5,7 +5,7 @@
     <title>留言管理</title>
     <link href="./css/sweetalert2.min.css" rel="stylesheet">
     <style>
-        /* 页面基础样式 */
+
         .content-wrapper {
             background: #ffffff !important;
             border-radius: 12px;
@@ -21,7 +21,7 @@
         .btn-outline-custom:disabled { cursor: not-allowed; opacity: 0.5; }
         .btn-link { text-decoration: none !important; }
         .form-select-sm { border-color: #dee2e6 !important; color: #666; }
-        /* 留言内容防溢出 */
+
         .msg-content { max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     </style>
 </head>
@@ -111,14 +111,14 @@
         const pageSize = 10;
         let allData = [];
 
-        // 格式化时间
+
         function formatDate(ts) {
             if (!ts) return '-';
             const d = new Date(ts);
             return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
         }
 
-        // 加载留言数据
+
         function loadData(page) {
             currentPage = page;
             const keyword = $('#searchInput').val().trim();
@@ -150,7 +150,7 @@
             });
         }
 
-        // 渲染表格
+
         function renderTable(data) {
             let html = '';
             if (!data.length) {
@@ -160,12 +160,12 @@
                     let badgeClass = 'bg-secondary';
                     let stateText = '未知状态';
 
-                    // 状态判断
+
                     if(item.state == 0) { badgeClass = 'bg-info'; stateText = '待审核'; }
                     else if(item.state == 1) { badgeClass = 'bg-success'; stateText = '已通过'; }
                     else if(item.state == 2) { badgeClass = 'bg-danger'; stateText = '已驳回'; }
 
-                    // 动态生成操作按钮
+
                     let btns = `<button class="btn btn-sm btn-link text-custom-blue p-0 me-2" onclick="showDetail(${item.id})">详情</button>`;
                     if(item.state == 0) {
                         btns += `<button class="btn btn-sm btn-link text-success p-0 me-2 fw-bold" onclick="updateStatus(${item.id}, '已通过')">通过</button>`;
@@ -177,7 +177,7 @@
                     }
                     btns += `<button class="btn btn-sm btn-link text-danger p-0" onclick="deleteItem(${item.id})">删除</button>`;
 
-                    // 区分层级
+
                     let levelBadge = (!item.parentId || item.parentId === 0)
                         ? `<span class="text-primary fw-bold">主留言</span>`
                         : `<span class="text-muted">楼层回复</span>`;
@@ -197,7 +197,7 @@
             $('#msgTableBody').html(html);
         }
 
-        // 批量操作通用函数
+
         function batchOperate(targetStateText, confirmTitle, successMsg) {
             const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get();
             if (!selectedIds.length) return window.Toast.error('请先勾选项目');
@@ -233,11 +233,11 @@
             window.Toast.confirm(confirmTitle, `确定要将这 ${targetItems.length} 条记录标记为【${targetStateText}】吗？`, executeBatch);
         }
 
-        // 绑定批量操作
+
         $('#batchApproveBtn').on('click', () => batchOperate('已通过', '批量通过', '审核通过'));
         $('#batchRejectBtn').on('click', () => batchOperate('已驳回', '批量驳回', '已驳回'));
 
-        // 批量删除
+
         $('#batchDeleteBtn').on('click', function() {
             const selectedIds = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get();
             if (!selectedIds.length) return window.Toast.error('请勾选要删除的项目');
@@ -254,7 +254,7 @@
             });
         });
 
-        // 单个审核操作
+
         window.updateStatus = (id, stateText) => {
             const confirmMsg = stateText === '已驳回' ? '确认驳回该留言吗？' : '确认通过该留言吗？';
             const titleMsg = stateText === '已驳回' ? '审核驳回' : '审核通过';
@@ -263,7 +263,7 @@
             });
         };
 
-        // 发送更新请求
+
         function sendUpdateRequest(id, stateText, reason) {
             const stateCode = stateText === '已通过' ? 1 : 2;
 
@@ -283,7 +283,7 @@
             });
         }
 
-        // 单个删除
+
         window.deleteItem = (id) => {
             window.Toast.confirm("删除确认", "确定永久删除此留言吗？", () => {
                 $.post('/school/admin/deleteMessage', { messageId: id }, (res) => {
@@ -292,7 +292,7 @@
             });
         };
 
-        // 查看详情
+
         window.showDetail = (id) => {
             const item = allData.find(u => u.id == id);
             if (!item) return;
@@ -320,7 +320,7 @@
             new bootstrap.Modal('#detailModal').show();
         };
 
-        // 事件监听
+
         $('#searchBtn').on('click', () => loadData(1));
         $('#searchInput').on('keypress', e => { if(e.which === 13) loadData(1); });
         $('#stateFilter').on('change', () => loadData(1));
@@ -331,7 +331,7 @@
         $('#btnPrevPage').on('click', () => { if(currentPage > 1) loadData(currentPage - 1); });
         $('#btnNextPage').on('click', () => { if(currentPage < totalPages) loadData(currentPage + 1); });
 
-        // 初始化加载
+
         loadData(1);
     })();
 </script>

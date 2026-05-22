@@ -4,17 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 
-/**
- * 封装前端返回的统一实体类
- *
- * @param <T>
- */
+
 @Data
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)//只包含非空字段
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class ServerResponse<T> {
-    private int status; //状态 0；接口调用成功,1调用失败,500表示出错了
-    private T data; //泛型T，当status=0，将返回的数据封装到data中
-    private String msg; //提示信息
+    private int status;
+    private T data;
+    private String msg;
 
     private ServerResponse() {
     }

@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 public class Util {
     @Value("${file.upload.path}")
     private  String uploadPath;
-    // 工作因子
+
     private static final int WORK_FACTOR = 12;
     private static RongCloudApi staticRongCloudApi;
     @Autowired
@@ -35,9 +35,7 @@ public class Util {
     public void init(){
         staticRongCloudApi = this.rongCloudApi;
     }
-    /**
-     * @return 返回随机昵称
-     */
+
     public static String NickNameRandom() {
         String[] TWO_LETTERS = {"阿宝", "蓝妹", "娃娃", "小花", "小丸", "皮蛋",
                 "乐乐", "小兔", "茶茶", "奶糖", "亲亲", "小虎",
@@ -59,27 +57,24 @@ public class Util {
                 "小小雅", "小呆呆", "小寿司", "小饼干", "小雪糕", "小水蜜桃",
                 "小可爱茶", "小甜甜梦"};
         final Random rand = new Random();
-        int type = rand.nextInt(2); // 随机选择两个或三个字的昵称
+        int type = rand.nextInt(2);
         if (type == 0) {
             return TWO_LETTERS[rand.nextInt(TWO_LETTERS.length)];
         } else {
             return THREE_LETTERS[rand.nextInt(THREE_LETTERS.length)];
         }
     }
-    //随机性别
+
     public static String SexRandom(){
         final Random rand = new Random();
         int type = rand.nextInt(2);
-        // 根据随机数返回对应的性别
+
         return type == 0 ? "男" : "女";
     }
-    /**
-     * @param oldPic 原图地址
-     * @return 新图地址
-     */
+
     public String updatePic(String oldPic) {
         Pattern pattern = Pattern.compile(".*http.*");
-        Matcher matcher = pattern.matcher(oldPic); // 将正则表达式应用到输入字符串上
+        Matcher matcher = pattern.matcher(oldPic);
         String savePath = "http://"+Ip.getIp()+":8081/school/upload/";
         //String savePath = "http://123.207.51.104:8081/school/upload/";
         if (!matcher.matches()) {
@@ -88,11 +83,7 @@ public class Util {
         return oldPic;
     }
 
-    /**
-     *
-     * @return 返回随机图片地址从搜狗图片网站获取
-     * @throws Exception 抛出异常
-     */
+
 
     public static String ImageSearch(String query) throws Exception {
         String url = "https://pic.sogou.com/pics?query=" + URLEncoder.encode(query, "utf-8");
@@ -126,40 +117,34 @@ public class Util {
         String fileName = UUID.randomUUID() + ".jpg";
         try {
             File dest = new File(savePath + fileName);
-            file.transferTo(dest); // 执行保存
-            return fileName; // 返回给前端的相对 URL
+            file.transferTo(dest);
+            return fileName;
         } catch (IOException e) {
             e.printStackTrace();
             return "上传失败：" + e.getMessage();
         }
     }
-    /**
-     * 加密明文密码
-     */
+
     public static String encryptPwd(String plainPassword) {
         if (plainPassword == null || plainPassword.trim().isEmpty()) {
             throw new IllegalArgumentException("密码不能为空");
         }
-        // 生成随机盐
+
         String salt = BCrypt.gensalt(WORK_FACTOR);
-        // 加盐哈希
+
         return BCrypt.hashpw(plainPassword, salt);
     }
 
-    /**
-     * 验证密码
-     */
+
     public static boolean verifyPwd(String plainPassword, String hashedPassword) {
         if (plainPassword == null || hashedPassword == null) {
             return false;
         }
-        // 自动从哈希值中提取盐，重新计算并对比
+
         return BCrypt.checkpw(plainPassword, hashedPassword);
     }
-    //IM注册
-    /**
-     * 执行用户注册并获取 Token
-     */
+
+
     public static String registerUserToProvider(String uid, String nickname, String avatarUrl) {
         try {
             return staticRongCloudApi.getToken(uid, nickname, avatarUrl);

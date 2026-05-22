@@ -38,7 +38,7 @@
 <script src="./js/sweetalert2@11.js"></script>
 <script src="./js/jquery.min.js"></script>
 <script>
-    // 密码显示/隐藏切换
+
     $('#togglePasswordBtn').on('click', function() {
         const pwdInput = $('#passwordInput');
         const icon = $(this).find('i');
@@ -51,10 +51,10 @@
         }
     });
 
-    // 防抖标识
+
     let isSubmitting = false;
 
-    // 统一提示工具类
+
     const Toast = {
         success: (msg) => {
             Swal.fire({
@@ -131,17 +131,21 @@
             url: '/school/login',
             type: 'POST',
             data: loginData,
-            timeout: 10000, // 超时时间10秒
-            dataType: 'json', // 期望返回JSON
+            timeout: 10000,
+            dataType: 'json',
             success: function(res) {
                 console.log("服务器返回：", res);
-                // 适配服务端状态码
+
                 if (res.status === 0) {
-                    // 存储用户信息
+
                     const loginData = res.data;
-                    const userInfo = loginData.userInfo; // 用户信息
-                    const token = loginData.token;       // Token
-                    // 存储用户信息
+                    const userInfo = loginData.userInfo;
+                    const token = loginData.token;
+                    if (userInfo.role===0) {
+                        Toast.error('非管理员用户登录！');
+                        return;
+                    }
+
                     sessionStorage.setItem("adminUser", JSON.stringify(userInfo));
                     sessionStorage.setItem("token", token);
                     Toast.success('登录成功');
@@ -155,7 +159,7 @@
             error: function(xhr, status, error) {
                 let errorMsg = "服务器内部错误";
                 if (xhr.responseJSON) {
-                    // 解析服务端返回的错误信息
+
                     errorMsg = xhr.responseJSON.msg || errorMsg;
                 } else if (status === 'timeout') {
                     errorMsg = '请求超时，请检查网络';

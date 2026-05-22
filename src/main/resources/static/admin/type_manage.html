@@ -101,7 +101,7 @@
         const pageSize = 10;
         let allData = [];
 
-        // 加载分类数据
+
         function loadData(page) {
             currentPage = page || 1;
             const keyword = $('#searchInput').val().trim();
@@ -114,7 +114,7 @@
                 keyword: keyword
             }, function(res) {
                 if(res && res.status === 0 && res.data) {
-                    // 如果后端未做分页，直接返回的是数组，做一下兼容处理
+
                     let list = res.data.list || res.data;
                     allData = list;
                     const totalItems = res.data.total || list.length;
@@ -135,7 +135,7 @@
             });
         }
 
-        // 渲染表格
+
         function renderTable(data) {
             let html = '';
             if (!data || !data.length) {
@@ -157,7 +157,7 @@
             $('#typeTableBody').html(html);
         }
 
-        // 批量删除
+
         $('#batchDeleteBtn').on('click', function() {
             const selectedIds = $('.item-checkbox:checked').map(function() {
                 return $(this).val();
@@ -179,7 +179,7 @@
             });
         });
 
-        // 删除单个
+
         window.deleteItem = (id) => {
             if (!id) return window.Toast.error('无效的记录ID');
 
@@ -202,7 +202,7 @@
             form.reset();
 
             if (id) {
-                // 编辑模式
+
                 const item = allData.find(u => u.id == id);
                 if(item) {
                     $('#modalTitle').text('编辑分类');
@@ -233,7 +233,7 @@
                 if (res && res.status === 0) {
                     window.Toast.success(id ? "修改成功" : "新增成功");
                     bootstrap.Modal.getInstance('#typeModal').hide();
-                    loadData(id ? currentPage : 1); // 修改留在当前页，新增跳到第一页
+                    loadData(id ? currentPage : 1);
                 } else {
                     window.Toast.error(res?.msg || "操作失败");
                 }
@@ -242,7 +242,7 @@
             });
         };
 
-        // 事件绑定
+
         $('#searchBtn').on('click', () => loadData(1));
         $('#searchInput').on('keypress', e => { if(e.which === 13) loadData(1); });
         $('#selectAll').on('change', function() { $('.item-checkbox').prop('checked', this.checked); });
@@ -252,7 +252,7 @@
         $('#btnPrevPage').on('click', () => { if(currentPage > 1) loadData(currentPage - 1); });
         $('#btnNextPage').on('click', () => { if(currentPage < totalPages) loadData(currentPage + 1); });
 
-        // 首次加载
+
         loadData(1);
     })();
 </script>

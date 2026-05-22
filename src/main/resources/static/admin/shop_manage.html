@@ -185,12 +185,12 @@
 
         window.saveItem = function() {
             const form = $('#itemForm')[0];
-            // 浏览器会根据 min="1" 自动拦截 0 并提示用户
+
             if (!form.checkValidity()) return form.reportValidity();
 
             const formData = new FormData(form);
 
-            // 防空文件提交
+
             const fileInput = $('#itemImageFile')[0];
             if (!fileInput.files || fileInput.files.length === 0) {
                 formData.delete('imageFile');

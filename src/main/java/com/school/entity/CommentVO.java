@@ -11,9 +11,9 @@ public class CommentVO {
     private Date create_time;
     private String state;
 
-    // 联表查询出的额外字段
-    private String nickname; // 评论人昵称
-    private String title;  // 帖子标题
+
+    private String nickname;
+    private String title;
 
     public CommentVO() {
     }

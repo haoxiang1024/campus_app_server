@@ -22,9 +22,9 @@ import java.nio.charset.StandardCharsets;
 
 @Component
 public class UserStatusInterceptor implements HandlerInterceptor {
-//先检查请求是否属于公开接口（登录、注册），是则放行
-//从Authorization头提取JWT Token，解析出用户ID
-//查询数据库校验用户是否被禁用，禁用了就返回401拦截
+
+
+
     @Autowired
     private UserMapper userMapper;
 
@@ -33,7 +33,7 @@ public class UserStatusInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        // 检查是否为免拦截的公开接口
+
         String requestURI = request.getRequestURI();
         if (requestURI.contains("/login") || requestURI.contains("/register") || requestURI.contains("/getIMUserToken")) {
             return true;
@@ -41,16 +41,16 @@ public class UserStatusInterceptor implements HandlerInterceptor {
 
         Integer userId = getCurrentUserId(request);
 
-        // 未携带 Token 或 Token 解析失败（非过期异常），放行
+
         if (userId == null) {
             return true;
         }
 
-        // 根据用户 ID 查询用户信息并校验用户状态
+
         User user = userMapper.getUserById(userId);
         if (user != null) {
             if (user.getstate() == 0) {
-                // 用户被禁用，返回 401
+
                 response.setStatus(401);
                 ServerResponse result = ServerResponse.createServerResponseByFail(401, "您的账号已被禁用，请联系管理员");
                 response.setContentType("application/json;charset=utf-8");
@@ -64,9 +64,7 @@ public class UserStatusInterceptor implements HandlerInterceptor {
         return true;
     }
 
-    /**
-     * 从 JWT Token 中解析当前用户 ID
-     */
+
     private Integer getCurrentUserId(HttpServletRequest request) throws ExpiredJwtException {
         String authHeader = request.getHeader("Authorization");
 
@@ -74,7 +72,7 @@ public class UserStatusInterceptor implements HandlerInterceptor {
             return null;
         }
 
-        // 提取 Token 字符串
+
         String token;
         if (authHeader.startsWith("Bearer ")) {
             token = authHeader.replace("Bearer ", "").trim();
@@ -106,7 +104,7 @@ public class UserStatusInterceptor implements HandlerInterceptor {
             }
 
         } catch (SignatureException e) {
-            // 签名不匹配：Token 被篡改或密钥不对，返回 null（放行）
+
             e.printStackTrace();
             return null;
         }

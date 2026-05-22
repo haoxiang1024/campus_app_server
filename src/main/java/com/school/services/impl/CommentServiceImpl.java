@@ -40,7 +40,7 @@ public class CommentServiceImpl implements CommentService {
     public ServerResponse addComment(int lostfound_id, int user_id, String content, int parent_id, int reply_user_id) {
         int status = 1;
 
-        // 敏感词检测与处罚
+
         if (sensitiveWordUtil.contains(content)) {
             status = 2;
             commentMapper.addComment(lostfound_id, user_id, content, status, parent_id, reply_user_id);
@@ -56,7 +56,7 @@ public class CommentServiceImpl implements CommentService {
             return ServerResponse.createServerResponseByFail("评论包含敏感词，扣除50积分，请重新发布内容");
         }
 
-        // 写入评论数据
+
         int row = commentMapper.addComment(lostfound_id, user_id, content, status, parent_id, reply_user_id);
         if (row > 0) {
             return ServerResponse.createServerResponseBySuccess(status == 0 ? "评论已提交审核" : "评论发布成功");
@@ -74,14 +74,14 @@ public class CommentServiceImpl implements CommentService {
         Map<Integer, Comment> commentMap = new HashMap<>();
         List<Comment> rootComments = new ArrayList<>();
 
-        // 预处理：更新图片路径、初始化回复列表、构建ID映射表
+
         for (Comment comment : allComments) {
             comment.setPhoto(util.updatePic(comment.getPhoto()));
             comment.setReplies(new ArrayList<>());
             commentMap.put(comment.getId(), comment);
         }
 
-        // 构建多级树状结构
+
         for (Comment comment : allComments) {
             if (comment.getParent_id() == 0) {
                 rootComments.add(comment);

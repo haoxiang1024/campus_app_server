@@ -164,7 +164,7 @@
 
         .emoji-picker {
             position: fixed;
-            bottom: calc(env(safe-area-inset-bottom, 12px) + 65px); /* 距离底部的高度，如果觉得离输入框太远或太近，可以微调这个 65px */
+            bottom: calc(env(safe-area-inset-bottom, 12px) + 65px);
             right: 16px;
             left: 16px;
             background: var(--white);
@@ -322,9 +322,9 @@
 </div>
 
 <script>
-    // targetParentId 为空时代表发一级留言；有值时代表发二级评论。
+
     let targetParentId = null;
-    // targetReplyUserId 记录被回复人的 ID
+
     let targetReplyUserId = null;
 
     function getQueryVariable(variable) {
@@ -424,12 +424,7 @@
 
     const BASE_URL = '/school/message';
 
-    /**
-     * 触发回复动作
-     * @param {number|string} parentId 主楼留言的 ID (保证只有两级)
-     * @param {number|string} replyUserId 被回复者的用户 ID
-     * @param {string} nickname 被回复者的昵称
-     */
+
     function handleReply(parentId, replyUserId, nickname) {
         targetParentId = parentId;
         targetReplyUserId = replyUserId;
@@ -437,15 +432,13 @@
         replyHintBar.style.display = 'flex';
         replyHintText.innerText = `正在回复 @${nickname}`;
 
-        // 输入框保持干净，不用再塞入文字前缀
+
         userInput.value = '';
         userInput.focus();
         emojiPicker.style.display = 'none';
     }
 
-    /**
-     * 取消回复状态，切回发布一级留言模式
-     */
+
     function cancelReply() {
         targetParentId = null;
         targetReplyUserId = null;
@@ -454,9 +447,7 @@
         userInput.placeholder = '留个言吧...';
     }
 
-    /**
-     * 加载留言列表
-     */
+
     async function fetchMessageList() {
         try {
             const response = await fetch(`${BASE_URL}/list`);
@@ -471,9 +462,7 @@
         }
     }
 
-    /**
-     * 渲染留言列表到页面
-     */
+
     function renderMessages(messages) {
         msgList.innerHTML = '';
 
@@ -486,7 +475,7 @@
             const card = document.createElement('div');
             card.className = 'msg-card';
 
-            // 头像
+
             let avatarContent = '';
             if (msg.photo && msg.photo.trim() !== '') {
                 avatarContent = `<img src="${msg.photo}" alt="头像" style="width: 100%; height: 100%; border-radius: 8px; object-fit: cover;">`;
@@ -505,11 +494,11 @@
                     const replyTimeStr = formatCommentTime(reply.createTime);
                     const replyAuthor = reply.nickname || '匿名用户';
 
-                    // 构建 A ▷ B 样式
-                    // A 的元素，点击 A 可以回复 A
+
+
                     let authorDisplay = `<span class="reply-user" onclick="handleReply(${msg.id}, ${reply.userId}, '${replyAuthor}')">${replyAuthor}</span>`;
 
-                    // 如果存在 B (被回复人)，则加上 ▷ B，点击 B 可以回复 B
+
                     if (reply.replyNickname) {
                         authorDisplay += `
                             <span style="color: var(--text-sub); margin: 0 4px; font-size: 11px;">▷</span>
@@ -554,9 +543,7 @@
         }, 100);
     }
 
-    /**
-     * 发送留言/评论
-     */
+
     sendBtn.onclick = async () => {
         const val = userInput.value.trim();
         if(!val) {
@@ -576,7 +563,7 @@
             requestBody.parentId = targetParentId;
         }
 
-        // 携带上被回复人的 ID
+
         if (targetReplyUserId) {
             requestBody.replyUserId = targetReplyUserId;
         }

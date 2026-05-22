@@ -91,7 +91,7 @@
     const pageSize = 10;
     let allData = [];
 
-    // 加载表格数据
+
     function loadData(page) {
       currentPage = page || 1;
       const keyword = $('#searchInput').val().trim();
@@ -119,7 +119,7 @@
       });
     }
 
-    // 渲染表格
+
     function renderTable(data) {
       let html = '';
       if (!data || !data.length) {
@@ -140,7 +140,7 @@
       $('#wordTableBody').html(html);
     }
 
-    // 批量删除
+
     $('#batchDeleteBtn').on('click', function() {
       const selectedWords = $('.item-checkbox:checked').map(function() { return $(this).val(); }).get();
       if (!selectedWords.length) return window.Toast.error('请先勾选项目');
@@ -155,7 +155,7 @@
       });
     });
 
-    // 单个删除
+
     window.deleteWord = (word) => {
       window.Toast.confirm("删除确认", `确定删除敏感词【${word}】吗？`, () => {
         $.post('/school/admin/sensitive/delete', { word: word }, (res) => {
@@ -165,13 +165,13 @@
       });
     };
 
-    // 新增弹窗
+
     window.openAddModal = () => {
       $('#addForm')[0].reset();
       new bootstrap.Modal('#addModal').show();
     };
 
-    // 提交新增
+
     window.submitWord = () => {
       const addForm = $('#addForm')[0];
       if (!addForm.checkValidity()) return addForm.reportValidity();
@@ -187,7 +187,7 @@
       }).fail(() => window.Toast.error("网络异常"));
     };
 
-    // 事件绑定
+
     $('#searchBtn').on('click', () => loadData(1));
     $('#searchInput').on('keypress', e => { if(e.which === 13) loadData(1); });
     $('#selectAll').on('change', function() { $('.item-checkbox').prop('checked', this.checked); });
@@ -196,7 +196,7 @@
     $('#btnPrevPage').on('click', () => { if(currentPage > 1) loadData(currentPage - 1); });
     $('#btnNextPage').on('click', () => { if(currentPage < totalPages) loadData(currentPage + 1); });
 
-    // 初始化
+
     loadData(1);
   })();
 </script>

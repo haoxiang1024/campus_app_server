@@ -18,7 +18,7 @@ public class SensitiveWordServiceImpl implements ISensitiveWordService {
 
     private final String FILE_PATH = System.getProperty("user.dir") + File.separator + "upload" + File.separator + "sensitive_words.txt";
 
-    // 读取所有敏感词
+
     private synchronized List<String> readAllWords() {
         List<String> words = new ArrayList<>();
         File file = new File(FILE_PATH);
@@ -38,7 +38,7 @@ public class SensitiveWordServiceImpl implements ISensitiveWordService {
         return words;
     }
 
-    // 写入敏感词到文件
+
     private synchronized void writeAllWords(List<String> words) {
         File file = new File(FILE_PATH);
         File parentDir = file.getParentFile();

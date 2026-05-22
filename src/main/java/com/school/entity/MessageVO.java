@@ -3,9 +3,7 @@ package com.school.entity;
 import java.util.Date;
 import java.util.List;
 
-/**
- * 留言展示视图对象 (包含用户头像和昵称)
- */
+
 public class MessageVO {
     private Integer id;
     private Integer userId;
@@ -13,10 +11,10 @@ public class MessageVO {
     private Date createTime;
     private String nickname;
     private String photo;
-    private Integer parentId; // 标识是否是子评论
-    private List<MessageVO> replies; // 用于存放该留言下的所有二级评论
-    private Integer replyUserId;    // 被回复人ID
-    private String replyNickname;   // 被回复人昵称
+    private Integer parentId;
+    private List<MessageVO> replies;
+    private Integer replyUserId;
+    private String replyNickname;
     private Integer state;
 
     public Integer getState() {

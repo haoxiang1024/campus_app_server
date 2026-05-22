@@ -47,7 +47,7 @@ public class ShopServiceImpl implements ShopService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)// 开启事务
+    @Transactional(rollbackFor = Exception.class)
     public ServerResponse deleteOrderById(Integer id) {
         if (id == null) {
             return ServerResponse.createServerResponseByFail("参数错误：订单ID不能为空");
@@ -57,10 +57,10 @@ public class ShopServiceImpl implements ShopService {
             return ServerResponse.createServerResponseByFail("订单不存在或已被删除");
         }
         if (exchangeOrder.getStatus() != null && exchangeOrder.getStatus() == 0) {
-            // 退还积分和库存
+
             int pointsResult = userMapper.addPoints(exchangeOrder.getUser_id(), exchangeOrder.getPoints_cost());
             shopItemMapper.addStock(exchangeOrder.getItem_id(), 1);
-            // 插入积分流水
+
             PointHistory history = new PointHistory();
             history.setUser_id(exchangeOrder.getUser_id());
             history.setDescription(exchangeOrder.getItem_name()+"被退还");
@@ -68,7 +68,7 @@ public class ShopServiceImpl implements ShopService {
             history.setPoints_changed(exchangeOrder.getPoints_cost());
             pointHistoryMapper.insert(history);
             if (pointsResult <= 0) {
-                throw new RuntimeException("退还积分失败，操作中止"); // 抛异常触发表回滚
+                throw new RuntimeException("退还积分失败，操作中止");
             }
         }
 
@@ -81,13 +81,11 @@ public class ShopServiceImpl implements ShopService {
 
         return ServerResponse.createServerResponseByFail("删除失败");
     }
-    /**
-     * 核心积分兑换逻辑
-     */
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse exchangeItem(Integer userId, Integer itemId) {
-        //  查询商品是否存在以及状态
+
         ShopItem item = shopItemMapper.selectByPrimaryKey(itemId);
         if (item == null || item.getStatus() == 0) {
             return ServerResponse.createServerResponseByFail("该商品不存在或已下架");
@@ -96,22 +94,22 @@ public class ShopServiceImpl implements ShopService {
             return ServerResponse.createServerResponseByFail("商品库存不足");
         }
 
-        //  扣减商品库存
+
         int stockRow = shopItemMapper.deductStock(itemId);
         if (stockRow == 0) {
             return ServerResponse.createServerResponseByFail("哎呀，手慢了，商品刚刚被抢光啦！");
         }
 
-        //  扣除用户积分
+
         int pointsRow = userMapper.deductPoints(userId, item.getRequired_points());
         if (pointsRow == 0) {
-            // 积分不够扣减失败，抛出异常以回滚上方扣掉的库存
+
             throw new RuntimeException("您的积分不足，无法兑换");
         }
-        //生成提货码
+
         String verifyCode = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         String orderNo = "EX" + System.currentTimeMillis();
-        //  生成订单记录
+
         ExchangeOrder order = new ExchangeOrder();
         order.setOrder_no(orderNo);
         order.setUser_id(userId);
@@ -120,10 +118,10 @@ public class ShopServiceImpl implements ShopService {
         order.setPoints_cost(item.getRequired_points());
         order.setVerify_code(verifyCode);
         exchangeOrderMapper.insertOrder(order);
-        //  插入积分变动流水
+
         PointHistory history = new PointHistory();
         history.setUser_id(userId);
-        history.setType(3); //  3 代表消耗兑换
+        history.setType(3);
         history.setPoints_changed(-item.getRequired_points());
         history.setDescription("兑换了商品：" + item.getName());
         pointHistoryMapper.insert(history);
@@ -137,9 +135,7 @@ public class ShopServiceImpl implements ShopService {
         return ServerResponse.createServerResponseBySuccess(histories);
     }
 
-    /**
-     * 管理员核验提货码
-     */
+
     @Override
     public ServerResponse verifyOrder(String verifyCode, Integer adminId) {
         ExchangeOrder order = exchangeOrderMapper.selectByVerifyCode(verifyCode);
@@ -150,7 +146,7 @@ public class ShopServiceImpl implements ShopService {
             return ServerResponse.createServerResponseByFail("该提货码已被核验或作废！");
         }
 
-        // 执行核验
+
         int updateCount = exchangeOrderMapper.verifyOrder(verifyCode, adminId);
         if (updateCount > 0) {
             return ServerResponse.createServerResponseBySuccess("核验成功！商品：【" + order.getItem_name() + "】");
@@ -162,7 +158,7 @@ public class ShopServiceImpl implements ShopService {
     public ServerResponse getMyOrders(Integer userId, String keyword) {
         List<ExchangeOrder> orders = exchangeOrderMapper.selectByUserIdAndKeyword(userId, keyword);
         if (orders != null) {
-            // 更新图片路径
+
             for (ExchangeOrder order : orders) {
                 order.setItem_image(util.updatePic(order.getItem_image()));
             }
@@ -172,7 +168,7 @@ public class ShopServiceImpl implements ShopService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)// 开启事务
+    @Transactional(rollbackFor = Exception.class)
     public ServerResponse deleteOrder(Integer id, Integer userId) {
         int deleteCount = exchangeOrderMapper.deleteOrder(id, userId);
         if (deleteCount > 0) {
@@ -182,9 +178,9 @@ public class ShopServiceImpl implements ShopService {
     }
 
     @Override
-    public ServerResponse getAllItems(int page, int pageSize, String keyword, Integer status) { // 接收状态参数
+    public ServerResponse getAllItems(int page, int pageSize, String keyword, Integer status) {
         PageHelper.startPage(page, pageSize);
-        List<ShopItem> list = shopItemMapper.selectAllWithSearch(keyword, status); // 传递给Mapper
+        List<ShopItem> list = shopItemMapper.selectAllWithSearch(keyword, status);
         PageInfo<ShopItem> pageInfo = new PageInfo<>(list);
 
         Map<String, Object> result = new HashMap<>();
@@ -219,7 +215,7 @@ public class ShopServiceImpl implements ShopService {
         return ServerResponse.createServerResponseBySuccess(result);
     }
 
-    // 修改商品上架状态
+
     @Override
     public ServerResponse updateStatus(Integer id, Integer status) {
         int updateStatus = shopItemMapper.updateStatus(id, status);
@@ -233,7 +229,7 @@ public class ShopServiceImpl implements ShopService {
         return ServerResponse.createServerResponseByFail("操作失败");
     }
 
-    // 实现分页获取所有积分流水
+
     @Override
     public ServerResponse getAllPointHistories(int page, int pageSize, String keyword, Integer type) {
         PageHelper.startPage(page, pageSize);
@@ -248,7 +244,7 @@ public class ShopServiceImpl implements ShopService {
         return ServerResponse.createServerResponseBySuccess(result);
     }
 
-    // 实现删除积分流水
+
     @Override
     public ServerResponse deletePointHistory(Integer id) {
         int rowCount = pointHistoryMapper.deleteById(id);

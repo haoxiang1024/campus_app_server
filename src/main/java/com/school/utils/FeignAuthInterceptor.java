@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Random;
 
-//签名实现
+
 public class FeignAuthInterceptor implements RequestInterceptor {
     private  static String secret ;
     @Value("${im.app.secret}")

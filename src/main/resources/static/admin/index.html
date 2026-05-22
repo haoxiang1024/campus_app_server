@@ -23,12 +23,16 @@
 <body>
 
 <script>
-    // 权限与用户名检查
+
     (function() {
         const data = sessionStorage.getItem("adminUser");
         console.log( data)
-        if (!data) { window.location.href = 'login.html'; return; }
         const user = JSON.parse(data);
+        if (user.role===0) {
+            Toast.error('非管理员用户登录！');
+            window.location.href = 'login.html';
+            return;
+        }
         const check = setInterval(function() {
             const el = document.getElementById('adminName');
             if (el) { el.textContent = user.nickname; clearInterval(check); }
@@ -75,10 +79,10 @@
 <script src="./js/utils.js"></script>
 <script>
     $(function() {
-        // 初始加载默认页
+
         loadContent('statistics.html');
 
-        // 点击侧边栏切换
+
         $('.sidebar .nav-link').click(function() {
             const page = $(this).attr('data-page');
             $('.sidebar .nav-link').removeClass('active');
@@ -87,7 +91,7 @@
         });
     });
 
-    // 核心加载函数
+
     function loadContent(pageName) {
         $('#displayArea').load(pageName, function(response, status, xhr) {
             if (status === "error") {
@@ -97,9 +101,9 @@
     }
 
     function logout() {
-        // 美化弹窗工具封装
+
         const Toast = {
-            // 成功提示（右上角自动消失）
+
             success: (msg) => {
                 Swal.fire({
                     icon: 'success',
@@ -108,26 +112,26 @@
                     position: 'top-end',
                     showConfirmButton: false,
                     timer: 2000,
-                    width: '220px', // 强制宽度
-                    padding: '0.5rem', // 极简内边距
+                    width: '220px',
+                    padding: '0.5rem',
                 });
             },
-            // 错误/失败提示（中间弹窗）
+
             error: (msg) => {
                 Swal.fire({
                     icon: 'error',
                     title: '操作失败',
                     text: msg,
                     confirmButtonColor: '#00aaff',
-                    width: '320px', // 锁定宽度，不再显得巨大
+                    width: '320px',
                     padding: '1.25rem',
                     customClass: {
-                        title: 'fs-6', // 使用 Bootstrap 字体类缩小标题
-                        htmlContainer: 'small' // 缩小内容字体
+                        title: 'fs-6',
+                        htmlContainer: 'small'
                     }
                 });
             },
-            // 确认对话框
+
             confirm: (title, text, callback) => {
                 Swal.fire({
                     title: title,
@@ -138,7 +142,7 @@
                     cancelButtonColor: '#6c757d',
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
-                    width: '350px', // 确认框稍宽一点点以便容纳两个按钮
+                    width: '350px',
                     padding: '1.25rem',
                     customClass: {
                         title: 'fs-6',
@@ -150,7 +154,7 @@
             }
         };
 
-// 修改后的退出逻辑
+
         Toast.confirm('确定退出吗？', '您的会话将被清除', () => {
             sessionStorage.clear();
             window.location.href = 'login.html';

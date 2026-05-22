@@ -1,7 +1,7 @@
 
 
 (function(window) {
-    // 如果已经初始化过，直接返回避免重复声明
+
     if (window.Toast) return;
 
     window.Toast = {

@@ -16,17 +16,13 @@ public class ShopController {
     private ShopService shopService;
     @Autowired
     private Util util;
-    /**
-     * 获取可兑换商品列表
-     */
+
     @ResponseBody
     @RequestMapping("/items")
     public ServerResponse getItems() {
         return shopService.getActiveShopItems();
     }
-    /**
-     * 获取所有商品列表（分页 + 模糊搜索 + 状态筛选）
-     */
+
     @ResponseBody
     @RequestMapping("/items/all")
     public ServerResponse allItems(
@@ -39,16 +35,16 @@ public class ShopController {
 
     @PostMapping("/item/save")
     public ServerResponse saveItem(ShopItem item, @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
-        // 处理图片上传
+
         if(imageFile != null && !imageFile.isEmpty()){
             String fileName = util.getFileName(imageFile);
-            // 数据库只存储文件名
+
             item.setImage_url(fileName);
         }
         return shopService.saveOrUpdateItem(item);
     }
 
-    // 修改商品上架状态
+
     @PostMapping("/updateStatus")
     public ServerResponse updateStatus(@RequestParam Integer id, @RequestParam Integer status) {
        return shopService.updateStatus(id, status);
@@ -62,16 +58,12 @@ public class ShopController {
                                      @RequestParam(value = "status", required = false) Integer status) {
         return shopService.getAllOrders(page, pageSize, keyword, status);
     }
-    /**
-     * 管理员强制删除订单接口
-     */
+
     @PostMapping("/deleteOrderById")
     public ServerResponse deleteOrderById(Integer id) {
         return shopService.deleteOrderById(id);
     }
-    /**
-     * 发起积分兑换
-     */
+
     @ResponseBody
     @RequestMapping("/exchange")
     public ServerResponse exchange(Integer userId, Integer itemId) {
@@ -84,7 +76,7 @@ public class ShopController {
             return ServerResponse.createServerResponseByFail("参数错误：商品ID不能为空");
         }
 
-        //  处理兑换逻辑
+
         try {
             return shopService.exchangeItem(userId, itemId);
         } catch (RuntimeException e) {
@@ -92,9 +84,7 @@ public class ShopController {
         }
     }
 
-    /**
-     * 获取我的积分明细
-     */
+
     @ResponseBody
     @RequestMapping("/history")
     public ServerResponse getMyPointHistory(Integer userId) {
@@ -109,13 +99,13 @@ public class ShopController {
             return ServerResponse.createServerResponseByFail("查询失败，请稍后再试");
         }
     }
-    // 获取我的订单
+
     @ResponseBody
     @RequestMapping("/myOrders")
     public ServerResponse getMyOrders(@RequestParam(required = false) Integer  userId, @RequestParam(required = false) String keyword) {
         return shopService.getMyOrders(userId, keyword);
     }
-    // 删除订单
+
     @ResponseBody
     @RequestMapping("/deleteOrder")
     public ServerResponse deleteOrder(int id, int userId) {

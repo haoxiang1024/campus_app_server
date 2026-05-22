@@ -1,11 +1,9 @@
 package com.school.entity;
-/**
- * 登录成功返回的DTO（包含用户信息+Token）
- */
+
 public class LoginResponseDTO {
-    // 用户信息
+
     private User userInfo;
-    // JWT Token
+
     private String token;
 
 

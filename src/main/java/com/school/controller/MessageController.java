@@ -12,10 +12,7 @@ public class MessageController {
     @Autowired
     private MessageService messageService;
 
-    /**
-     * 发布留言
-     *
-     */
+
     @PostMapping("/add")
     public ServerResponse addMessage(@RequestBody java.util.Map<String, Object> params) {
         Integer userId = (Integer) params.get("userId");
@@ -26,27 +23,19 @@ public class MessageController {
         return messageService.addMessage(userId, content, parentId, replyUserId);
     }
 
-    /**
-     * 获取留言列表
-     */
+
     @GetMapping("/list")
     public ServerResponse getMessageList() {
         return messageService.getMessageList();
     }
 
-    /**
-     * 根据用户ID获取留言列表
-     *
-     */
+
     @GetMapping("/userList")
     public ServerResponse getMessagesByUserId(@RequestParam("userId") Integer userId) {
         return messageService.getMessagesByUserId(userId);
     }
 
-    /**
-     * 删除留言
-     *
-     */
+
     @ResponseBody
     @PostMapping("/deleteMessage")
     public ServerResponse deleteMessage(@RequestParam("id") Integer id) {

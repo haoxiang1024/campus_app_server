@@ -17,10 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpSession;
 
 
-/**
- * 失物招领控制器类
- * 处理失物招领相关的请求，包括物品发布、信息查询、状态更新等功能
- */
+
 @Controller
 public class LostFoundController {
     @Autowired
@@ -30,34 +27,21 @@ public class LostFoundController {
     @Autowired
     private Util util;
 
-    /**
-     * 获取所有失物招领分类
-     * @return 返回ServerResponse对象，包含所有分类信息
-     */
+
     @ResponseBody
     @RequestMapping("/getAllType")
     public ServerResponse getAllType() {
         return lostFoundTypeService.getAllType();
     }
 
-    /**
-     * 根据标题和类型获取详细信息
-     * @param title 标题
-     * @param type 类型
-     * @return 返回ServerResponse对象，包含符合条件的详细信息
-     */
+
     @ResponseBody
     @RequestMapping("/DetailByTitle")
     public ServerResponse getDetailByTitle(String title,String type) {
         return lostFoundService.getDetailByTitle(title,type);
     }
 
-    /**
-     * 根据ID获取用户名并存储到session中
-     * @param session HTTP会话对象
-     * @param id 用户ID
-     * @return 返回ServerResponse对象，包含用户名信息
-     */
+
     @ResponseBody
     @RequestMapping("/getUname")
     public ServerResponse getUname(HttpSession session, int id) {
@@ -68,64 +52,41 @@ public class LostFoundController {
         return lostDetailUserName;
     }
 
-    /**
-     * 根据名称获取类型ID
-     * @param name 类型名称
-     * @return 返回ServerResponse对象，包含对应的类型ID
-     */
+
     @ResponseBody
     @RequestMapping("/getIdByName")
     public ServerResponse getIdByName(String name) {
         return lostFoundTypeService.getIdByName(name);
     }
 
-    /**
-     * 根据用户ID获取发布的失物招领信息
-     * @param user_id 用户ID
-     * @return 返回ServerResponse对象，包含该用户发布的所有失物招领信息
-     */
+
     @ResponseBody
     @RequestMapping("/getLostFoundByUserId")
     public ServerResponse getLostFoundByUserId(int user_id) {
         return lostFoundService.getLostFoundByUserId(user_id);
     }
 
-    /**
-     * 更新失物招领信息状态
-     * @param id 失物招领信息ID
-     * @param state 新状态值
-     * @param user_id 用户ID
-     * @return 返回ServerResponse对象，包含更新结果信息
-     */
+
     @ResponseBody
     @RequestMapping("/updateState")
     public ServerResponse updateState(int id, String state, int user_id) {
         return lostFoundService.updateState(id, state, user_id);
     }
 
-    /**
-     * 获取置顶列表信息
-     * @param stick 置顶标识
-     * @return 返回ServerResponse对象，包含置顶的失物招领信息列表
-     */
+
     @ResponseBody
     @RequestMapping("/showTopList")
     public ServerResponse showTopList(Integer stick) {
         return lostFoundService.showTopList(stick);
     }
 
-    /**
-     * 发布失物或招领信息
-     * @param upload_file 上传的文件
-     * @param lostFoundJson 丢失物品 招领json数据
-     * @return 返回ServerResponse对象，包含发布结果信息
-     */
+
     @ResponseBody
     @PostMapping("/addLostFound")
     public ServerResponse addLostFound(MultipartFile upload_file, String lostFoundJson) {
         String filename = util.getFileName(upload_file);
         String type = Json.getJsonValueByKey(lostFoundJson, "type").toString();
-        // 判断类型
+
         if (type != null && !type.isEmpty()) {
             String newLostFoundJson = Json.updateByKey(lostFoundJson, "img", filename);
             return lostFoundService.addLostFound(newLostFoundJson);

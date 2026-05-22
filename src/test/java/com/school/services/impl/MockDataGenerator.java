@@ -19,7 +19,7 @@ public class MockDataGenerator {
 
     @Autowired
     private LostFoundService lostFoundService;
-    // 定义分类配置实体
+
     static class CategoryConfig {
         int typeId;
         String[] keywords;
@@ -32,7 +32,7 @@ public class MockDataGenerator {
         }
     }
 
-    // 定义用户配置实体
+
     static class UserConfig {
         int id;
         String nickname;
@@ -45,7 +45,7 @@ public class MockDataGenerator {
         }
     }
 
-    // 定义地点配置实体
+
     static class PlaceConfig {
         String name;
         double lon;
@@ -58,12 +58,12 @@ public class MockDataGenerator {
         }
     }
 
-    // 生成模拟数据
+
     public void generateData() {
         String saveDirectory = "upload/";
         Random random = new Random();
 
-        // 初始化分类与目标数量
+
         CategoryConfig[] categories = {
                 new CategoryConfig(1, new String[]{"手机", "耳机"}, 6),
                 new CategoryConfig(2, new String[]{"身份证", "校园卡"}, 5),
@@ -72,7 +72,7 @@ public class MockDataGenerator {
                 new CategoryConfig(5, new String[]{"钥匙", "雨伞"}, 5)
         };
 
-        // 初始化用户数据
+
         UserConfig[] users = {
                 new UserConfig(1, "admin", "18682675515"),
                 new UserConfig(2, "小卷毛", "15181544770"),
@@ -81,7 +81,7 @@ public class MockDataGenerator {
                 new UserConfig(5, "阿宝", "17673297533")
         };
 
-        // 初始化地点数据
+
         PlaceConfig[] places = {
                 new PlaceConfig("西南科技大学(青义校区)-西7教学楼", 104.693323, 31.543984),
                 new PlaceConfig("西南科技大学(青义校区西区图书馆)", 104.694491, 31.540717),
@@ -90,7 +90,7 @@ public class MockDataGenerator {
                 new PlaceConfig("西南科技大学东区-体育场", 104.710198, 31.543931)
         };
 
-        // 遍历分类执行生成
+
         for (CategoryConfig category : categories) {
             int countPerKeyword = (int) Math.ceil((double) category.totalNeeded / category.keywords.length);
             int generatedCount = 0;
@@ -100,11 +100,11 @@ public class MockDataGenerator {
                     if (generatedCount >= category.totalNeeded) break;
 
                     try {
-                        // 随机获取用户与地点
+
                         UserConfig user = users[random.nextInt(users.length)];
                         PlaceConfig place = places[random.nextInt(places.length)];
 
-                        // 生成基础文本参数
+
                         long dynamicPubDate = System.currentTimeMillis();
                         boolean isFound = random.nextBoolean();
                         String actionTitle = isFound ? "找到" : "丢失";
@@ -114,7 +114,7 @@ public class MockDataGenerator {
                         String dynamicTitle = actionTitle + keyword;
                         String dynamicContent = "在 " + place.name + " " + actionTitle + "了" + keyword + "，联系电话：" + user.phone;
 
-                        // 获取网络图片并下载
+
                         String photoUrl = Util.ImageSearch(keyword);
                         String fileName = UUID.randomUUID() + ".jpg";
                         Path targetPath = Paths.get(saveDirectory, fileName);
@@ -125,7 +125,7 @@ public class MockDataGenerator {
                             Files.copy(in, targetPath, StandardCopyOption.REPLACE_EXISTING);
                         }
 
-                        // 拼接完整JSON数据
+
                         String newLostJson = String.format(
                                 "{" +
                                         "\"title\":\"%s\"," +
@@ -158,7 +158,7 @@ public class MockDataGenerator {
                                 place.lat
                         );
 
-                        // 写入数据库
+
 
                          //lostFoundService.addLostFound(newLostJson);
 

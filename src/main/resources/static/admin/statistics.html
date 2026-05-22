@@ -5,10 +5,10 @@
     .stat-card { transition: transform 0.3s ease, box-shadow 0.3s ease; border-radius: 0.75rem; }
     .stat-card:hover { transform: translateY(-5px); box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important; }
     .icon-box { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
-    /* 隐藏GL地图控件 */
+
     .BMap_cpyCtrl, .anchorBL { display: none !important; }
 
-    /* 自定义滚动条 */
+
     .custom-info-window::-webkit-scrollbar { width: 6px; }
     .custom-info-window::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
     .custom-info-window::-webkit-scrollbar-track { background: transparent; }
@@ -157,7 +157,7 @@
     $(function() {
         let dataMap = { users: 0, lost: 0, found: 0, items: 0, orders: 0, messages: 0, comments: 0, types: 0 };
 
-        // 发起数据请求
+
         const reqs = [
             $.get('/school/admin/getAllUser').then(res => { if(res?.status === 0) dataMap.users = Array.isArray(res.data) ? res.data.length : (res.data || 0); }),
             $.get('/school/admin/getAllLostFoundCount', { type: '失物' }).then(res => { if(res?.status === 0) dataMap.lost = res.data || 0; }),
@@ -169,7 +169,7 @@
             $.get('/school/getAllType').then(res => { if(res?.status === 0) dataMap.types = Array.isArray(res.data) ? res.data.length : (res.data || 0); })
         ];
 
-        // 绑定数据到UI
+
         Promise.allSettled(reqs).then(() => {
             $('#s_totalUsers').text(dataMap.users);
             $('#s_totalLost').text(dataMap.lost);
@@ -182,7 +182,7 @@
             initCharts(dataMap);
         });
 
-        // 初始化图表
+
         function initCharts(data) {
             const chartPie = echarts.init(document.getElementById('lostFoundChart'));
             chartPie.setOption({
@@ -214,7 +214,7 @@
             window.addEventListener('resize', () => { chartPie.resize(); chartBar.resize(); });
         }
 
-        // 初始化地图
+
         window.initMap = function() {
             const map = new BMapGL.Map("lostFoundMap");
             const point = new BMapGL.Point(104.701646, 31.540942);
@@ -222,7 +222,7 @@
             map.enableScrollWheelZoom(true);
             map.setTilt(0);
 
-            // 自定义图例控件
+
             function LegendControl() {
                 this.defaultAnchor = BMAP_ANCHOR_TOP_LEFT;
                 this.defaultOffset = new BMapGL.Size(15, 15);
@@ -251,12 +251,12 @@
             };
             map.addControl(new LegendControl());
 
-            // 附带尺寸属性的蓝色图标
+
             const blueIconSvg = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMCIgaGVpZ2h0PSI0MiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSIjMGQ2ZWZkIiBkPSJNMTIgMkM4LjEzIDIgNSA1LjEzIDUgOWMwIDUuMjUgNyAxMyA3IDEzczctNy43NSA3LTEzYzAtMy44Ny0zLjEzLTctNy03em0wIDkuNWMtMS4zOCAwLTIuNS0xLjEyLTIuNS0yLjVzMS4xMi0yLjUgMi41LTIuNSAyLjUgMS4xMiAyLjUgMi41LTEuMTIgMi41LTIuNSAyLjV6Ii8+PC9zdmc+";
-            // 附带尺寸属性的红色图标
+
             const redIconSvg = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMCIgaGVpZ2h0PSI0MiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSIjZGMzNTQ1IiBkPSJNMTIgMkM4LjEzIDIgNSA1LjEzIDUgOWMwIDUuMjUgNyAxMyA3IDEzczctNy43NSA3LTEzYzAtMy44Ny0zLjEzLTctNy03em0wIDkuNWMtMS4zOCAwLTIuNS0xLjEyLTIuNS0yLjVzMS4xMi0yLjUgMi41LTIuNSAyLjUgMS4xMiAyLjUgMi41LTEuMTIgMi41LTIuNSAyLjV6Ii8+PC9zdmc+";
 
-            // 添加标记点
+
             const addMarkerGroup = (items, typeName, lng, lat, iconSvg) => {
                 if(items.length === 0) return;
 
@@ -310,7 +310,7 @@
                 marker.addEventListener("click", () => map.openInfoWindow(infoWindow, markerPoint));
             };
 
-            // 获取数据并处理重叠
+
             $.get('/school/showTopList').then(res => {
                 if(res?.status === 0 && res.data) {
                     let locationMap = {};
@@ -344,7 +344,7 @@
             });
         };
 
-        // 异步加载地图脚本
+
         function loadBaiduMap() {
             const ak = (typeof MAP_CONFIG !== 'undefined') ? MAP_CONFIG.baiduAK : "YOUR_FALLBACK_AK";
             const script = document.createElement("script");

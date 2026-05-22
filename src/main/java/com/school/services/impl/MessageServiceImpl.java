@@ -41,24 +41,24 @@ public class MessageServiceImpl implements MessageService {
         Date now = DateUtil.getTime();
         Integer pId = (parentId == null) ? 0 : parentId;
 
-        // 传入 replyUserId
-        //敏感词检测
+
+
         if(sensitiveWordUtil.contains(content)){
-            Message msg = new Message(userId, content, now, 2, pId, replyUserId);//驳回
+            Message msg = new Message(userId, content, now, 2, pId, replyUserId);
             messageMapper.insertMessage(msg);
-            //扣除积分
+
             userMapper.deductPoints(msg.getUserId(),50 );
-            //记录积分流水
+
             PointHistory history = new PointHistory();
             history.setUser_id(userId);
-            history.setType(4); //系统扣除
+            history.setType(4);
             history.setPoints_changed(-50);
             history.setDescription("发布违规留言");
             pointHistoryMapper.insert(history);
 
             return ServerResponse.createServerResponseByFail("留言包含敏感词，扣除50积分，请重新发布内容");
         }
-        Message msg = new Message(userId, content, now, 1, pId, replyUserId);//审核
+        Message msg = new Message(userId, content, now, 1, pId, replyUserId);
         int result = messageMapper.insertMessage(msg);
         if (result > 0) {
             return ServerResponse.createServerResponseBySuccess("留言发布成功");
@@ -82,9 +82,9 @@ public class MessageServiceImpl implements MessageService {
             }
 
             if (vo.getParentId() == null || vo.getParentId() == 0) {
-                rootMessages.add(vo); // 收集主楼
+                rootMessages.add(vo);
             } else {
-                replyMessages.add(vo); // 收集评论
+                replyMessages.add(vo);
             }
         }
 
@@ -103,16 +103,16 @@ public class MessageServiceImpl implements MessageService {
     public ServerResponse getAdminMessagePage(int page, int pageSize, String keyword, Integer state) {
         int offset = (page - 1) * pageSize;
 
-        // 查询总数
+
         int total = messageMapper.countAdminMessages(keyword, state);
 
-        // 查询当前页数据
+
         List<MessageVO> list = messageMapper.getAdminMessageList(offset, pageSize, keyword, state);
 
-        // 计算总页数
+
         int totalPages = (int) Math.ceil((double) total / pageSize);
         if (totalPages == 0) totalPages = 1;
-        // 封装前端需要的分页对象
+
         Map<String, Object> data = new HashMap<>();
         data.put("list", list);
         data.put("total", total);
@@ -120,7 +120,7 @@ public class MessageServiceImpl implements MessageService {
 
         return ServerResponse.createServerResponseBySuccess(data, "获取成功");
     }
-    // 提取积分流水记录方法
+
     private void recordPointHistory(Integer userId, int historyType, int pointsChange, String description) {
         PointHistory history = new PointHistory();
         history.setUser_id(userId);
@@ -132,13 +132,13 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public ServerResponse updateCommentStatus(Integer commentId, Integer state) {
         Msg message = messageMapper.getMessageById(commentId);
-        int oldState = message.getState();  // 获取当前状态
-        int newState = state;  // 要更新的目标状态
+        int oldState = message.getState();
+        int newState = state;
         int row = messageMapper.updateMessageState(commentId, state);
         if (row > 0) {
-            // 处理积分
+
             if (newState == 2 && oldState != 2) {
-                // 驳回，扣除50积分
+
                 userMapper.addPoints(message.getUser_id(), -50);
                 recordPointHistory(message.getUser_id(), 4, -50, "留言被驳回，扣除用户积分");
             } else if (newState != 2 && oldState == 2) {
@@ -152,7 +152,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public ServerResponse deleteCommentById(Integer commentId) {
-        //扣除用户积分
+
         Msg message = messageMapper.getMessageById(commentId);
         userMapper.addPoints(message.getUser_id(), -50);
         recordPointHistory(message.getUser_id(), 4, -50, "留言被删除，扣除用户积分");
@@ -184,7 +184,7 @@ public class MessageServiceImpl implements MessageService {
             return ServerResponse.createServerResponseBySuccess(new ArrayList<>(), "暂无留言");
         }
 
-        // 处理头像图片路径
+
         for (MessageVO vo : list) {
             if (vo.getPhoto() != null && !vo.getPhoto().isEmpty()) {
                 vo.setPhoto(util.updatePic(vo.getPhoto()));
